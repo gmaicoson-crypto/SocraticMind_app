@@ -21,36 +21,32 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gmaicoson.socraticmind.auth.SessionState
+import com.gmaicoson.socraticmind.chat.ChatActionsController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
 import com.gmaicoson.socraticmind.chat.ChatRegeneration
 import com.gmaicoson.socraticmind.chat.ChatTurnController
-import com.gmaicoson.socraticmind.chat.ChatTurnState
 import com.gmaicoson.socraticmind.chat.ConversationSummary
 import com.gmaicoson.socraticmind.chat.HistoryAccount
 import com.gmaicoson.socraticmind.chat.HistoryLoad
-import com.gmaicoson.socraticmind.chat.HistoryPageState
-import com.gmaicoson.socraticmind.chat.StoredChatMessage
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownRenderer
-import com.gmaicoson.socraticmind.messageui.MessageContent
 
 @Composable
 fun ChatLibraryScreen(
     model: ChatLibraryController,
     turn: ChatTurnController,
+    actions: ChatActionsController,
     account: SessionState.SignedIn,
     logout: () -> Unit,
     newConversation: () -> Unit,
@@ -59,10 +55,17 @@ fun ChatLibraryScreen(
 ) {
     val state by model.state.collectAsStateWithLifecycle()
     val turnState by turn.state.collectAsStateWithLifecycle()
+    val actionState by actions.state.collectAsStateWithLifecycle()
     var discardDraft by remember { mutableStateOf(false) }
     val back = {
         if (turnState.editable) {
-            if (turnState.draft.isNotEmpty()) discardDraft = true else closeConversation()
+            if (actionState.selectionSessionId != null) {
+                actions.dismiss()
+            } else if (turnState.draft.isNotEmpty()) {
+                discardDraft = true
+            } else {
+                closeConversation()
+            }
         }
     }
     val listState = rememberLazyListState()
@@ -75,7 +78,9 @@ fun ChatLibraryScreen(
         }
         HorizontalDivider()
         // Session and feature flows can be delivered in different frames; never render a mismatched account.
-        if (state.account != HistoryAccount.from(account) || turnState.account != state.account) {
+        if (state.account != HistoryAccount.from(account) || turnState.account != state.account ||
+            actionState.account != state.account
+        ) {
             CircularProgressIndicator(Modifier.padding(24.dp))
         } else {
             val selected = state.selected
@@ -85,7 +90,7 @@ fun ChatLibraryScreen(
                 TextButton(onClick = newConversation, enabled = turnState.editable) { Text("新建对话") }
                 LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
                     items(state.conversations.items, key = { "conversation:${it.sessionId}" }) { summary ->
-                        ConversationRow(summary) { selectConversation(summary.sessionId) }
+                        ConversationRow(summary, turnState.editable, actions) { selectConversation(summary.sessionId) }
                     }
                     item(key = "conversation-controls") {
                         HistoryPageControls(
@@ -102,28 +107,49 @@ fun ChatLibraryScreen(
                     selected.title?.takeIf { it.isNotBlank() } ?: "对话",
                     state.messages.loading,
                     if (turnState.editable) back else null,
-                    model::refreshMessages,
+                    model::refreshSelectedConversation,
                 )
+                if (actionState.selectionSessionId == selected.sessionId) {
+                    ChatSelectionControls(actionState, turnState.editable && !actionState.busy, actions)
+                } else {
+                    ChatManagementMenu(
+                        selected.sessionId,
+                        actions.canManage(selected.sessionId),
+                        actions,
+                        messages = state.messages.items.isNotEmpty(),
+                    )
+                }
                 if (selected.target != turnState.target) {
                     CircularProgressIndicator(Modifier.padding(24.dp))
                 } else {
                     key(selected.sessionId) {
                         MessageHistory(
                             state.messages,
-                            model::refreshMessages,
+                            model::refreshSelectedConversation,
                             model::loadMoreMessages,
                             renderer,
                             turnState,
                             ChatRegeneration.from(state)?.answerId,
                             { turn.regenerate(model.state.value, account.user.aiStyle) },
+                            actionState,
+                            actions::toggleMessage,
                             Modifier.weight(1f),
                         )
                     }
                 }
             }
-            ChatComposer(turnState, turn, account.user.aiStyle, selected != null && selected.target == turnState.target)
+            if (actionState.dialog == null) actionState.notice?.let { Text(it, Modifier.padding(12.dp)) }
+            if (actionState.selectionSessionId == null) {
+                ChatComposer(
+                    turnState,
+                    turn,
+                    account.user.aiStyle,
+                    selected != null && selected.target == turnState.target,
+                )
+            }
         }
     }
+    if (actionState.account == HistoryAccount.from(account)) ChatActionDialog(actionState, actions)
     if (discardDraft) {
         AlertDialog(
             onDismissRequest = { discardDraft = false },
@@ -163,10 +189,12 @@ private fun HistoryHeader(
 @Composable
 private fun ConversationRow(
     summary: ConversationSummary,
+    enabled: Boolean,
+    actions: ChatActionsController,
     select: () -> Unit,
 ) {
     Column(
-        Modifier.fillMaxWidth().clickable(onClick = select).padding(16.dp),
+        Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = select).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
@@ -182,54 +210,7 @@ private fun ConversationRow(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        ChatManagementMenu(summary.sessionId, actions.canManage(summary.sessionId), actions)
     }
     HorizontalDivider()
-}
-
-@Composable
-private fun MessageHistory(
-    page: HistoryPageState<StoredChatMessage>,
-    refresh: () -> Unit,
-    more: () -> Unit,
-    renderer: MarkdownRenderer,
-    turn: ChatTurnState,
-    regenerationId: Long?,
-    regenerate: () -> Unit,
-    modifier: Modifier,
-) {
-    val scroll = rememberLazyListState()
-    val visible = page.items.asReversed().filter(turn::showsInHistory)
-    LaunchedEffect(page.loaded) {
-        if (page.loaded && visible.isNotEmpty()) scroll.scrollToItem(visible.size)
-    }
-    LaunchedEffect(turn.pending?.requestId) {
-        if (turn.pending != null) scroll.scrollToItem(visible.size + 1)
-    }
-    LazyColumn(modifier = modifier, state = scroll, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        item(key = "message-controls") {
-            HistoryPageControls(page, "暂无可读取的消息", "加载更早消息", refresh, more)
-        }
-        items(visible, key = { it.id }) { message ->
-            MessageContent(message, renderer)
-            if (message.id == regenerationId) {
-                TextButton(
-                    onClick = regenerate,
-                    enabled = turn.canRegenerate,
-                    modifier = Modifier.testTag("chat_regenerate"),
-                ) {
-                    Text("重新生成回答")
-                }
-            }
-        }
-        if (turn.pending != null) {
-            item(key = "pending-turn") {
-                if (turn.pending?.regenerateMessageId != null) {
-                    Text("正在重新生成，完成前保留原回答。")
-                } else if (turn.submitted.isNotEmpty()) {
-                    MessageContent("user", turn.submitted, renderer)
-                }
-                MessageContent("ai", turn.partial, renderer, provisional = true)
-            }
-        }
-    }
 }

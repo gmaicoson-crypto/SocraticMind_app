@@ -246,8 +246,8 @@
       "paths": [
         "ios/Packages/MindCore/Package.swift",
         "ios/project.yml",
-        "ios/SocraticMind.xcodeproj/*",
-        "ios/Packages/MindCore/Package.resolved"
+        "ios/Packages/MindCore/Package.resolved",
+        "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
       ],
       "depends_on": [],
       "checks": {},
@@ -629,7 +629,9 @@
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/HistoryPageControls.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
-        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt"
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt"
       ],
       "depends_on": [
         "history-android",
@@ -655,7 +657,9 @@
         "ios/SocraticMind/Chat/ChatLibraryView.swift",
         "ios/SocraticMind/Chat/HistoryPageControls.swift",
         "ios/SocraticMind/App/AppModel.swift",
-        "ios/SocraticMind/App/AppRootView.swift"
+        "ios/SocraticMind/App/AppRootView.swift",
+        "ios/SocraticMind/Chat/MessageHistoryView.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift"
       ],
       "depends_on": [
         "history-ios",
@@ -695,7 +699,8 @@
         "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MessageContent.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
         "android/core/chat/build.gradle.kts",
-        "android/core/chat/gradle.lockfile"
+        "android/core/chat/gradle.lockfile",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt"
       ],
       "depends_on": [
         "markdown-fixtures",
@@ -724,7 +729,8 @@
         "ios/SocraticMind/Messages/MarkdownBlockView.swift",
         "ios/SocraticMind/Messages/MessageCopyButton.swift",
         "ios/SocraticMind/Messages/MessageContentView.swift",
-        "ios/SocraticMind/Chat/ChatLibraryView.swift"
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/SocraticMind/Chat/MessageHistoryView.swift"
       ],
       "depends_on": [
         "markdown-fixtures",
@@ -836,7 +842,9 @@
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatComposer.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatRegeneration.kt",
-        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationTest.kt"
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt"
       ],
       "depends_on": [
         "turn-api-android",
@@ -868,7 +876,9 @@
         "ios/SocraticMind/Chat/ChatComposerView.swift",
         "ios/SocraticMind/Chat/ChatLibraryView.swift",
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatRegeneration.swift",
-        "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationTests.swift"
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationTests.swift",
+        "ios/SocraticMind/Chat/MessageHistoryView.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift"
       ],
       "depends_on": [
         "turn-api-ios",
@@ -924,7 +934,8 @@
       "depends_on": [
         "actions-provider",
         "actions-fixtures",
-        "http-android"
+        "http-android",
+        "history-android"
       ],
       "checks": {
         "android": [
@@ -932,7 +943,7 @@
         ]
       },
       "manual": [
-        "标题 / 删除适配器尚未接入原生操作界面；对话并发、确认、错误恢复和设备行为继续验收。"
+        "标题 / 删除三方接口及操作状态已有定向核心测试；原生宿主行为另行验收。"
       ]
     },
     "actions-ios": {
@@ -943,7 +954,8 @@
       "depends_on": [
         "actions-provider",
         "actions-fixtures",
-        "http-ios"
+        "http-ios",
+        "history-ios"
       ],
       "checks": {
         "ios": [
@@ -951,7 +963,76 @@
         ]
       },
       "manual": [
-        "标题 / 删除适配器尚未接入原生操作界面；对话并发、确认、错误恢复和设备行为继续验收。"
+        "标题 / 删除三方接口及操作状态已有定向核心测试；原生宿主行为另行验收。"
+      ]
+    },
+    "actions-state-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsController.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsControllerTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsTestDoubles.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatActionsControls.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt"
+      ],
+      "depends_on": [
+        "actions-android",
+        "history-state-android",
+        "turn-state-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest"
+        ]
+      },
+      "manual": [
+        "标题编辑、会话删除和消息选择已接原生页面；确认、键盘、无障碍、进程终止及设备行为待独立获准构建后验证。"
+      ]
+    },
+    "actions-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsModel.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatActionsModelTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatActionsTestDoubles.swift",
+        "ios/SocraticMind/App/AppModel.swift",
+        "ios/SocraticMind/App/AppRootView.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/SocraticMind/Chat/ChatActionsControls.swift",
+        "ios/SocraticMind/Chat/MessageHistoryView.swift"
+      ],
+      "depends_on": [
+        "actions-ios",
+        "history-state-ios",
+        "turn-state-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatActionsModelTests"
+        ]
+      },
+      "manual": [
+        "标题编辑、会话删除和消息选择已接原生页面；确认、键盘、无障碍、进程终止及设备行为待独立获准构建后验证。"
+      ]
+    },
+    "ios-project": {
+      "paths": [
+        "ios/SocraticMind.xcodeproj/project.pbxproj",
+        "ios/SocraticMind.xcodeproj/xcshareddata/xcschemes/*.xcscheme"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "unittest:scripts.ci.tests.test_native_configuration",
+          "unittest:scripts.ci.tests.test_package_resolution"
+        ]
+      },
+      "manual": [
+        "Xcode 宿主登记仅做来源与配置静态检查；应用编译及运行仍须独立构建授权，Swift 包测试按变化源码选择。"
       ]
     }
   },

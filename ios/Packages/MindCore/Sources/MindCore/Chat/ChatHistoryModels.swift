@@ -35,8 +35,8 @@ public struct ConversationSummary: Decodable, Equatable, Sendable {
     public let lastRole: String
     public let preview: String
     public let updatedAt: String?
-    public let title: String?
-    public let titleStatus: String?
+    public internal(set) var title: String?
+    public internal(set) var titleStatus: String?
 
     enum CodingKeys: String, CodingKey {
         case sessionID = "session_id", mode, topicID = "topic_id", nodeKey = "node_key"

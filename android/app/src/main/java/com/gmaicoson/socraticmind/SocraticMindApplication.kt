@@ -3,6 +3,7 @@ package com.gmaicoson.socraticmind
 import android.app.Application
 import com.gmaicoson.socraticmind.auth.AuthApi
 import com.gmaicoson.socraticmind.auth.SessionStore
+import com.gmaicoson.socraticmind.chat.ChatActionsApi
 import com.gmaicoson.socraticmind.chat.ChatHistoryApi
 import com.gmaicoson.socraticmind.chat.ChatTurnApi
 import com.gmaicoson.socraticmind.chat.FileChatTurnJournal
@@ -26,6 +27,7 @@ class SocraticMindApplication : Application() {
                 ChatHistoryApi(transport),
                 ChatTurnApi(transport),
                 FileChatTurnJournal(noBackupFilesDir, endpoint.credentialScope),
+                ChatActionsApi(transport),
             )
         }
     }
@@ -37,4 +39,5 @@ class AppGraph(
     val history: ChatHistoryApi,
     val turn: ChatTurnApi,
     val journal: FileChatTurnJournal,
+    val actions: ChatActionsApi,
 )

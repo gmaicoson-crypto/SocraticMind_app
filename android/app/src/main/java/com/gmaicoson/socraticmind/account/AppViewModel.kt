@@ -7,6 +7,7 @@ import com.gmaicoson.socraticmind.AppGraph
 import com.gmaicoson.socraticmind.auth.AuthFormController
 import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.auth.accountErrorMessage
+import com.gmaicoson.socraticmind.chat.ChatActionsController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
 import com.gmaicoson.socraticmind.chat.ChatTarget
 import com.gmaicoson.socraticmind.chat.ChatTurnController
@@ -26,6 +27,10 @@ class AppViewModel(
     val form = graph?.let { AuthFormController(it.session, it.auth) }
     val history = graph?.let { ChatLibraryController(it.session, it.history, viewModelScope) }
     val turn = graph?.let { ChatTurnController(it.session, it.turn, it.journal, viewModelScope) }
+    val actions =
+        graph?.let {
+            ChatActionsController(it.session, it.actions, checkNotNull(history), checkNotNull(turn), viewModelScope)
+        }
     private val mutableError = MutableStateFlow<String?>(null)
     val error = mutableError.asStateFlow()
     private var formJob: Job? = null
@@ -38,6 +43,7 @@ class AppViewModel(
                 session.collect { state ->
                     history?.bindAccount(state)
                     turn?.bindAccount(state)
+                    actions?.bindAccount(state)
                     val next = (state as? SessionState.SignedIn)?.revision
                     if (next != accountRevision) {
                         form?.reset()
@@ -82,6 +88,7 @@ class AppViewModel(
         val coordinator = turn ?: return
         if (!coordinator.state.value.editable) return
         val target = ChatTarget(UUID.randomUUID().toString())
+        actions?.dismiss()
         coordinator.select(target)
         history?.openConversation(target)
     }
@@ -89,6 +96,7 @@ class AppViewModel(
     fun selectConversation(id: String) {
         val coordinator = turn ?: return
         if (!coordinator.state.value.editable) return
+        actions?.dismiss()
         history?.selectConversation(id)
         turn.select(
             history
@@ -102,6 +110,7 @@ class AppViewModel(
     fun closeConversation() {
         val coordinator = turn ?: return
         if (!coordinator.state.value.editable) return
+        actions?.dismiss()
         history?.closeConversation()
         coordinator.select(null)
     }
@@ -110,12 +119,14 @@ class AppViewModel(
         if (sessionJob?.isActive == true) return
         formJob?.cancel()
         form?.reset()
+        actions?.clear()
         history?.clear()
         turn?.clear()
         runSession { graph?.session?.logout() }
     }
 
     override fun onCleared() {
+        actions?.close()
         history?.close()
         turn?.close()
         super.onCleared()

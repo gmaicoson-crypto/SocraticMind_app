@@ -1,6 +1,7 @@
 """Prevent development-only cleartext exceptions from escaping into release configs."""
 
 import plistlib
+import re
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -8,6 +9,30 @@ from scripts.quality.changed_files import ROOT
 
 
 class NativeConfigurationTests(unittest.TestCase):
+    def test_xcode_host_registers_current_sources_and_only_local_core_package(self):
+        project = (ROOT / "ios/SocraticMind.xcodeproj/project.pbxproj").read_text()
+        sources = project.split("/* Begin PBXSourcesBuildPhase section */", 1)[1].split(
+            "/* End PBXSourcesBuildPhase section */", 1
+        )[0]
+        registered = re.findall(r"/\* ([^*\n]+\.swift) in Sources \*/", sources)
+        expected = [
+            path.name
+            for folder in ["ios/SocraticMind", "ios/UITests"]
+            for path in (ROOT / folder).rglob("*.swift")
+        ]
+        self.assertEqual(
+            len(expected),
+            len(set(expected)),
+            "Duplicate source names require target-aware registration checks",
+        )
+        self.assertCountEqual(expected, registered)
+        self.assertNotIn("isa = XCRemoteSwiftPackageReference;", project)
+        self.assertEqual(["Packages/MindCore"], re.findall(r"relativePath = ([^;]+);", project))
+        dependencies = project.split("/* Begin XCSwiftPackageProductDependency section */", 1)[
+            1
+        ].split("/* End XCSwiftPackageProductDependency section */", 1)[0]
+        self.assertEqual(["MindCore"], re.findall(r"productName = ([^;]+);", dependencies))
+
     def test_android_cleartext_is_denied_except_explicit_debug_loopback_hosts(self):
         main = ET.parse(ROOT / "android/app/src/main/res/xml/network_security_config.xml").getroot()
         self.assertEqual("false", main.find("base-config").get("cleartextTrafficPermitted"))

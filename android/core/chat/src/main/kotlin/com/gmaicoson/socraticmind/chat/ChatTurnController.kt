@@ -32,6 +32,36 @@ class ChatTurnController(
     private var job: Job? = null
     private var ticket = 0L
     private var closed = false
+    private var historyMutation: ChatMutationLease? = null
+
+    internal fun reserveHistoryMutation(account: HistoryAccount): ChatMutationLease? =
+        synchronized(lock) {
+            if (!current() || state.value.account != account || !state.value.editable ||
+                state.value.receipt != null
+            ) {
+                return null
+            }
+            ChatMutationLease(account).also {
+                historyMutation = it
+                mutableState.value = state.value.copy(changingHistory = true)
+            }
+        }
+
+    internal fun releaseHistoryMutation(
+        lease: ChatMutationLease,
+        deletedSessionId: String? = null,
+    ) = synchronized(lock) {
+        if (historyMutation != lease) return@synchronized
+        historyMutation = null
+        if (!current()) return@synchronized
+        val value = state.value
+        mutableState.value =
+            if (deletedSessionId != null && value.target?.sessionId == deletedSessionId) {
+                value.copy(changingHistory = false, target = null, draft = "", notice = null)
+            } else {
+                value.copy(changingHistory = false)
+            }
+    }
 
     fun bindAccount(value: SessionState): Unit =
         synchronized(lock) {
@@ -352,6 +382,7 @@ class ChatTurnController(
         !closed && state.value.account != null && state.value.account == HistoryAccount.from(session.state.value)
 
     private fun clearLocked() {
+        historyMutation = null
         ++ticket
         job?.cancel()
         job = null

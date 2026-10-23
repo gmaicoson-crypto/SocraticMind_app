@@ -56,6 +56,32 @@ public final class ChatLibraryModel: ObservableObject {
         readMessages(.refresh)
     }
 
+    public func refreshSelectedConversation() {
+        refreshMessages(); refreshConversations()
+    }
+
+    func accept(_ change: ChatLibraryChange, account: HistoryAccount) {
+        guard !closed, state.account == account else { return }
+        reads.removeValue(forKey: .conversations)?.task.cancel()
+        let selected = state.selected?.sessionID == change.sessionID
+        var refresh = false
+        if selected {
+            switch change {
+            case .renamed: break
+            case .deletedSession: reads.removeValue(forKey: .messages)?.task.cancel()
+            case .deletedMessages:
+                reads.removeValue(forKey: .messages)?.task.cancel(); refresh = true
+            }
+        }
+        state.apply(change)
+        if refresh {
+            refreshMessages()
+        }
+        if case .renamed = change {} else {
+            refreshConversations()
+        }
+    }
+
     public func loadMoreMessages() {
         readMessages(.more)
     }
@@ -163,6 +189,11 @@ public final class ChatLibraryModel: ObservableObject {
                 updated.failure = historyFailure(operation, error)
             }
             state[keyPath: page] = updated
+            if lane == .conversations, let selected = state.selected,
+               let summary = state.conversations.items.first(where: { $0.sessionID == selected.sessionID })
+            {
+                state.selected = ChatConversation(target: selected.target, title: summary.title)
+            }
         }
         reads[lane] = Read(ticket: ticket, task: task)
     }

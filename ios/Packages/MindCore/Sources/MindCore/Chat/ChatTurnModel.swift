@@ -13,6 +13,25 @@ public final class ChatTurnModel: ObservableObject {
     private var task: Task<Void, Never>?
     private var ticket: UInt64 = 0
     private var closed = false
+    private var historyMutation: ChatMutationLease?
+
+    func reserveHistoryMutation(_ account: HistoryAccount) -> ChatMutationLease? {
+        guard !closed, state.account == account, state.editable, state.receipt == nil else { return nil }
+        let lease = ChatMutationLease(account: account)
+        historyMutation = lease; state.changingHistory = true
+        return lease
+    }
+
+    func releaseHistoryMutation(_ lease: ChatMutationLease, deletedSessionID: String? = nil) {
+        guard historyMutation == lease else { return }
+        historyMutation = nil
+        guard !closed, state.account == lease.account else { return }
+        if let deletedSessionID, state.target?.sessionID == deletedSessionID {
+            state.target = nil; state.draft = ""; state.notice = nil
+        }
+        state.changingHistory = false
+    }
+
     private var buffer = ChatTurnBuffer()
     private var published: TimeInterval = 0
 
@@ -34,6 +53,7 @@ public final class ChatTurnModel: ObservableObject {
     }
 
     public func clear() {
+        historyMutation = nil
         ticket += 1
         task?.cancel(); task = nil
         buffer = ChatTurnBuffer()

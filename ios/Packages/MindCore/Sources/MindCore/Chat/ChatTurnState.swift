@@ -40,9 +40,10 @@ public struct ChatTurnState: Sendable {
     public internal(set) var ids: ChatMessageIDs?
     public internal(set) var notice: String?
     public internal(set) var receipt: ChatTurnReceipt?
+    public internal(set) var changingHistory = false
 
     public var editable: Bool {
-        account != nil && phase == .ready && pending == nil
+        account != nil && phase == .ready && pending == nil && !changingHistory
     }
 
     public var characterCount: Int {

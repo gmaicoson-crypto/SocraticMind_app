@@ -4,6 +4,7 @@ import SwiftUI
 struct ChatLibraryView: View {
     @ObservedObject var model: ChatLibraryModel
     @ObservedObject var turn: ChatTurnModel
+    @ObservedObject var actions: ChatActionsModel
     let account: SessionState
     let logout: () -> Void
     let newConversation: () -> Void
@@ -23,12 +24,28 @@ struct ChatLibraryView: View {
                 .padding(.horizontal, 20).padding(.vertical, 8)
             }
             Divider()
-            if model.state.account != HistoryAccount.from(account) || turn.state.account != model.state.account {
+            if model.state.account != HistoryAccount.from(account) || turn.state.account != model.state
+                .account || actions.state.account != model.state.account
+            {
                 ProgressView("正在读取会话…").frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let selected = model.state.selected {
                 header(title: selected.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "对话",
                        loading: model.state.messages.loading, back: turn.state.editable ? back : nil,
-                       refresh: model.refreshMessages)
+                       refresh: model.refreshSelectedConversation)
+                if actions.state.selectionSessionID == selected.sessionID {
+                    ChatSelectionControls(
+                        state: actions.state,
+                        enabled: turn.state.editable && !actions.state.busy,
+                        model: actions
+                    )
+                } else {
+                    ChatManagementMenu(
+                        sessionID: selected.sessionID,
+                        enabled: actions.canManage(selected.sessionID),
+                        model: actions,
+                        messages: !model.state.messages.items.isEmpty
+                    )
+                }
                 if selected.target != turn.state.target {
                     ProgressView("正在切换会话…").frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -38,7 +55,9 @@ struct ChatLibraryView: View {
                         turn: turn.state,
                         regenerationID: ChatRegeneration.from(model.state)?.answerID,
                         regenerate: regenerate,
-                        refresh: model.refreshMessages,
+                        actions: actions.state,
+                        toggleMessage: actions.toggleMessage,
+                        refresh: model.refreshSelectedConversation,
                         more: model.loadMoreMessages
                     )
                     .id(selected.sessionID)
@@ -48,13 +67,29 @@ struct ChatLibraryView: View {
                 Button("新建对话", action: newConversation).disabled(!turn.state.editable)
                 conversations
             }
+            if actions.state.dialog == nil, actions.state.account == HistoryAccount.from(account),
+               let notice = actions.state.notice
+            {
+                Text(notice).padding(12)
+            }
             if model.state.account == HistoryAccount.from(account), turn.state.account == model.state.account,
+               actions.state.selectionSessionID == nil,
                case let .signedIn(user, _) = account
             {
                 ChatComposerView(model: turn, style: user.aiStyle,
                                  selected: model.state.selected != nil && model.state.selected?.target == turn.state
                                      .target)
             }
+        }
+        .sheet(isPresented: Binding(
+            get: { actions.state.dialog != nil && actions.state.account == HistoryAccount.from(account) },
+            set: {
+                if !$0 {
+                    actions.cancelDialog()
+                }
+            }
+        )) {
+            ChatActionSheet(model: actions)
         }
         .confirmationDialog("放弃未发送的内容？", isPresented: $discardDraft, titleVisibility: .visible) {
             Button("放弃草稿", role: .destructive, action: closeConversation)
@@ -65,7 +100,9 @@ struct ChatLibraryView: View {
 
     private func back() {
         guard turn.state.editable else { return }
-        if turn.state.draft.isEmpty {
+        if actions.state.selectionSessionID != nil {
+            actions.dismiss()
+        } else if turn.state.draft.isEmpty {
             closeConversation()
         } else {
             discardDraft = true
@@ -80,15 +117,23 @@ struct ChatLibraryView: View {
     private var conversations: some View {
         List {
             ForEach(model.state.conversations.items, id: \.sessionID) { summary in
-                Button { selectConversation(summary.sessionID) } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(summary.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "未命名对话")
-                            .font(.headline).foregroundStyle(.primary).lineLimit(2)
-                        Text(summary.preview.nilIfEmpty ?? "暂无文字预览").font(.subheadline)
-                            .foregroundStyle(.secondary).lineLimit(2)
-                    }.padding(.vertical, 6)
+                VStack(alignment: .leading) {
+                    Button { selectConversation(summary.sessionID) } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(summary.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "未命名对话")
+                                .font(.headline).foregroundStyle(.primary).lineLimit(2)
+                            Text(summary.preview.nilIfEmpty ?? "暂无文字预览").font(.subheadline)
+                                .foregroundStyle(.secondary).lineLimit(2)
+                        }.padding(.vertical, 6)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!turn.state.editable)
+                    ChatManagementMenu(
+                        sessionID: summary.sessionID,
+                        enabled: actions.canManage(summary.sessionID),
+                        model: actions
+                    )
                 }
-                .buttonStyle(.plain)
             }
             HistoryPageControls(page: model.state.conversations, emptyText: "暂无历史会话", moreText: "加载更多会话",
                                 refresh: model.refreshConversations, more: model.loadMoreConversations)
@@ -108,52 +153,6 @@ struct ChatLibraryView: View {
             Button("刷新", action: refresh).disabled(loading == .refresh)
         }
         .padding(.horizontal, 20).padding(.vertical, 12)
-    }
-}
-
-private struct MessageHistoryView: View {
-    let page: HistoryPageState<StoredChatMessage>
-    let renderer: MarkdownRenderer
-    let turn: ChatTurnState
-    let regenerationID: Int64?
-    let regenerate: () -> Void
-    let refresh: () -> Void
-    let more: () -> Void
-
-    var body: some View {
-        ScrollViewReader { scroll in
-            List {
-                HistoryPageControls(page: page, emptyText: "暂无可读取的消息", moreText: "加载更早消息",
-                                    refresh: refresh, more: more)
-                ForEach(page.items.reversed().filter(turn.showsInHistory), id: \.id) { message in
-                    MessageContentView(message: message, renderer: renderer).listRowSeparator(.hidden)
-                    if message.id == regenerationID {
-                        Button("重新生成回答", action: regenerate).disabled(!turn.canRegenerate)
-                            .accessibilityIdentifier("chat_regenerate")
-                    }
-                }
-                if turn.pending != nil {
-                    if turn.pending?.regenerateMessageID != nil {
-                        Text("正在重新生成，完成前保留原回答。")
-                    } else if !turn.submitted.isEmpty {
-                        MessageContentView(role: "user", content: turn.submitted, renderer: renderer)
-                    }
-                    MessageContentView(role: "ai", content: turn.partial, renderer: renderer, provisional: true)
-                        .id("pending-turn")
-                }
-            }
-            .listStyle(.plain)
-            .onChange(of: turn.pending?.requestID, initial: true) { _, pending in
-                if pending != nil {
-                    scroll.scrollTo("pending-turn", anchor: .bottom)
-                }
-            }
-            .onChange(of: page.loaded) { _, loaded in
-                if loaded, let latest = page.items.first?.id {
-                    scroll.scrollTo(latest, anchor: .bottom)
-                }
-            }
-        }
     }
 }
 

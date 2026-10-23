@@ -87,4 +87,12 @@ quality.yml 的 GitHub Actions 固定完整 commit SHA；MySQL 服务固定 8.4.
 
 actions-provider / actions-fixtures / actions-android / actions-ios 登记后端、共享样例与双端适配。标题路由变化选择既有标题测试及关联删除生命周期；新增 PUT 进入 OpenAPI 快照，保留旧 operation / schema。通用回环 fixture 变化扩展已登记 HTTP、账号、历史和发送消费者，最终 Android 12 类 92 项、Swift 12 suite 89 项、后端 23 项及工具 57 项通过，证据见[实施状态](execution-status.md)。
 
-本批没有新增依赖或数据库迁移；Kotlin 2、Swift 2、Python 6 个变化源码通过固定工具，test_impact.py 536 行的职责复查见[动作实施](chat-actions-implementation.md)。适配器尚未注入应用容器，Swift 包与 Android JVM 通过不能代替操作界面编译、删除确认或设备验证。
+接口检查点没有新增依赖或数据库迁移；当时 Kotlin 2、Swift 2、Python 6 个变化源码通过固定工具，适配器尚未注入应用容器。后续状态接线见下节；Swift 包与 Android JVM 通过不能代替操作界面编译、删除确认或设备验证。
+
+## 标题与删除操作的定向集合
+
+actions-state-android / ios 纳入操作状态、宿主注入与确认 / 多选页面；共享动作类型关联账号、历史和发送集合。独立消息列表仍关联原有 Markdown / 历史 / 发送消费者。最终 Android 9 类 77 项有效报告、Swift 12 suite 90 项及工具 64 项通过，执行与缓存边界见[实施状态](execution-status.md)。
+
+ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改动校验当前 Swift 源文件、唯一文件名和本地 MindCore 引用，同时运行配置 / 包锁检查；新增同名宿主文件需先扩展为按 target 检查。Package.swift、Package.resolved 和 project.yml 变化仍扩展依赖消费者。未经明确授权，静态登记不会触发应用构建。
+
+本批固定工具覆盖 Kotlin 13、Swift 13、Python 2 个变化文件；391 / 301 行发送协调器与 598 行影响测试的预警结论见[动作实施](chat-actions-implementation.md)。没有新的工具版本、依赖锁或例外。

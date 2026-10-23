@@ -9,6 +9,7 @@ final class AppModel: ObservableObject {
     let form: AuthFormModel?
     let history: ChatLibraryModel?
     let turn: ChatTurnModel?
+    let actions: ChatActionsModel?
     let configurationError: String?
     private let store: SessionStore?
     private var observation: Task<Void, Never>?
@@ -35,14 +36,26 @@ final class AppModel: ObservableObject {
             let journal = try FileChatTurnJournal(directory: directory, endpointScope: endpoint.credentialScope)
             store = session
             form = AuthFormModel(session: session, recovery: api)
-            history = ChatLibraryModel(session: session, gateway: ChatHistoryAPI(transport: transport))
-            turn = ChatTurnModel(session: session, gateway: ChatTurnAPI(transport: transport), journal: journal)
+            let library = ChatLibraryModel(session: session, gateway: ChatHistoryAPI(transport: transport))
+            let coordinator = ChatTurnModel(
+                session: session,
+                gateway: ChatTurnAPI(transport: transport),
+                journal: journal
+            )
+            history = library; turn = coordinator
+            actions = ChatActionsModel(
+                session: session,
+                gateway: ChatActionsAPI(transport: transport),
+                library: library,
+                turn: coordinator
+            )
             configurationError = nil
         } catch {
             store = nil
             form = nil
             history = nil
             turn = nil
+            actions = nil
             configurationError = "服务地址未正确配置，请检查当前开发配置。"
         }
         // @Published emits before storing state; acknowledge on the next main-actor turn.
@@ -67,6 +80,7 @@ final class AppModel: ObservableObject {
                 }
                 history?.bindAccount(state)
                 turn?.bindAccount(state)
+                actions?.bindAccount(state)
                 session = state
             }
         }
@@ -89,6 +103,7 @@ final class AppModel: ObservableObject {
         guard !sessionRunning else { return }
         formTask?.cancel()
         form?.reset()
+        actions?.clear()
         history?.clear()
         turn?.clear()
         runSession { try await $0.logout() }
@@ -96,16 +111,19 @@ final class AppModel: ObservableObject {
 
     func newConversation() {
         guard turn?.state.editable == true, let target = try? ChatTarget(sessionID: UUID().uuidString) else { return }
+        actions?.dismiss()
         turn?.select(target); history?.openConversation(target)
     }
 
     func selectConversation(_ id: String) {
         guard turn?.state.editable == true else { return }
+        actions?.dismiss()
         history?.selectConversation(id); turn?.select(history?.state.selected?.target)
     }
 
     func closeConversation() {
         guard turn?.state.editable == true else { return }
+        actions?.dismiss()
         history?.closeConversation(); turn?.select(nil)
     }
 

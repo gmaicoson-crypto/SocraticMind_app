@@ -78,10 +78,12 @@ fun AppRoot(model: AppViewModel) {
                         key(current.revision) {
                             val history = model.history
                             val turn = model.turn
-                            if (history != null && turn != null) {
+                            val actions = model.actions
+                            if (history != null && turn != null && actions != null) {
                                 ChatLibraryScreen(
                                     history,
                                     turn,
+                                    actions,
                                     current,
                                     model::logout,
                                     model::newConversation,

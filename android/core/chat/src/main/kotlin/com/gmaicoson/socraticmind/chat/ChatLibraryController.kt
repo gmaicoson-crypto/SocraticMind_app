@@ -64,6 +64,29 @@ class ChatLibraryController(
 
     fun refreshMessages() = readMessages(HistoryLoad.REFRESH)
 
+    fun refreshSelectedConversation() {
+        refreshMessages()
+        refreshConversations()
+    }
+
+    internal fun accept(
+        change: ChatLibraryChange,
+        account: HistoryAccount,
+    ) {
+        var refreshSelected = false
+        synchronized(lock) {
+            if (!isCurrentAccount() || state.value.account != account) return
+            reads.remove(Lane.CONVERSATIONS)?.job?.cancel()
+            if (state.value.selected?.sessionId == change.sessionId && change !is ChatLibraryChange.Renamed) {
+                reads.remove(Lane.MESSAGES)?.job?.cancel()
+                refreshSelected = change is ChatLibraryChange.DeletedMessages
+            }
+            mutableState.value = state.value.applying(change)
+        }
+        if (refreshSelected) refreshMessages()
+        if (change !is ChatLibraryChange.Renamed) refreshConversations()
+    }
+
     fun loadMoreMessages() = readMessages(HistoryLoad.MORE)
 
     fun selectConversation(sessionId: String) {
@@ -132,7 +155,21 @@ class ChatLibraryController(
             Lane.CONVERSATIONS,
             operation,
             { it.conversations },
-            { value, page -> value.copy(conversations = page) },
+            { value, page ->
+                val current = value.selected
+                val title = page.items.find { it.sessionId == current?.sessionId }
+                value.copy(
+                    conversations = page,
+                    selected =
+                        if (current != null &&
+                            title != null
+                        ) {
+                            current.copy(title = title.title)
+                        } else {
+                            current
+                        },
+                )
+            },
             { it.sessionId },
         ) { token, cursor -> gateway.conversations(token, mode, cursor = cursor) }
 

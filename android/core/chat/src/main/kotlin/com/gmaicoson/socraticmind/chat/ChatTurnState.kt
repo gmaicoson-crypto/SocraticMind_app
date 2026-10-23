@@ -45,8 +45,9 @@ data class ChatTurnState(
     val ids: ChatMessageIds? = null,
     val notice: String? = null,
     val receipt: ChatTurnReceipt? = null,
+    val changingHistory: Boolean = false,
 ) {
-    val editable: Boolean get() = account != null && phase == ChatTurnPhase.READY && pending == null
+    val editable: Boolean get() = account != null && phase == ChatTurnPhase.READY && pending == null && !changingHistory
     val canSend: Boolean get() =
         editable && receipt == null && target != null && draft.isNotBlank() &&
             characterCount <= 5000
