@@ -1,6 +1,7 @@
 package com.gmaicoson.socraticmind.chat
 
 import com.gmaicoson.socraticmind.network.ChatEvent
+import kotlinx.serialization.json.JsonPrimitive
 
 enum class ChatTurnPhase { RESTORING, READY, PREPARING, SENDING, VERIFYING, STOPPING, UNRESOLVED, STORAGE_FAILED }
 
@@ -8,7 +9,30 @@ data class ChatTurnReceipt(
     val pending: PendingChatTurn,
     val status: ChatTurnStatus?,
     val messages: List<StoredChatMessage>,
-)
+) {
+    val replacedMessageId: Long? get() = pending.regenerateMessageId?.takeIf { status == ChatTurnStatus.COMPLETE }
+    val historyMessages: List<StoredChatMessage> get() =
+        if (pending.regenerateMessageId != null && status != ChatTurnStatus.COMPLETE) {
+            messages.filter { it.role == "user" }
+        } else {
+            messages
+        }
+
+    fun retains(message: StoredChatMessage): Boolean {
+        if (message.id == replacedMessageId) return false
+        if (message.role == "ai" &&
+            message.metadata?.get("request_id") == JsonPrimitive(pending.requestId)
+        ) {
+            return false
+        }
+        if (pending.regenerateMessageId == null || status == ChatTurnStatus.COMPLETE ||
+            message.role != "ai"
+        ) {
+            return true
+        }
+        return messages.none { it.role == "ai" && it.id == message.id }
+    }
+}
 
 data class ChatTurnState(
     val account: HistoryAccount? = null,
@@ -26,12 +50,21 @@ data class ChatTurnState(
     val canSend: Boolean get() =
         editable && receipt == null && target != null && draft.isNotBlank() &&
             characterCount <= 5000
+    val canRegenerate: Boolean get() = editable && receipt == null && target != null
     val characterCount: Int get() = draft.codePointCount(0, draft.length)
     val canStop: Boolean
         get() =
             pending != null &&
                 phase in setOf(ChatTurnPhase.SENDING, ChatTurnPhase.VERIFYING, ChatTurnPhase.UNRESOLVED)
     val canVerify: Boolean get() = phase in setOf(ChatTurnPhase.UNRESOLVED, ChatTurnPhase.STORAGE_FAILED)
+
+    /** History may expose the current provisional row before msg_ids or during process recovery. */
+    fun showsInHistory(message: StoredChatMessage): Boolean {
+        val reference = pending ?: return true
+        if (reference.regenerateMessageId != null && message.role == "user") return true
+        return message.id != ids?.ai && message.id != ids?.user &&
+            message.metadata?.get("request_id") != JsonPrimitive(reference.requestId)
+    }
 }
 
 /** Bounds retained live text. Only server status plus stored history can produce a receipt. */

@@ -8,6 +8,25 @@ public struct ChatTurnReceipt: Equatable, Sendable {
     public let pending: PendingChatTurn
     public let status: ChatTurnStatus?
     public let messages: [StoredChatMessage]
+
+    public var replacedMessageID: Int64? {
+        status == .complete ? pending.regenerateMessageID : nil
+    }
+
+    public var historyMessages: [StoredChatMessage] {
+        pending.regenerateMessageID != nil && status != .complete ? messages.filter { $0.role == "user" } : messages
+    }
+
+    public func retains(_ message: StoredChatMessage) -> Bool {
+        if message.id == replacedMessageID {
+            return false
+        }
+        if message.role == "ai", message.metadata?["request_id"] == .string(pending.requestID) {
+            return false
+        }
+        guard pending.regenerateMessageID != nil, status != .complete, message.role == "ai" else { return true }
+        return !messages.contains { $0.role == "ai" && $0.id == message.id }
+    }
 }
 
 public struct ChatTurnState: Sendable {
@@ -39,8 +58,22 @@ public struct ChatTurnState: Sendable {
         pending != nil && [.sending, .verifying, .unresolved].contains(phase)
     }
 
+    public var canRegenerate: Bool {
+        editable && receipt == nil && target != nil
+    }
+
     public var canVerify: Bool {
         [.unresolved, .storageFailed].contains(phase)
+    }
+
+    /// History may expose the current provisional row before msg_ids or during process recovery.
+    public func showsInHistory(_ message: StoredChatMessage) -> Bool {
+        guard let pending else { return true }
+        if pending.regenerateMessageID != nil, message.role == "user" {
+            return true
+        }
+        return message.id != ids?.ai && message.id != ids?.user &&
+            message.metadata?["request_id"] != .string(pending.requestID)
     }
 }
 

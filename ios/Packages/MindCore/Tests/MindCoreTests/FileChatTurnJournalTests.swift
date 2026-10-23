@@ -4,6 +4,35 @@ import Testing
 
 struct FileChatTurnJournalTests {
     @Test
+    func schemaOneRemainsReadableAndRegenerationSurvivesSchemaTwoReopen() async throws {
+        try await withDirectory { directory in
+            let journal = try FileChatTurnJournal(directory: directory, endpointScope: "scope")
+            let ordinary = try turnRequest().pending
+            try await journal.save(ordinary)
+            let file = try #require(records(directory).first)
+            let legacy = try String(contentsOf: file, encoding: .utf8).replacingOccurrences(
+                of: "\"schema\":2",
+                with: "\"schema\":1"
+            )
+            try Data(legacy.utf8).write(to: file)
+            #expect(try await journal.read(ownerID: 1) == ordinary)
+            try await journal.clear(ordinary)
+            let pending = try PendingChatTurn(
+                ownerID: 1,
+                target: ordinary.target,
+                requestID: ordinary.requestID,
+                regenerateMessageID: 102
+            )
+            try await journal.save(pending)
+            #expect(try String(contentsOf: file, encoding: .utf8).contains("\"schema\":2"))
+            #expect(try await FileChatTurnJournal(directory: directory, endpointScope: "scope")
+                .read(ownerID: 1) == pending)
+            await #expect(throws: ChatTurnFailure.self) { try await journal.clear(ordinary) }
+            #expect(try await journal.read(ownerID: 1) == pending)
+        }
+    }
+
+    @Test
     func reopenPersistsOnlyIdentifiersWithEndpointAndOwnerIsolation() async throws {
         try await withDirectory { directory in
             let pending = try turnRequest().pending

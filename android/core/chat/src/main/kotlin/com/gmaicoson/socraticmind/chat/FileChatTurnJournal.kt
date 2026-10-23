@@ -88,7 +88,7 @@ class FileChatTurnJournal(
                 .parseToJsonElement(
                     bytes.decodeToString(0, count, throwOnInvalidSequence = true),
                 ).historyObject()
-        require(value.historyLong("schema") == 1L)
+        require(value.historyLong("schema") in 1L..2L)
         val target = value.getValue("target").historyObject()
         return PendingChatTurn(
             ownerId = value.historyLong("owner_id").also { require(it == ownerId) },
@@ -100,14 +100,21 @@ class FileChatTurnJournal(
                     target.historyLong("topic_id"),
                 ),
             requestId = value.historyString("request_id"),
+            regenerateMessageId =
+                if (value.containsKey("regenerate_message_id")) {
+                    value.historyOptionalLong("regenerate_message_id")
+                } else {
+                    null
+                },
         )
     }
 
     private fun encode(pending: PendingChatTurn): String =
         buildJsonObject {
-            put("schema", 1)
+            put("schema", 2)
             put("owner_id", pending.ownerId)
             put("request_id", pending.requestId)
+            pending.regenerateMessageId?.let { put("regenerate_message_id", it) }
             put(
                 "target",
                 buildJsonObject {

@@ -4,11 +4,13 @@ import Testing
 
 struct TurnFixture: Decodable {
     let request: Request
+    let regeneration_request: Request
     let messages: [StoredChatMessage]
     let invalid_status: [Invalid]
     let cancel_cases: [Cancel]
     struct Request: Decodable {
         let request_id: String; let session_id: String; let user_input: String; let ai_style: String
+        let regenerate_message_id: Int64?
     }
 
     struct Invalid: Decodable { let id: String }
@@ -44,6 +46,31 @@ private actor TurnEvents {
 }
 
 struct ChatTurnAPIContractTests {
+    @Test
+    func regenerationUsesOriginalAnswerAndExactQuestionOnSameStream() async throws {
+        let value = try turnFixture().regeneration_request
+        let pending = try PendingChatTurn(ownerID: 1, target: ChatTarget(sessionID: value.session_id),
+                                          requestID: value.request_id, regenerateMessageID: value.regenerate_message_id)
+        let request = try ChatTurnRequest(pending: pending, input: value.user_input, style: value.ai_style)
+        let server = try LoopbackFixture()
+        defer { server.close() }
+        let transport = try HTTPTransport(endpoint: server.endpoint)
+        defer { transport.close() }
+        let events = TurnEvents()
+        try await ChatTurnAPI(transport: transport)
+            .stream(token: "turn-contract", request: request) { await events.add($0) }
+        #expect(await events.values.first == .messageIDs(user: 101, ai: 103))
+        #expect(await events.values.last == .done)
+        #expect(throws: ChatTurnFailure.self) {
+            try PendingChatTurn(
+                ownerID: 1,
+                target: pending.target,
+                requestID: pending.requestID,
+                regenerateMessageID: 0
+            )
+        }
+    }
+
     @Test
     func liveBufferRejectsIdentityChangeTerminalReversalAndExcessiveText() throws {
         var buffer = ChatTurnBuffer()

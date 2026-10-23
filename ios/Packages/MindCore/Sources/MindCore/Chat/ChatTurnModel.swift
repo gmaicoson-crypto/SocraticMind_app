@@ -61,12 +61,27 @@ public final class ChatTurnModel: ObservableObject {
     }
 
     public func send(style: String) {
-        guard !closed, state.canSend, let account = state.account, let target = state.target else { return }
+        start(style: style, regeneration: nil)
+    }
+
+    public func regenerate(history: ChatLibraryState, style: String) {
+        guard let candidate = ChatRegeneration.from(history) else { return }
+        start(style: style, regeneration: candidate)
+    }
+
+    private func start(style: String, regeneration: ChatRegeneration?) {
+        guard !closed, let account = state.account, let target = state.target else { return }
+        if let regeneration {
+            guard state.canRegenerate, regeneration.account == account, regeneration.target == target else { return }
+        } else if !state.canSend {
+            return
+        }
         let request: ChatTurnRequest
         do {
             request = try ChatTurnRequest(
-                pending: PendingChatTurn(ownerID: account.userID, target: target, requestID: requestID()),
-                input: state.draft, style: style
+                pending: PendingChatTurn(ownerID: account.userID, target: target, requestID: requestID(),
+                                         regenerateMessageID: regeneration?.answerID),
+                input: regeneration?.input ?? state.draft, style: style
             )
         } catch { state.notice = "输入或会话配置无效，请检查后重试。"; return }
         state.phase = .preparing; state.pending = request.pending; state.receipt = nil
@@ -79,7 +94,11 @@ public final class ChatTurnModel: ObservableObject {
                 return
             }
             try await self.requireCurrent(operation)
-            self.state.phase = .sending; self.state.draft = ""; self.state.submitted = request.input
+            self.state.phase = .sending
+            if regeneration == nil {
+                self.state.draft = ""
+            }
+            self.state.submitted = request.input
             self.state.partial = ""; self.state.ids = nil; self.buffer = ChatTurnBuffer(); self.published = 0
             let gateway = self.gateway
             do {
@@ -88,7 +107,20 @@ public final class ChatTurnModel: ObservableObject {
                         try await self.receive(event, operation: operation)
                     }
                 }
-            } catch { try await self.requireCurrent(operation) }
+            } catch {
+                try await self.requireCurrent(operation)
+                if regeneration != nil, let failure = error as? HTTPFailure, [400, 409].contains(failure.status),
+                   ["CHAT_REGENERATE_INVALID", "CHAT_REGENERATE_NOT_LATEST"].contains(failure.code ?? "")
+                {
+                    // Persist a stop tombstone before clearing the rejected stale request's recovery record.
+                    let remote = try await self.authenticated(operation) {
+                        try await gateway.cancel(token: $0, pending: request.pending)
+                    }
+                    try await self.finish(operation, pending: request.pending, remote: remote)
+                    self.state.notice = "原问题已变化或不再是最后一问，请刷新历史后重试。"
+                    return
+                }
+            }
             self.state.partial = self.buffer.content; self.state.ids = self.buffer.ids
             try await self.verify(operation, pending: request.pending)
         }
@@ -169,7 +201,8 @@ public final class ChatTurnModel: ObservableObject {
         guard remote == nil || remote?.status.terminal == true else { throw ChatTurnFailure.invalidResponse }
         let messages: [StoredChatMessage]
         if let ids = remote?.ids {
-            guard state.ids == nil || state.ids == ids else { throw ChatTurnFailure.invalidResponse }
+            guard state.ids == nil || state.ids == ids,
+                  ids.ai != pending.regenerateMessageID else { throw ChatTurnFailure.invalidResponse }
             let gateway = gateway
             messages = try await authenticated(operation) { try await gateway.messages(
                 token: $0,
@@ -188,7 +221,11 @@ public final class ChatTurnModel: ObservableObject {
             return
         }
         try await requireCurrent(operation)
-        state.notice = if remote == nil || (remote?.ids != nil && messages.count != 2) {
+        state.notice = if pending.regenerateMessageID != nil, remote?.status == .interrupted {
+            "重新生成已停止，原回答仍保留。"
+        } else if pending.regenerateMessageID != nil, remote?.status == .failed {
+            "重新生成失败，原回答仍保留。"
+        } else if remote == nil || (remote?.ids != nil && messages.count != 2) {
             "消息已更新或删除，请刷新历史查看。"
         } else {
             switch remote?.status {

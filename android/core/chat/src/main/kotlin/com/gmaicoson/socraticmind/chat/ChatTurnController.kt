@@ -72,15 +72,40 @@ class ChatTurnController(
             if (current() && state.value.editable) mutableState.value = state.value.copy(draft = value, notice = null)
         }
 
-    fun send(style: String): Unit =
+    fun send(style: String): Unit = start(style, null)
+
+    fun regenerate(
+        history: ChatLibraryState,
+        style: String,
+    ) {
+        val candidate = ChatRegeneration.from(history) ?: return
+        start(style, candidate)
+    }
+
+    private fun start(
+        style: String,
+        regeneration: ChatRegeneration?,
+    ): Unit =
         synchronized(lock) {
             val value = state.value
-            if (!current() || !value.canSend) return
+            if (!current()) return
+            if (regeneration == null) {
+                if (!value.canSend) return
+            } else if (!value.canRegenerate || regeneration.account != value.account ||
+                regeneration.target != value.target
+            ) {
+                return
+            }
             val request =
                 runCatching {
                     ChatTurnRequest(
-                        PendingChatTurn(checkNotNull(value.account).userId, checkNotNull(value.target), requestId()),
-                        value.draft,
+                        PendingChatTurn(
+                            checkNotNull(value.account).userId,
+                            checkNotNull(value.target),
+                            requestId(),
+                            regeneration?.answerId,
+                        ),
+                        regeneration?.input ?: value.draft,
                         style,
                     )
                 }.getOrElse {
@@ -100,7 +125,7 @@ class ChatTurnController(
                 update(operation) {
                     it.copy(
                         phase = ChatTurnPhase.SENDING,
-                        draft = "",
+                        draft = if (regeneration == null) "" else it.draft,
                         submitted = request.input,
                         partial = "",
                         ids = null,
@@ -124,6 +149,15 @@ class ChatTurnController(
                     }
                 } catch (error: Exception) {
                     requireCurrent(operation)
+                    if (regeneration != null && error is HttpFailure && error.status in setOf(400, 409) &&
+                        error.code in setOf("CHAT_REGENERATE_INVALID", "CHAT_REGENERATE_NOT_LATEST")
+                    ) {
+                        // A rejected stale question has no turn; persist a stop tombstone before clearing recovery.
+                        val remote = authenticated(operation) { gateway.cancel(it, request.pending) }
+                        finish(operation, request.pending, remote)
+                        update(operation) { it.copy(notice = "原问题已变化或不再是最后一问，请刷新历史后重试。") }
+                        return@launchOperation
+                    }
                     // A transport error, timeout or DONE is not a confirmed terminal result.
                 }
                 update(operation) { it.copy(partial = buffer.content(), ids = buffer.ids) }
@@ -210,6 +244,7 @@ class ChatTurnController(
                 emptyList()
             } else {
                 require(state.value.ids == null || state.value.ids == ids) { "Recovered message IDs changed" }
+                require(ids.ai != pending.regenerateMessageId) { "Regeneration did not allocate a new answer" }
                 authenticated(operation) { gateway.messages(it, pending, ids) }
             }
         requireCurrent(operation)
@@ -227,10 +262,29 @@ class ChatTurnController(
         }
         val notice =
             when {
-                remote == null || (ids != null && messages.size != 2) -> "消息已更新或删除，请刷新历史查看。"
-                remote.status == ChatTurnStatus.COMPLETE -> null
-                remote.status == ChatTurnStatus.INTERRUPTED -> "回复已停止；已保存的部分可在历史中查看。"
-                else -> "本次回复失败；可查看已有内容后重新输入。"
+                pending.regenerateMessageId != null && remote?.status == ChatTurnStatus.INTERRUPTED -> {
+                    "重新生成已停止，原回答仍保留。"
+                }
+
+                pending.regenerateMessageId != null && remote?.status == ChatTurnStatus.FAILED -> {
+                    "重新生成失败，原回答仍保留。"
+                }
+
+                remote == null || (ids != null && messages.size != 2) -> {
+                    "消息已更新或删除，请刷新历史查看。"
+                }
+
+                remote.status == ChatTurnStatus.COMPLETE -> {
+                    null
+                }
+
+                remote.status == ChatTurnStatus.INTERRUPTED -> {
+                    "回复已停止；已保存的部分可在历史中查看。"
+                }
+
+                else -> {
+                    "本次回复失败；可查看已有内容后重新输入。"
+                }
             }
         update(operation) {
             it.copy(

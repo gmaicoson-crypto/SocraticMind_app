@@ -36,6 +36,8 @@ struct ChatLibraryView: View {
                         page: model.state.messages,
                         renderer: renderer,
                         turn: turn.state,
+                        regenerationID: ChatRegeneration.from(model.state)?.answerID,
+                        regenerate: regenerate,
                         refresh: model.refreshMessages,
                         more: model.loadMoreMessages
                     )
@@ -68,6 +70,11 @@ struct ChatLibraryView: View {
         } else {
             discardDraft = true
         }
+    }
+
+    private func regenerate() {
+        guard case let .signedIn(user, _) = account else { return }
+        turn.regenerate(history: model.state, style: user.aiStyle)
     }
 
     private var conversations: some View {
@@ -108,6 +115,8 @@ private struct MessageHistoryView: View {
     let page: HistoryPageState<StoredChatMessage>
     let renderer: MarkdownRenderer
     let turn: ChatTurnState
+    let regenerationID: Int64?
+    let regenerate: () -> Void
     let refresh: () -> Void
     let more: () -> Void
 
@@ -116,13 +125,17 @@ private struct MessageHistoryView: View {
             List {
                 HistoryPageControls(page: page, emptyText: "暂无可读取的消息", moreText: "加载更早消息",
                                     refresh: refresh, more: more)
-                ForEach(page.items.reversed().filter {
-                    turn.pending == nil || ($0.id != turn.ids?.user && $0.id != turn.ids?.ai)
-                }, id: \.id) { message in
+                ForEach(page.items.reversed().filter(turn.showsInHistory), id: \.id) { message in
                     MessageContentView(message: message, renderer: renderer).listRowSeparator(.hidden)
+                    if message.id == regenerationID {
+                        Button("重新生成回答", action: regenerate).disabled(!turn.canRegenerate)
+                            .accessibilityIdentifier("chat_regenerate")
+                    }
                 }
                 if turn.pending != nil {
-                    if !turn.submitted.isEmpty {
+                    if turn.pending?.regenerateMessageID != nil {
+                        Text("正在重新生成，完成前保留原回答。")
+                    } else if !turn.submitted.isEmpty {
                         MessageContentView(role: "user", content: turn.submitted, renderer: renderer)
                     }
                     MessageContentView(role: "ai", content: turn.partial, renderer: renderer, provisional: true)

@@ -770,7 +770,9 @@
           "pytest:tests/p0/test_chat_lifecycle.py::test_expired_same_request_replay_returns_interrupted",
           "pytest:tests/p0/test_chat_lifecycle.py::test_cancel_before_begin_is_durable_and_prevents_generation",
           "pytest:tests/p0/test_chat_lifecycle.py::test_lease_refresh_preserves_partial_answer_then_cancel_prevents_completion",
-          "pytest:tests/p0/test_chat_lifecycle.py::test_stop_intent_blocks_model_start_and_completion_before_cancel_transition"
+          "pytest:tests/p0/test_chat_lifecycle.py::test_stop_intent_blocks_model_start_and_completion_before_cancel_transition",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_failed_regeneration_preserves_answer_success_replaces_and_invalidates",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_regenerate_only_latest_question_and_reject_changes"
         ]
       },
       "manual": []
@@ -831,7 +833,9 @@
         "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatComposer.kt",
-        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt"
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatRegeneration.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationTest.kt"
       ],
       "depends_on": [
         "turn-api-android",
@@ -842,7 +846,8 @@
         "android": [
           "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
           "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
-          "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest"
+          "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+          "com.gmaicoson.socraticmind.chat.ChatRegenerationTest"
         ]
       },
       "manual": [
@@ -860,7 +865,9 @@
         "ios/SocraticMind/App/AppModel.swift",
         "ios/SocraticMind/App/AppRootView.swift",
         "ios/SocraticMind/Chat/ChatComposerView.swift",
-        "ios/SocraticMind/Chat/ChatLibraryView.swift"
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatRegeneration.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationTests.swift"
       ],
       "depends_on": [
         "turn-api-ios",
@@ -871,7 +878,8 @@
         "ios": [
           "ChatTurnModelTests",
           "FileChatTurnJournalTests",
-          "ChatLibraryModelTests"
+          "ChatLibraryModelTests",
+          "ChatRegenerationTests"
         ]
       },
       "manual": [

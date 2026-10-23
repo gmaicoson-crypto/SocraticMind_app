@@ -9,6 +9,29 @@ import java.nio.file.Files
 
 class FileChatTurnJournalTest {
     @Test
+    fun `schema one remains readable and regeneration identity survives schema two reopen`() =
+        runBlocking {
+            val directory = Files.createTempDirectory("chat-journal-version").toFile()
+            try {
+                val journal = FileChatTurnJournal(directory, "scope")
+                val ordinary = turnRequest().pending
+                journal.save(ordinary)
+                val file = directory.walkTopDown().single { it.isFile }
+                file.writeText(file.readText().replace("\"schema\":2", "\"schema\":1"))
+                assertEquals(ordinary, journal.read(1))
+                journal.clear(ordinary)
+                val regeneration = ordinary.copy(regenerateMessageId = 102)
+                journal.save(regeneration)
+                assertTrue(file.readText().contains("\"schema\":2"))
+                assertEquals(regeneration, FileChatTurnJournal(directory, "scope").read(1))
+                assertTrue(runCatching { journal.clear(ordinary) }.isFailure)
+                assertEquals(regeneration, journal.read(1))
+            } finally {
+                directory.deleteRecursively()
+            }
+        }
+
+    @Test
     fun `reopen preserves only identifiers with endpoint and owner isolation`() =
         runBlocking {
             val directory = Files.createTempDirectory("chat-journal").toFile()

@@ -25,7 +25,8 @@ public actor FileChatTurnJournal: ChatTurnJournal {
         let bytes = try handle.read(upToCount: maximumBytes + 1) ?? Data()
         guard !bytes.isEmpty, bytes.count <= maximumBytes else { throw ChatTurnFailure.journalCorrupt }
         let record = try JSONDecoder().decode(Record.self, from: bytes)
-        guard record.schema == 1, record.pending.ownerID == ownerID else { throw ChatTurnFailure.journalCorrupt }
+        guard (1 ... 2).contains(record.schema), record.pending.ownerID == ownerID
+        else { throw ChatTurnFailure.journalCorrupt }
         return record.pending
     }
 
@@ -40,7 +41,7 @@ public actor FileChatTurnJournal: ChatTurnJournal {
         values.isExcludedFromBackup = true
         var location = directory
         try location.setResourceValues(values)
-        let bytes = try JSONEncoder().encode(Record(schema: 1, pending: pending))
+        let bytes = try JSONEncoder().encode(Record(schema: 2, pending: pending))
         guard bytes.count <= maximumBytes else { throw ChatTurnFailure.journalCorrupt }
         let destination = try file(ownerID: pending.ownerID)
         #if os(iOS)

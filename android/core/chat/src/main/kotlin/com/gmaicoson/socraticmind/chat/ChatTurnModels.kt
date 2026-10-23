@@ -25,9 +25,11 @@ data class PendingChatTurn(
     val ownerId: Long,
     val target: ChatTarget,
     val requestId: String,
+    val regenerateMessageId: Long? = null,
 ) {
     init {
         require(ownerId > 0 && requestId.matches(Regex("[A-Za-z0-9_-]{1,100}")))
+        require(regenerateMessageId == null || regenerateMessageId > 0)
     }
 }
 
@@ -51,6 +53,7 @@ data class ChatTurnRequest(
             put("kind", "qa")
             put("user_input", input)
             put("ai_style", style)
+            pending.regenerateMessageId?.let { put("regenerate_message_id", it) }
         }
 }
 

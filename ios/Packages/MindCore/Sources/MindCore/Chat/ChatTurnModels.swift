@@ -38,22 +38,28 @@ public struct PendingChatTurn: Equatable, Codable, Sendable {
     public let ownerID: Int64
     public let target: ChatTarget
     public let requestID: String
+    public let regenerateMessageID: Int64?
 
-    enum CodingKeys: String, CodingKey { case ownerID = "owner_id", target, requestID = "request_id" }
+    enum CodingKeys: String, CodingKey {
+        case ownerID = "owner_id", target, requestID = "request_id", regenerateMessageID = "regenerate_message_id"
+    }
 
-    public init(ownerID: Int64, target: ChatTarget, requestID: String) throws {
+    public init(ownerID: Int64, target: ChatTarget, requestID: String, regenerateMessageID: Int64? = nil) throws {
         let allowed = Set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-".utf8)
         guard ownerID > 0, (1 ... 100).contains(requestID.utf8.count),
-              requestID.utf8.allSatisfy({ allowed.contains($0) })
+              requestID.utf8.allSatisfy({ allowed.contains($0) }),
+              regenerateMessageID == nil || (regenerateMessageID ?? 0) > 0
         else { throw ChatTurnFailure.invalidRequest }
         self.ownerID = ownerID; self.target = target; self.requestID = requestID
+        self.regenerateMessageID = regenerateMessageID
     }
 
     public init(from decoder: any Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(ownerID: values.decode(Int64.self, forKey: .ownerID),
                       target: values.decode(ChatTarget.self, forKey: .target),
-                      requestID: values.decode(String.self, forKey: .requestID))
+                      requestID: values.decode(String.self, forKey: .requestID),
+                      regenerateMessageID: values.decodeIfPresent(Int64.self, forKey: .regenerateMessageID))
     }
 }
 
@@ -71,11 +77,15 @@ public struct ChatTurnRequest: Sendable {
     }
 
     public func encoded() throws -> Data {
-        try JSONSerialization.data(withJSONObject: [
+        var value: [String: Any] = [
             "request_id": pending.requestID, "session_id": pending.target.sessionID,
             "node_key": pending.target.nodeKey, "topic_id": pending.target.topicID,
             "mode": pending.target.mode.rawValue, "kind": "qa", "user_input": input, "ai_style": style,
-        ])
+        ]
+        if let id = pending.regenerateMessageID {
+            value["regenerate_message_id"] = id
+        }
+        return try JSONSerialization.data(withJSONObject: value)
     }
 }
 

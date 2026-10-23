@@ -85,9 +85,11 @@ public final class ChatLibraryModel: ObservableObject {
         guard !closed, state.account == account, receipt.pending.ownerID == account.userID else { return }
         if state.selected?.target == receipt.pending.target {
             reads.removeValue(forKey: .messages)?.task.cancel()
-            let refresh = !state.messages.loaded || receipt.messages.isEmpty
+            let refresh = !state.messages.loaded || receipt.messages.isEmpty ||
+                (receipt.replacedMessageID != nil && !receipt.messages.contains { $0.role == "ai" })
             var seen: Set<Int64> = []
-            state.messages.items = (receipt.messages + state.messages.items)
+            state.messages
+                .items = (receipt.historyMessages + state.messages.items.filter(receipt.retains))
                 .filter { seen.insert($0.id).inserted }.sorted { $0.id > $1.id }
             state.messages.loaded = true; state.messages.loading = nil; state.messages.failure = nil
             if refresh {

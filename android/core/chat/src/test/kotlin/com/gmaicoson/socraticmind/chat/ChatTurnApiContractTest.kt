@@ -33,6 +33,24 @@ internal fun turnRequest(): ChatTurnRequest {
 
 class ChatTurnApiContractTest {
     @Test
+    fun `regeneration sends original answer ID and exact question`(): Unit =
+        runBlocking {
+            LoopbackFixture().use { server ->
+                HttpTransport(server.endpoint).use { transport ->
+                    val ordinary = turnRequest()
+                    val request = ordinary.copy(pending = ordinary.pending.copy(regenerateMessageId = 102))
+                    assertEquals(turnFixture().getValue("regeneration_request"), request.json())
+                    val events = ChatTurnApi(transport).stream("turn-contract", request).toList()
+                    assertEquals(ChatEvent.MessageIds(101, 103), events.first())
+                    assertEquals(ChatEvent.Done, events.last())
+                    assertThrows(
+                        IllegalArgumentException::class.java,
+                    ) { ordinary.pending.copy(regenerateMessageId = 0) }
+                }
+            }
+        }
+
+    @Test
     fun `live buffer rejects identity changes terminal reversal and excessive text`() {
         val buffer = ChatTurnBuffer()
         buffer.accept(ChatEvent.MessageIds(1, 2))

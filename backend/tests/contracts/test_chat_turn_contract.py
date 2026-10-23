@@ -138,3 +138,66 @@ def test_native_request_shape_preserves_whitespace_and_scalar_limit():
         ChatRequest.model_validate({**REQUEST, "user_input": "🙂" * 5001})
     with pytest.raises(ValidationError):
         ChatRequest.model_validate({**REQUEST, "web_mode": "auto"})
+
+
+@pytest.mark.parametrize("status", ["complete", "failed", "interrupted"])
+def test_regeneration_reuses_question_and_only_replaces_on_success(
+    client, generation, monkeypatch, db_session, status
+):
+    assert client.post("/api/chat/stream", json=REQUEST).status_code == 200
+    original = client.get(f"/api/chat/requests/{REQUEST['request_id']}").json()["msg_ids"]
+    visible_during = []
+
+    def replacement(**_arguments):
+        visible_during.extend(
+            row["id"]
+            for row in client.get(
+                "/api/chat/session-messages", params={"session_id": REQUEST["session_id"]}
+            ).json()["items"]
+        )
+        yield "新回答"
+        if status != "complete":
+            code = "AI_STREAM_INCOMPLETE" if status == "interrupted" else "AI_STREAM_ERROR"
+            raise ChatStreamError(code, "合成失败", retryable=True)
+
+    monkeypatch.setattr("routers.chat.chat_stream", replacement)
+    request = {
+        **DATA["regeneration_request"],
+        "request_id": "regenerated",
+        "regenerate_message_id": original["ai"],
+    }
+    assert client.post("/api/chat/stream", json=request).status_code == 200
+    result = client.get("/api/chat/requests/regenerated").json()
+    assert result["status"] == status
+    assert result["msg_ids"]["user"] == original["user"]
+    assert result["msg_ids"]["ai"] != original["ai"]
+    assert original["ai"] in visible_during
+    assert result["msg_ids"]["ai"] in visible_during  # History exposes an active provisional row.
+    page = client.get(
+        "/api/chat/session-messages", params={"session_id": REQUEST["session_id"]}
+    ).json()["items"]
+    expected_ai = result["msg_ids"]["ai"] if status == "complete" else original["ai"]
+    assert [row["id"] for row in page] == [expected_ai, original["user"]]
+    assert db_session.query(ChatMessage).filter_by(role="user").count() == 1
+    if status == "complete":
+        assert client.get(f"/api/chat/requests/{REQUEST['request_id']}").status_code == 409
+    else:
+        assert (
+            client.get(f"/api/chat/requests/{REQUEST['request_id']}").json()["status"] == "complete"
+        )
+
+
+def test_stale_regeneration_rejection_can_be_cancelled_without_another_question(client, generation):
+    assert client.post("/api/chat/stream", json=REQUEST).status_code == 200
+    original = client.get(f"/api/chat/requests/{REQUEST['request_id']}").json()["msg_ids"]
+    second = {**REQUEST, "request_id": "second", "user_input": "另一端追加的问题"}
+    assert client.post("/api/chat/stream", json=second).status_code == 200
+    stale = {**REQUEST, "request_id": "stale-regen", "regenerate_message_id": original["ai"]}
+    rejected = client.post("/api/chat/stream", json=stale)
+    assert rejected.status_code == 400, rejected.json()
+    assert rejected.json()["code"] == "CHAT_REGENERATE_NOT_LATEST"
+    assert client.get("/api/chat/requests/stale-regen").status_code == 404
+    assert client.post(
+        "/api/chat/cancel", json={key: stale[key] for key in ("request_id", "session_id")}
+    ).json() == {"status": "interrupted"}
+    assert len(generation) == 2

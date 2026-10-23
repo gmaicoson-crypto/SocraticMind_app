@@ -107,8 +107,12 @@ class ChatLibraryController(
             if (state.value.selected?.target == receipt.pending.target) {
                 reads.remove(Lane.MESSAGES)?.job?.cancel()
                 val page = state.value.messages
-                refresh = !page.loaded || receipt.messages.isEmpty()
-                val items = (receipt.messages + page.items).distinctBy { it.id }.sortedByDescending { it.id }
+                refresh = !page.loaded || receipt.messages.isEmpty() ||
+                    (receipt.replacedMessageId != null && receipt.messages.none { it.role == "ai" })
+                val items =
+                    (receipt.historyMessages + page.items.filter(receipt::retains))
+                        .distinctBy { it.id }
+                        .sortedByDescending { it.id }
                 mutableState.value =
                     state.value.copy(messages = page.copy(items = items, loaded = true, loading = null, failure = null))
             }

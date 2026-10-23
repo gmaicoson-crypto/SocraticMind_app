@@ -227,5 +227,16 @@
       },
       "valid": false
     }
-  ]
+  ],
+  "regeneration_request": {
+    "request_id": "turn-contract-id",
+    "session_id": "会话 /?&#+💡",
+    "mode": "normal",
+    "node_key": "__normal__",
+    "topic_id": 0,
+    "kind": "qa",
+    "user_input": "  为什么？\n```python\nprint(\"好\")\n```  ",
+    "ai_style": "标准",
+    "regenerate_message_id": 102
+  }
 }

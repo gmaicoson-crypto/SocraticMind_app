@@ -29,6 +29,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -38,6 +39,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatLibraryModelTests",
+                "ChatRegenerationTests",
                 "ChatTurnAPIContractTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -52,6 +54,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
             ],
@@ -70,7 +73,12 @@ class ImpactTests(unittest.TestCase):
         ]:
             result = load_plan(scope(path))
             self.assertEqual(
-                ["ChatLibraryModelTests", "ChatTurnModelTests", "FileChatTurnJournalTests"],
+                [
+                    "ChatLibraryModelTests",
+                    "ChatRegenerationTests",
+                    "ChatTurnModelTests",
+                    "FileChatTurnJournalTests",
+                ],
                 result["checks"]["ios"],
             )
             self.assertFalse(result["checks"]["android"])
@@ -85,7 +93,7 @@ class ImpactTests(unittest.TestCase):
             "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt"
         )
         result = load_plan(scope(value))
-        self.assertEqual(11, len(result["checks"]["android"]))
+        self.assertEqual(12, len(result["checks"]["android"]))
         self.assertFalse(result["checks"]["ios"])
         self.assertFalse(result["checks"]["python"])
         self.assertEqual([value], result["files"]["android"])
@@ -108,6 +116,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
             ],
@@ -118,6 +127,7 @@ class ImpactTests(unittest.TestCase):
                 "AuthAPIContractTests",
                 "AuthFormModelTests",
                 "ChatLibraryModelTests",
+                "ChatRegenerationTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
                 "KeychainTokenVaultTests",
@@ -145,6 +155,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -155,6 +166,7 @@ class ImpactTests(unittest.TestCase):
             [
                 "ChatHistoryAPIContractTests",
                 "ChatLibraryModelTests",
+                "ChatRegenerationTests",
                 "ChatTurnAPIContractTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -180,6 +192,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -253,6 +266,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatLibraryModelTests",
+                "ChatRegenerationTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
                 "MarkdownContractTests",
@@ -270,7 +284,7 @@ class ImpactTests(unittest.TestCase):
             "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         ]:
             result = load_plan(scope(value))
-            self.assertEqual(13, len(result["checks"]["ios"]))
+            self.assertEqual(14, len(result["checks"]["ios"]))
             self.assertIn("MarkdownContractTests", result["checks"]["ios"])
             self.assertEqual(
                 ["unittest:scripts.ci.tests.test_package_resolution"], result["checks"]["python"]
@@ -305,6 +319,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatLibraryModelTests",
+                "ChatRegenerationTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
                 "KeychainTokenVaultTests",
@@ -327,6 +342,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
             ],
@@ -342,6 +358,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatLibraryModelTests",
+                "ChatRegenerationTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
                 "SessionStoreTests",
@@ -362,6 +379,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.AuthFormControllerTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
             ],

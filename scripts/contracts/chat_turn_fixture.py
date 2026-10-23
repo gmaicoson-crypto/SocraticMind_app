@@ -51,6 +51,8 @@ def response(method: str, path: str, query: dict, headers, body: bytes = b""):
             return 400, {"detail": "invalid JSON"}
         if path == "/api/chat/stream" and payload == request:
             return 200, {"stream": True}
+        if path == "/api/chat/stream" and payload == DATA["regeneration_request"]:
+            return 200, {"stream": True, "regeneration": True}
         if path == "/api/chat/cancel" and payload == {
             "request_id": request["request_id"],
             "session_id": request["session_id"],
@@ -61,9 +63,9 @@ def response(method: str, path: str, query: dict, headers, body: bytes = b""):
     return 400, {"detail": "wrong turn request"}
 
 
-def frames() -> bytes:
+def frames(regeneration: bool = False) -> bytes:
     payloads = [
-        {"msg_ids": DATA["status"]["msg_ids"]},
+        {"msg_ids": {"user": 101, "ai": 103} if regeneration else DATA["status"]["msg_ids"]},
         {"text": "你好，"},
         {"text": "世界🙂"},
         {"request_state": {"status": "complete"}},

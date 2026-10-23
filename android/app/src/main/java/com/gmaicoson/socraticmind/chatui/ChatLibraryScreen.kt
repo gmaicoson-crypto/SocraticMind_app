@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
+import com.gmaicoson.socraticmind.chat.ChatRegeneration
 import com.gmaicoson.socraticmind.chat.ChatTurnController
 import com.gmaicoson.socraticmind.chat.ChatTurnState
 import com.gmaicoson.socraticmind.chat.ConversationSummary
@@ -112,6 +114,8 @@ fun ChatLibraryScreen(
                             model::loadMoreMessages,
                             renderer,
                             turnState,
+                            ChatRegeneration.from(state)?.answerId,
+                            { turn.regenerate(model.state.value, account.user.aiStyle) },
                             Modifier.weight(1f),
                         )
                     }
@@ -189,13 +193,12 @@ private fun MessageHistory(
     more: () -> Unit,
     renderer: MarkdownRenderer,
     turn: ChatTurnState,
+    regenerationId: Long?,
+    regenerate: () -> Unit,
     modifier: Modifier,
 ) {
     val scroll = rememberLazyListState()
-    val visible =
-        page.items.asReversed().filter {
-            turn.pending == null || (it.id != turn.ids?.user && it.id != turn.ids?.ai)
-        }
+    val visible = page.items.asReversed().filter(turn::showsInHistory)
     LaunchedEffect(page.loaded) {
         if (page.loaded && visible.isNotEmpty()) scroll.scrollToItem(visible.size)
     }
@@ -208,10 +211,23 @@ private fun MessageHistory(
         }
         items(visible, key = { it.id }) { message ->
             MessageContent(message, renderer)
+            if (message.id == regenerationId) {
+                TextButton(
+                    onClick = regenerate,
+                    enabled = turn.canRegenerate,
+                    modifier = Modifier.testTag("chat_regenerate"),
+                ) {
+                    Text("重新生成回答")
+                }
+            }
         }
         if (turn.pending != null) {
             item(key = "pending-turn") {
-                if (turn.submitted.isNotEmpty()) MessageContent("user", turn.submitted, renderer)
+                if (turn.pending?.regenerateMessageId != null) {
+                    Text("正在重新生成，完成前保留原回答。")
+                } else if (turn.submitted.isNotEmpty()) {
+                    MessageContent("user", turn.submitted, renderer)
+                }
                 MessageContent("ai", turn.partial, renderer, provisional = true)
             }
         }

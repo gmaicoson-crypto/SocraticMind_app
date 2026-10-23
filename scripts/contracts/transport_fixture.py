@@ -91,7 +91,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path in {"/api/chat/stream", "/api/chat/cancel"}:
             status, payload = turn_response("POST", self.path, {}, self.headers, body)
             if self.path == "/api/chat/stream" and status == 200:
-                wire = turn_frames()
+                wire = turn_frames(payload.get("regeneration", False))
                 self.send_response(200)
                 self.send_header("Content-Type", "text/event-stream")
                 self.send_header("Content-Length", str(len(wire)))

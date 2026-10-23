@@ -78,3 +78,7 @@ quality.yml 的 GitHub Actions 固定完整 commit SHA；MySQL 服务固定 8.4.
 新增 ChatTurn API、状态与 FileChatTurnJournal 使用现有 JDK / Foundation / CryptoKit 和传输依赖，没有新版本或锁文件变更。`turn-provider` / `turn-fixtures` / `turn-api-*` / `turn-state-*` 在影响映射中登记明确路径、账号 / 历史依赖和测试选择；共享回环服务器变化扩展实际使用它的双端消费者。新建源码仍必须登记映射，不能由通配规则自动跳过。
 
 当前提供方 10 项、工具 58 项，Android 12 类 87 项有效报告、Swift 13 suite 91 项通过；实际执行与缓存复用边界见[实施状态](execution-status.md)。变化源码通过固定格式 / lint；306 行发送协调器和 503 行影响映射测试达到预警，职责审查见[发送实施](chat-turn-implementation.md)，无硬上限突破或新豁免。XcodeGen 只登记组件，没有应用编译或安装；平台文件保护、备份和生命周期仍属独立原生验证。
+
+## 普通文字重生成的定向集合
+
+重生成资格与状态测试加入既有 turn-state 双端组；提供方增加 2 项既有生命周期选择。共享发送 fixture 及回环服务器变化扩展已登记的 HTTP、账号、历史、Markdown 与发送消费者，仍为显式类 / suite，没有全量测试或应用构建。最终结果和历史临时行的修正见[实施状态](execution-status.md)。schema 1 / 2 兼容和请求 ID 去重由主机测试覆盖，设备生命周期与原生 UI 单独验收。
