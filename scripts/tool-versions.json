@@ -1,0 +1,32 @@
+{
+  "tools": {
+    "ktlint": {
+      "version": "1.8.0",
+      "platform": "any",
+      "url": "https://github.com/ktlint/ktlint/releases/download/1.8.0/ktlint",
+      "sha256": "a3fd620207d5c40da6ca789b95e7f823c54e854b7fade7f613e91096a3706d75",
+      "format": "executable"
+    },
+    "swiftformat": {
+      "version": "0.64.0",
+      "platform": "Darwin",
+      "url": "https://github.com/nicklockwood/SwiftFormat/releases/download/0.64.0/swiftformat.zip",
+      "sha256": "95ea62625d0b898a7af870293311ae6f09e4a3147ecd900593687e4b9ab2fd98",
+      "format": "zip"
+    },
+    "swiftlint": {
+      "version": "0.65.1",
+      "platform": "Darwin",
+      "url": "https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip",
+      "sha256": "c1e429b0599cf1b516f369a2d9ec04eaf0e436f3c12b637df8851fa52ff694d0",
+      "format": "zip"
+    },
+    "xcodegen": {
+      "version": "2.46.0",
+      "platform": "Darwin",
+      "url": "https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip",
+      "sha256": "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806",
+      "format": "zip"
+    }
+  }
+}

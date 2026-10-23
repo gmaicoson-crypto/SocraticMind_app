@@ -1,0 +1,15 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+force-exclude = true
+
+[tool.ruff.lint]
+# Initial lint gate adds syntax/import correctness to the upstream format-only gate.
+# Keep this explicit: Ruff's evolving default rule set must not change CI silently.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+exclude = ["backend/alembic/versions/*.py"]

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "payloads": [
+    "not-json",
+    "[]",
+    "{\"text\":null}",
+    "{\"msg_ids\":null}",
+    "{\"text\":42}",
+    "{\"msg_ids\":{\"user\":-1,\"ai\":2}}",
+    "{\"msg_ids\":{\"user\":\"1\",\"ai\":2}}",
+    "{\"error\":{\"code\":\"X\",\"message\":\"bad\",\"retryable\":\"true\"}}",
+    "{\"request_state\":{}}",
+    "{\"type\":null}"
+  ]
+}

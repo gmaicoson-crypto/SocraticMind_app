@@ -1,0 +1,648 @@
+{
+  "version": 1,
+  "initial_policy": "固定迁入清单中的旧文件在首次提交选已审查的 baseline cohort；后续未知业务路径必须新增准确映射，不自动全量。",
+  "groups": {
+    "import-baseline": {
+      "paths": [],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_config.py",
+          "pytest:tests/p0/test_models.py",
+          "pytest:tests/p0/test_migrations.py",
+          "pytest:tests/p0/test_errors.py",
+          "pytest:tests/p0/test_user_llm_api.py",
+          "pytest:tests/p0/test_plans_queries.py",
+          "pytest:tests/p0/test_agent_orchestrator.py",
+          "pytest:tests/p0/test_web_chat.py",
+          "pytest:tests/p0/test_chat_summaries.py::test_running_job_waits_for_lease_and_recovers_after_process_restart",
+          "pytest:tests/test_attachments.py::test_docx_order_nested_tables_pptx_notes",
+          "pytest:tests/test_attachments.py::test_pdf_range_confirmation_and_scan_failure",
+          "pytest:tests/test_attachments.py::test_upload_idempotency_scope_and_download"
+        ]
+      },
+      "manual": [
+        "固定源迁入只运行列明的基线用例，不代表全部旧业务验收。"
+      ]
+    },
+    "mysql": {
+      "paths": [
+        "backend/core/database.py",
+        "backend/core/migrations.py",
+        "backend/models.py",
+        "backend/alembic/*",
+        "backend/alembic.ini",
+        "backend/tests/integration/test_mysql_baseline.py",
+        "scripts/dev/verify_backend_mysql.py",
+        "backend/models/user.py"
+      ],
+      "depends_on": [
+        "configuration",
+        "import-baseline"
+      ],
+      "checks": {
+        "mysql": [
+          "pytest:tests/integration/test_mysql_baseline.py::test_mysql_empty_database_upgrades_to_head",
+          "pytest:tests/integration/test_mysql_baseline.py::test_mysql_previous_revision_upgrade_keeps_unicode_user",
+          "pytest:tests/integration/test_mysql_baseline.py::test_mysql_application_lifespan_and_health"
+        ],
+        "python": [
+          "pytest:tests/p0/test_models.py",
+          "pytest:tests/p0/test_migrations.py"
+        ]
+      },
+      "manual": []
+    },
+    "configuration": {
+      "paths": [
+        "backend/core/config.py",
+        "backend/.env.example",
+        "backend/main.py",
+        "backend/tests/p0/test_config.py",
+        "backend/requirements*.txt"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_config.py"
+        ]
+      },
+      "manual": []
+    },
+    "avatars": {
+      "paths": [
+        "backend/core/avatars.py",
+        "backend/core/avatar_uploads.py",
+        "backend/assets/*",
+        "backend/tests/p0/test_avatar_presets.py"
+      ],
+      "depends_on": [
+        "configuration"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_avatar_presets.py"
+        ]
+      },
+      "manual": [
+        "头像选择器 / 系统相册在 App 宿主另验。"
+      ]
+    },
+    "openapi": {
+      "paths": [
+        "contracts/openapi/socraticmind.json",
+        "scripts/contracts/export_openapi.py",
+        "backend/tests/contracts/test_openapi_contract.py"
+      ],
+      "depends_on": [
+        "configuration",
+        "import-baseline",
+        "history-provider"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_openapi_contract.py"
+        ]
+      },
+      "manual": []
+    },
+    "chat-provider": {
+      "paths": [
+        "backend/services/chat_stream_runner.py",
+        "backend/tests/contracts/test_chat_stream_contract.py",
+        "contracts/sse/*",
+        "contracts/fixtures/chat-streams.json",
+        "backend/core/errors.py",
+        "backend/tests/p0/test_errors.py",
+        "backend/routers/chat.py"
+      ],
+      "depends_on": [
+        "import-baseline"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_chat_stream_contract.py",
+          "pytest:tests/p0/test_errors.py",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_request_replay_and_fingerprint",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_expired_same_request_replay_returns_interrupted",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_cancel_before_begin_is_durable_and_prevents_generation",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_failed_regeneration_preserves_answer_success_replaces_and_invalidates"
+        ]
+      },
+      "manual": []
+    },
+    "sse-android": {
+      "paths": [
+        "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt",
+        "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/ChatEvent.kt",
+        "android/core/network/src/test/kotlin/com/gmaicoson/socraticmind/network/SseContractTest.kt"
+      ],
+      "depends_on": [
+        "chat-provider",
+        "wire-fixtures",
+        "android-dependencies"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.network.SseContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "sse-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Networking/SSEDecoder.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Networking/ChatEvent.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/SSEContractTests.swift"
+      ],
+      "depends_on": [
+        "chat-provider",
+        "wire-fixtures",
+        "ios-dependencies"
+      ],
+      "checks": {
+        "ios": [
+          "SSEContractTests"
+        ]
+      },
+      "manual": []
+    },
+    "wire-fixtures": {
+      "paths": [
+        "contracts/fixtures/sse-framing.json",
+        "contracts/fixtures/invalid-chat-events.json"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "http-android": {
+      "paths": [
+        "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/ApiEndpoint.kt",
+        "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/HttpFailure.kt",
+        "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/HttpTransport.kt",
+        "android/core/network/src/test/kotlin/com/gmaicoson/socraticmind/network/HttpTransportTest.kt",
+        "android/core/network/src/test/kotlin/com/gmaicoson/socraticmind/network/LoopbackFixture.kt",
+        "android/core/network/src/testFixtures/kotlin/com/gmaicoson/socraticmind/network/LoopbackFixture.kt"
+      ],
+      "depends_on": [
+        "sse-android",
+        "http-fixture"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.network.HttpTransportTest"
+        ]
+      },
+      "manual": []
+    },
+    "http-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Networking/APIEndpoint.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Networking/HTTPFailure.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Networking/HTTPTransport.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/HTTPTransportTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/LoopbackFixture.swift"
+      ],
+      "depends_on": [
+        "sse-ios",
+        "http-fixture"
+      ],
+      "checks": {
+        "ios": [
+          "HTTPTransportTests"
+        ]
+      },
+      "manual": []
+    },
+    "http-fixture": {
+      "paths": [
+        "scripts/contracts/transport_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "android-dependencies": {
+      "paths": [
+        "android/*.gradle.kts",
+        "android/gradle.properties",
+        "android/settings-gradle.lockfile",
+        "android/gradle/*",
+        "android/gradlew",
+        "android/gradlew.bat",
+        "android/core/network/build.gradle.kts",
+        "android/core/network/gradle.lockfile",
+        "android/app/build.gradle.kts",
+        "android/app/gradle.lockfile"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "ios-dependencies": {
+      "paths": [
+        "ios/Packages/MindCore/Package.swift",
+        "ios/project.yml",
+        "ios/SocraticMind.xcodeproj/*"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "native-shell": {
+      "paths": [
+        "android/app/src/main/*",
+        "ios/SocraticMind/*"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": [
+        "原生 UI、权限、键盘、后台和安装需要独立设备验证；自动任务不构建 APK / IPA。"
+      ]
+    },
+    "local-environment": {
+      "paths": [
+        "scripts/dev/local_backend.py",
+        "scripts/dev/local_environment.py",
+        "scripts/dev/mysql_runtime.py",
+        "scripts/dev/serve_backend.py",
+        "scripts/dev/tests/test_local_environment.py",
+        "scripts/dev/tests/test_local_backend_lifecycle.py"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "unittest:scripts.dev.tests.test_local_environment"
+        ]
+      },
+      "manual": [
+        "持久服务启动 / 注册 / 上传 / 重启用例需在具备 mysqld 的本机单独运行。"
+      ]
+    },
+    "quality-tools": {
+      "paths": [
+        "scripts/quality/*",
+        "scripts/ci/*",
+        ".github/workflows/*",
+        "scripts/tool-versions.json",
+        "scripts/dev/bootstrap_tools.py",
+        ".editorconfig",
+        "pyproject.toml",
+        "ios/.swiftformat",
+        "ios/.swiftlint.yml"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "unittest:scripts.quality.tests.test_file_rules",
+          "unittest:scripts.quality.tests.test_changed_files",
+          "unittest:scripts.ci.tests.test_impact"
+        ]
+      },
+      "manual": []
+    },
+    "auth-provider": {
+      "paths": [
+        "contracts/fixtures/auth.json",
+        "scripts/contracts/auth_fixture.py",
+        "backend/tests/contracts/test_auth_contract.py",
+        "backend/routers/auth.py",
+        "backend/core/auth.py",
+        "backend/core/deps.py",
+        "backend/core/email.py",
+        "backend/models/user.py"
+      ],
+      "depends_on": [
+        "configuration"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_auth_contract.py"
+        ]
+      },
+      "manual": [
+        "会话竞态、安全凭证存储、账号清理和设备表单仍需对应功能用例；本集合仅验证账号接口。"
+      ]
+    },
+    "auth-android": {
+      "paths": [
+        "android/core/auth/build.gradle.kts",
+        "android/core/auth/gradle.lockfile",
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/AuthApi.kt",
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/AuthModels.kt",
+        "android/core/auth/src/test/kotlin/com/gmaicoson/socraticmind/auth/AuthApiContractTest.kt"
+      ],
+      "depends_on": [
+        "http-android",
+        "auth-provider"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.auth.AuthApiContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "auth-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/AuthAPI.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/AuthModels.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/AuthAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "http-ios",
+        "auth-provider"
+      ],
+      "checks": {
+        "ios": [
+          "AuthAPIContractTests"
+        ]
+      },
+      "manual": []
+    },
+    "session-android": {
+      "paths": [
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/SessionStore.kt",
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/SessionState.kt",
+        "android/core/auth/src/test/kotlin/com/gmaicoson/socraticmind/auth/SessionStoreTest.kt",
+        "android/core/auth/src/test/kotlin/com/gmaicoson/socraticmind/auth/SessionTestDoubles.kt"
+      ],
+      "depends_on": [
+        "auth-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.auth.SessionStoreTest"
+        ]
+      },
+      "manual": [
+        "会话主机测试不覆盖页面生命周期；功能消费者需按账号 revision 取消任务并清理缓存。"
+      ]
+    },
+    "session-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/SessionStore.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/SessionState.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/SessionStoreTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/SessionTestDoubles.swift"
+      ],
+      "depends_on": [
+        "auth-ios"
+      ],
+      "checks": {
+        "ios": [
+          "SessionStoreTests"
+        ]
+      },
+      "manual": [
+        "会话主机测试不覆盖页面生命周期；功能消费者需按账号 revision 取消任务并清理缓存。"
+      ]
+    },
+    "credential-storage-android": {
+      "paths": [
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/EncryptedTokenVault.kt",
+        "android/core/auth/src/test/kotlin/com/gmaicoson/socraticmind/auth/EncryptedTokenVaultTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/storage/KeystoreTokenVault.kt"
+      ],
+      "depends_on": [
+        "session-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
+          "com.gmaicoson.socraticmind.auth.SessionStoreTest"
+        ]
+      },
+      "manual": [
+        "AndroidKeyStore、AtomicFile 和设备重启行为待应用宿主验证；JVM 测试仅覆盖真实 JCE 加密与模拟存储故障。"
+      ]
+    },
+    "credential-storage-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/KeychainTokenVault.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/KeychainTokenVaultTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/KeychainTestDouble.swift"
+      ],
+      "depends_on": [
+        "session-ios"
+      ],
+      "checks": {
+        "ios": [
+          "KeychainTokenVaultTests",
+          "SessionStoreTests"
+        ]
+      },
+      "manual": [
+        "Keychain 查询与错误处理使用合成替身验证；设备锁屏、真实 Keychain 与重装行为待应用宿主验证。"
+      ]
+    },
+    "auth-form-fixtures": {
+      "paths": [
+        "contracts/fixtures/auth-form.json"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "auth-form-android": {
+      "paths": [
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/AuthFormState.kt",
+        "android/core/auth/src/main/kotlin/com/gmaicoson/socraticmind/auth/AuthFormController.kt",
+        "android/core/auth/src/test/kotlin/com/gmaicoson/socraticmind/auth/AuthFormControllerTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/*.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/MainActivity.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt"
+      ],
+      "depends_on": [
+        "session-android",
+        "auth-form-fixtures"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.auth.AuthFormControllerTest"
+        ]
+      },
+      "manual": [
+        "账号表单核心已映射；原生页面、容器接线、键盘和账号恢复仍需 Android 宿主定向验证。"
+      ]
+    },
+    "auth-form-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/AuthFormState.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Authentication/AuthFormModel.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/AuthFormModelTests.swift",
+        "ios/SocraticMind/App/*.swift",
+        "ios/SocraticMind/Account/*.swift"
+      ],
+      "depends_on": [
+        "session-ios",
+        "auth-form-fixtures"
+      ],
+      "checks": {
+        "ios": [
+          "AuthFormModelTests"
+        ]
+      },
+      "manual": [
+        "账号表单核心已映射；原生页面、容器接线、键盘和账号恢复仍需 iOS 宿主定向验证。"
+      ]
+    },
+    "native-configuration": {
+      "paths": [
+        "android/app/src/main/AndroidManifest.xml",
+        "android/app/src/main/res/xml/network_security_config.xml",
+        "android/app/src/debug/res/xml/network_security_config.xml",
+        "ios/Config/*.plist",
+        "ios/project.yml",
+        "scripts/ci/tests/test_native_configuration.py"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "unittest:scripts.ci.tests.test_native_configuration"
+        ]
+      },
+      "manual": [
+        "网络配置静态校验不能替代模拟器 / 真机对本地后端的实际连接。"
+      ]
+    },
+    "native-auth-ui-tests": {
+      "paths": [
+        "ios/UITests/*.swift",
+        "android/uitests/*",
+        "scripts/dev/auth_ui_fixture.py",
+        "scripts/dev/tests/test_auth_ui_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "unittest:scripts.dev.tests.test_auth_ui_fixture"
+        ]
+      },
+      "manual": [
+        "双端真实账号 UI 流程仅在明确获准构建后运行，使用独立后端和合成验证码读取器；默认 CI 不构建或运行设备包。"
+      ]
+    },
+    "history-provider": {
+      "paths": [
+        "backend/routers/chat.py",
+        "backend/routers/chat_history.py",
+        "backend/services/chat_history.py",
+        "backend/schemas/chat_history.py",
+        "backend/tests/contracts/test_chat_history_contract.py",
+        "contracts/fixtures/chat-history.json"
+      ],
+      "depends_on": [
+        "import-baseline"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_chat_history_contract.py",
+          "pytest:tests/p0/test_web_chat.py::test_sources_persist_before_terminal_and_replay_without_search",
+          "pytest:tests/p0/test_web_chat.py::test_failed_regeneration_keeps_original_sources",
+          "pytest:tests/p0/test_web_chat.py::test_successful_regeneration_replaces_answer_and_sources",
+          "pytest:tests/p0/test_attachment_chat.py::test_attachment_only_chat_history_followup_and_replay",
+          "pytest:tests/p0/test_attachment_chat.py::test_deleted_source_in_history_is_unavailable"
+        ]
+      },
+      "manual": [
+        "会话列表与消息分页核心不等于原生页面验收；需要按账号清理状态，另验长消息、滚动、键盘与刷新。"
+      ]
+    },
+    "history-native-fixtures": {
+      "paths": [
+        "contracts/fixtures/invalid-history-pages.json",
+        "scripts/contracts/chat_history_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "history-mysql": {
+      "paths": [
+        "backend/tests/integration/test_mysql_chat_history.py"
+      ],
+      "depends_on": [
+        "history-provider",
+        "mysql"
+      ],
+      "checks": {
+        "mysql": [
+          "pytest:tests/integration/test_mysql_chat_history.py::test_mysql_history_window_and_unicode_projection"
+        ]
+      },
+      "manual": []
+    },
+    "history-android": {
+      "paths": [
+        "android/core/chat/build.gradle.kts",
+        "android/core/chat/gradle.lockfile",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryModels.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryDecoding.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryApi.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryApiContractTest.kt"
+      ],
+      "depends_on": [
+        "history-provider",
+        "history-native-fixtures",
+        "http-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "history-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryModels.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/StoredChatMessage.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryAPI.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatHistoryAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "history-provider",
+        "history-native-fixtures",
+        "http-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatHistoryAPIContractTests"
+        ]
+      },
+      "manual": []
+    }
+  },
+  "metadata": [
+    "*.md",
+    ".gitignore",
+    "backend/LICENSE.upstream",
+    "backend/upstream-manifest.json",
+    "docs/*.json",
+    "contracts/compatibility/*"
+  ],
+  "format_expansion": {
+    "pyproject.toml": [
+      "*.py"
+    ],
+    ".editorconfig": [
+      "*.py",
+      "*.kt",
+      "*.kts",
+      "*.swift"
+    ],
+    "ios/.swiftformat": [
+      "ios/*.swift"
+    ],
+    "ios/.swiftlint.yml": [
+      "ios/*.swift"
+    ],
+    "scripts/tool-versions.json": [
+      "*.kt",
+      "*.kts",
+      "*.swift"
+    ]
+  }
+}

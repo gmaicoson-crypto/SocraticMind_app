@@ -1,0 +1,835 @@
+{
+  "cases": [
+    {
+      "id": "duplicate-message",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 104,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "ascending",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "zero-id",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 0,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "string-id",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": "104",
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "missing-id",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "bad-metadata",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": [],
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "bad-attachments",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": [
+              true
+            ]
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "wrong-cursor",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 102
+      },
+      "cursor": null
+    },
+    {
+      "id": "empty-cursor",
+      "kind": "messages",
+      "payload": {
+        "items": [],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "future-item",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 103,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "negative-snapshot",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": -1,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "wrong-session",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "other",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "zero-cursor",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 0
+      },
+      "cursor": null
+    },
+    {
+      "id": "changed-window",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 102,
+            "role": "ai",
+            "content": "第一次回答",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 101,
+            "role": "user",
+            "content": "第一问",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 105,
+        "next_before_id": null
+      },
+      "cursor": {
+        "snapshot_id": 104,
+        "before_id": 103
+      }
+    },
+    {
+      "id": "overlap-window",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": {
+        "snapshot_id": 104,
+        "before_id": 103
+      }
+    },
+    {
+      "id": "oversized",
+      "kind": "messages",
+      "payload": {
+        "items": [
+          {
+            "id": 104,
+            "role": "ai",
+            "content": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 103,
+            "role": "user",
+            "content": "继续说明 + & ?",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": null,
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          },
+          {
+            "id": 102,
+            "role": "ai",
+            "content": "第一次回答",
+            "node_key": "normal",
+            "mode": "normal",
+            "topic_id": null,
+            "session_id": "普通/会话 + 中文🙂?&",
+            "message_type": "chat",
+            "metadata": {
+              "status": "complete",
+              "future": {
+                "flag": true,
+                "count": 2,
+                "ratio": 0.5,
+                "names": [
+                  "甲",
+                  null
+                ]
+              }
+            },
+            "created_at": "2026-10-23T08:10:00",
+            "attachments": []
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 103
+      },
+      "cursor": null
+    },
+    {
+      "id": "duplicate-session",
+      "kind": "sessions",
+      "payload": {
+        "items": [
+          {
+            "session_id": "普通/会话 + 中文🙂?&",
+            "mode": "normal",
+            "topic_id": null,
+            "node_key": "normal",
+            "last_message_id": 104,
+            "last_role": "ai",
+            "preview": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "updated_at": "2026-10-23T08:10:00",
+            "title": "合成测试对话",
+            "title_status": "manual"
+          },
+          {
+            "session_id": "普通/会话 + 中文🙂?&",
+            "mode": "normal",
+            "topic_id": null,
+            "node_key": "normal",
+            "last_message_id": 99,
+            "last_role": "ai",
+            "preview": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "updated_at": "2026-10-23T08:10:00",
+            "title": "合成测试对话",
+            "title_status": "manual"
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 104
+      },
+      "cursor": null
+    },
+    {
+      "id": "wrong-mode",
+      "kind": "sessions",
+      "payload": {
+        "items": [
+          {
+            "session_id": "普通/会话 + 中文🙂?&",
+            "mode": "socratic",
+            "topic_id": null,
+            "node_key": "normal",
+            "last_message_id": 104,
+            "last_role": "ai",
+            "preview": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "updated_at": "2026-10-23T08:10:00",
+            "title": "合成测试对话",
+            "title_status": "manual"
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 104
+      },
+      "cursor": null
+    },
+    {
+      "id": "bad-title",
+      "kind": "sessions",
+      "payload": {
+        "items": [
+          {
+            "session_id": "普通/会话 + 中文🙂?&",
+            "mode": "normal",
+            "topic_id": null,
+            "node_key": "normal",
+            "last_message_id": 104,
+            "last_role": "ai",
+            "preview": "## 回答\n\n中文🙂与 `code`\n\n| 项目 | 值 |\n| --- | --- |\n| 示例 | 1 |",
+            "updated_at": "2026-10-23T08:10:00",
+            "title": 123,
+            "title_status": "manual"
+          }
+        ],
+        "snapshot_id": 104,
+        "next_before_id": 104
+      },
+      "cursor": null
+    }
+  ]
+}

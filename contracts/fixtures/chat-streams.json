@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "complete-utf8",
+      "wire": "data: {\"msg_ids\": {\"user\": 1, \"ai\": 2}}\n\ndata: {\"text\": \"你\"}\n\ndata: {\"text\": \"好\"}\n\ndata: {\"request_state\": {\"status\": \"complete\"}}\n\ndata: [DONE]\n\n",
+      "text": "你好",
+      "status": "complete"
+    },
+    {
+      "id": "interrupted-partial",
+      "wire": "data: {\"msg_ids\": {\"user\": 1, \"ai\": 2}}\n\ndata: {\"text\": \"部分\"}\n\ndata: {\"request_state\": {\"status\": \"interrupted\"}}\n\ndata: {\"error\": {\"code\": \"AI_STREAM_INCOMPLETE\", \"message\": \"测试流中断\", \"retryable\": true}}\n\ndata: [DONE]\n\n",
+      "text": "部分",
+      "status": "interrupted"
+    }
+  ]
+}

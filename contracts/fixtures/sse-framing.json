@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "bom-crlf-multiline",
+      "wire": "﻿: 注释\r\nevent: extension\r\ndata: 第一行\r\ndata: 第二行\r\n\r\n",
+      "payloads": [
+        "第一行\n第二行"
+      ]
+    },
+    {
+      "id": "cr-and-empty-data",
+      "wire": "data: 😀\r\rdata\r\r",
+      "payloads": [
+        "😀",
+        ""
+      ]
+    },
+    {
+      "id": "ignore-non-data",
+      "wire": ": keepalive\nid: 3\nretry: 10\nfuture: ignore\n\ndata:  保留空格\n\n",
+      "payloads": [
+        " 保留空格"
+      ]
+    },
+    {
+      "id": "incomplete-line",
+      "wire": "data: 已完成\n\ndata: 不完整",
+      "payloads": [
+        "已完成"
+      ]
+    },
+    {
+      "id": "incomplete-event",
+      "wire": "data: 未分派\n",
+      "payloads": []
+    }
+  ]
+}

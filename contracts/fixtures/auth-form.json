@@ -1,0 +1,51 @@
+{
+  "description": "Synthetic form inputs shared by native presentation tests; no real credentials.",
+  "cases": [
+    {
+      "mode": "login",
+      "fields": {},
+      "error": "请输入邮箱"
+    },
+    {
+      "mode": "login",
+      "fields": {
+        "email": "invalid"
+      },
+      "error": "请检查邮箱格式"
+    },
+    {
+      "mode": "login",
+      "fields": {
+        "email": " learner@example.test "
+      },
+      "error": "请输入密码"
+    },
+    {
+      "mode": "register",
+      "fields": {
+        "email": "learner@example.test",
+        "password": "Test1234"
+      },
+      "error": "请输入用户名"
+    },
+    {
+      "mode": "register",
+      "fields": {
+        "username": "学员",
+        "email": "learner@example.test",
+        "password": "Test1234",
+        "confirmation": "Different1"
+      },
+      "error": "两次输入的密码不一致"
+    },
+    {
+      "mode": "reset",
+      "fields": {
+        "email": "learner@example.test",
+        "password": "Test1234",
+        "confirmation": "Test1234"
+      },
+      "error": "请输入验证码"
+    }
+  ]
+}

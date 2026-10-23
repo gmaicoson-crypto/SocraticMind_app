@@ -1,0 +1,491 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072095AA102764FA32FE2A9C /* AuthScreen.swift */; };
+		1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB4AB36687E098F09045608 /* AuthFields.swift */; };
+		1EDDD242011246266AB5C4BF /* AuthUITestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F189D44C9164E612C194209 /* AuthUITestFixture.swift */; };
+		2855770B90E837BC2E36EB68 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DFA684F16FC815A3CAA454 /* AppRootView.swift */; };
+		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
+		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
+		C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4648BB5C680AAE1441E028BF /* AuthTextInput.swift */; };
+		E39ABE4A8138E47D7C469462 /* AuthFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */; };
+		E68A9A2A5BA6651F1369D0FA /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DDBEDD8CAC3E583E97292B /* AppModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9E3EAE74156290DDFB848F38 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D8339CF58E1CAC8CFB48B497 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2B523D3526F472DF8A00F8A7;
+			remoteInfo = SocraticMind;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		072095AA102764FA32FE2A9C /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
+		0F189D44C9164E612C194209 /* AuthUITestFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUITestFixture.swift; sourceTree = "<group>"; };
+		2C45889AB397FDA45D84D37D /* MindCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MindCore; path = Packages/MindCore; sourceTree = SOURCE_ROOT; };
+		4648BB5C680AAE1441E028BF /* AuthTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextInput.swift; sourceTree = "<group>"; };
+		69DFA684F16FC815A3CAA454 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowTests.swift; sourceTree = "<group>"; };
+		C2DFEB354734BE9B1218B7B9 /* SocraticMindUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SocraticMindUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6DDBEDD8CAC3E583E97292B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		CA2FBA22AE30161F8C7E7733 /* SocraticMind.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SocraticMind.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBB4AB36687E098F09045608 /* AuthFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFields.swift; sourceTree = "<group>"; };
+		E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocraticMindApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		40E95E7F0BF0B5DBFA5AC23C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		164449EA9A263028866B4700 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CA2FBA22AE30161F8C7E7733 /* SocraticMind.app */,
+				C2DFEB354734BE9B1218B7B9 /* SocraticMindUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		25910EC35AA2FA841EBD535A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C6DDBEDD8CAC3E583E97292B /* AppModel.swift */,
+				69DFA684F16FC815A3CAA454 /* AppRootView.swift */,
+				E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		85B07146BA30DD8775C1103E /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				2C45889AB397FDA45D84D37D /* MindCore */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		96640CF4405DA51087373CF5 /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				DBB4AB36687E098F09045608 /* AuthFields.swift */,
+				072095AA102764FA32FE2A9C /* AuthScreen.swift */,
+				4648BB5C680AAE1441E028BF /* AuthTextInput.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		BB9F4E2895E5597F34105B58 = {
+			isa = PBXGroup;
+			children = (
+				85B07146BA30DD8775C1103E /* Packages */,
+				FF4E64E6BCC3E2B97495ABF9 /* SocraticMind */,
+				E230DB14413FC185FE443BDC /* UITests */,
+				164449EA9A263028866B4700 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E230DB14413FC185FE443BDC /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */,
+				0F189D44C9164E612C194209 /* AuthUITestFixture.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		FF4E64E6BCC3E2B97495ABF9 /* SocraticMind */ = {
+			isa = PBXGroup;
+			children = (
+				96640CF4405DA51087373CF5 /* Account */,
+				25910EC35AA2FA841EBD535A /* App */,
+			);
+			path = SocraticMind;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2B523D3526F472DF8A00F8A7 /* SocraticMind */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 99326BF9FD49EF77EF0F123F /* Build configuration list for PBXNativeTarget "SocraticMind" */;
+			buildPhases = (
+				6AD9EDEE27E60ADA862276D4 /* Sources */,
+				40E95E7F0BF0B5DBFA5AC23C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SocraticMind;
+			packageProductDependencies = (
+				492390A04D3652B12EA883A7 /* MindCore */,
+			);
+			productName = SocraticMind;
+			productReference = CA2FBA22AE30161F8C7E7733 /* SocraticMind.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F736376DDB5A6C1F03C220D2 /* SocraticMindUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4635186869749974B2BD3C96 /* Build configuration list for PBXNativeTarget "SocraticMindUITests" */;
+			buildPhases = (
+				8FDB91EC027986731F4C5C43 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4C9644E0CBBD85C0839F1F2B /* PBXTargetDependency */,
+			);
+			name = SocraticMindUITests;
+			packageProductDependencies = (
+			);
+			productName = SocraticMindUITests;
+			productReference = C2DFEB354734BE9B1218B7B9 /* SocraticMindUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D8339CF58E1CAC8CFB48B497 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					2B523D3526F472DF8A00F8A7 = {
+						ProvisioningStyle = Automatic;
+					};
+					F736376DDB5A6C1F03C220D2 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = 2B523D3526F472DF8A00F8A7;
+					};
+				};
+			};
+			buildConfigurationList = 4CFDC1B909F9EE0A5847BA05 /* Build configuration list for PBXProject "SocraticMind" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = BB9F4E2895E5597F34105B58;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EFE7C40AE58BAB13F2B24B3B /* XCLocalSwiftPackageReference "Packages/MindCore" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 164449EA9A263028866B4700 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2B523D3526F472DF8A00F8A7 /* SocraticMind */,
+				F736376DDB5A6C1F03C220D2 /* SocraticMindUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6AD9EDEE27E60ADA862276D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E68A9A2A5BA6651F1369D0FA /* AppModel.swift in Sources */,
+				2855770B90E837BC2E36EB68 /* AppRootView.swift in Sources */,
+				1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */,
+				11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */,
+				C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */,
+				8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FDB91EC027986731F4C5C43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E39ABE4A8138E47D7C469462 /* AuthFlowTests.swift in Sources */,
+				1EDDD242011246266AB5C4BF /* AuthUITestFixture.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4C9644E0CBBD85C0839F1F2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2B523D3526F472DF8A00F8A7 /* SocraticMind */;
+			targetProxy = 9E3EAE74156290DDFB848F38 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1855CB664B87B6706CF7F486 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Info-Release.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = SocraticMind;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmaicoson.socraticmind;
+				SDKROOT = iphoneos;
+				SOCRATICMIND_API_URL = "";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1BE62A9B01FE81123868DE47 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Info-UITests.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmaicoson.socraticmind.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SocraticMind;
+			};
+			name = Release;
+		};
+		446F8660C2C4E932D7D9F413 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		79A8FC1F5E739300CD6ADE5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		8E0C244433E29CF70F2397C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Info-Debug.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = SocraticMind;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmaicoson.socraticmind;
+				SDKROOT = iphoneos;
+				SOCRATICMIND_API_URL = "http://127.0.0.1:8765/";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A965468B4342704F8C753276 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Info-UITests.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmaicoson.socraticmind.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SocraticMind;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4635186869749974B2BD3C96 /* Build configuration list for PBXNativeTarget "SocraticMindUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A965468B4342704F8C753276 /* Debug */,
+				1BE62A9B01FE81123868DE47 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4CFDC1B909F9EE0A5847BA05 /* Build configuration list for PBXProject "SocraticMind" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79A8FC1F5E739300CD6ADE5B /* Debug */,
+				446F8660C2C4E932D7D9F413 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		99326BF9FD49EF77EF0F123F /* Build configuration list for PBXNativeTarget "SocraticMind" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8E0C244433E29CF70F2397C0 /* Debug */,
+				1855CB664B87B6706CF7F486 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		EFE7C40AE58BAB13F2B24B3B /* XCLocalSwiftPackageReference "Packages/MindCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/MindCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		492390A04D3652B12EA883A7 /* MindCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MindCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D8339CF58E1CAC8CFB48B497 /* Project object */;
+}

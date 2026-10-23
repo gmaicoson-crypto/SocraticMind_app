@@ -1,0 +1,200 @@
+{
+  "repository": "https://github.com/gmaicoson-crypto/SocraticMind.git",
+  "commit": "4a20228e630168113e9e09a66de83699545fa82c",
+  "license": "../LICENSE.upstream",
+  "purpose": "Product preset avatars only, no user uploads or Web runtime",
+  "files": [
+    {
+      "source": "frontend/public/avatars/AI/normal/AI_normal.webp",
+      "target": "backend/assets/avatars/AI/normal/AI_normal.webp",
+      "sha256": "45462b34dae21d9d9bdec9e938fe38717666888ae42fd69d64fdd1006a52eb8a",
+      "bytes": 12088
+    },
+    {
+      "source": "frontend/public/avatars/AI/normal/AI_normal_2.webp",
+      "target": "backend/assets/avatars/AI/normal/AI_normal_2.webp",
+      "sha256": "93ed98611e6400e086a052339e89941162b8179b30a8eed3e33fb83fba242c2d",
+      "bytes": 14240
+    },
+    {
+      "source": "frontend/public/avatars/AI/normal/AI_normal_3.webp",
+      "target": "backend/assets/avatars/AI/normal/AI_normal_3.webp",
+      "sha256": "9ce16a3049da0ee323b6a6b2980e47b4690a18c18d94301d8ee01b8ab56a535c",
+      "bytes": 11460
+    },
+    {
+      "source": "frontend/public/avatars/AI/normal/AI_normal_4.webp",
+      "target": "backend/assets/avatars/AI/normal/AI_normal_4.webp",
+      "sha256": "e9b093057a80a299d0a9b52f4d139078e66be82df20a69e0fc85202c8e7856b8",
+      "bytes": 10442
+    },
+    {
+      "source": "frontend/public/avatars/AI/normal/AI_normal_5.webp",
+      "target": "backend/assets/avatars/AI/normal/AI_normal_5.webp",
+      "sha256": "cedf4485ec251af608f5a9f5beb423052ec0204bc10f8bea598788867b579d82",
+      "bytes": 12860
+    },
+    {
+      "source": "frontend/public/avatars/AI/normal/AI_normal_6.webp",
+      "target": "backend/assets/avatars/AI/normal/AI_normal_6.webp",
+      "sha256": "461820c0e60fb0420141d6fa046d6e50a00569ee95472209268e439a0ec32561",
+      "bytes": 8706
+    },
+    {
+      "source": "frontend/public/avatars/AI/study/AI-female-1.webp",
+      "target": "backend/assets/avatars/AI/study/AI-female-1.webp",
+      "sha256": "edd3c84c4974074946887b0a95733b3a9d3d515f05b9ce33b39828f864e428d1",
+      "bytes": 352286
+    },
+    {
+      "source": "frontend/public/avatars/AI/study/AI-female-2.webp",
+      "target": "backend/assets/avatars/AI/study/AI-female-2.webp",
+      "sha256": "935ae08b2746c55a7d269ee9337747703085fbf13f736c9ee6314b3abc16e858",
+      "bytes": 360170
+    },
+    {
+      "source": "frontend/public/avatars/AI/study/AI-female-3.webp",
+      "target": "backend/assets/avatars/AI/study/AI-female-3.webp",
+      "sha256": "eaa24e246573030569f8297754d7e8b92892a24fc0c80c9e4b1d9eb48eaf447f",
+      "bytes": 375908
+    },
+    {
+      "source": "frontend/public/avatars/AI/study/AI-male-1.webp",
+      "target": "backend/assets/avatars/AI/study/AI-male-1.webp",
+      "sha256": "c2d38ab69a0dba354f6b8c5bf1b8874c9d051138c934ed627c604d82b31982f3",
+      "bytes": 356038
+    },
+    {
+      "source": "frontend/public/avatars/AI/study/AI-male-2.webp",
+      "target": "backend/assets/avatars/AI/study/AI-male-2.webp",
+      "sha256": "61b53b6256b1e32a20533bbb95e441e206bc50d7c56cbc8a9af4fa86c5c9cfb7",
+      "bytes": 349654
+    },
+    {
+      "source": "frontend/public/avatars/AI/study/AI-male-3.webp",
+      "target": "backend/assets/avatars/AI/study/AI-male-3.webp",
+      "sha256": "ec122a1241147da1fd51098ac32671afa42406143e910ade1f61aaa74287cbe2",
+      "bytes": 388256
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-astronomy.webp",
+      "target": "backend/assets/avatars/study/boy-astronomy.webp",
+      "sha256": "874abd49666bcf662f3c7c72dc9417c4dba2d97216b37ce8c3789dbce9e60fc2",
+      "bytes": 80526
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-atlas.webp",
+      "target": "backend/assets/avatars/study/boy-atlas.webp",
+      "sha256": "8a9221664c161a64e51113831067a259809b4323db4d79418c6f3fd03660b1da",
+      "bytes": 68718
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-calligraphy.webp",
+      "target": "backend/assets/avatars/study/boy-calligraphy.webp",
+      "sha256": "a1693ee8721c3be4259ccc43f91e8c41b445f54e1083614587e05bbcac889430",
+      "bytes": 63218
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-dictionary.webp",
+      "target": "backend/assets/avatars/study/boy-dictionary.webp",
+      "sha256": "982d2bf8b83cff611bc26bf28edc0518db65ab5533157ed0a423e2756c03f6a9",
+      "bytes": 64804
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-geometry.webp",
+      "target": "backend/assets/avatars/study/boy-geometry.webp",
+      "sha256": "f3033e46b2b091178acbdda85dc822d2682633780fa309d6a85f181ec7864390",
+      "bytes": 67778
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-insects.webp",
+      "target": "backend/assets/avatars/study/boy-insects.webp",
+      "sha256": "bcd840e83c0cd1d8cfab8a4a5e2be03fae6acee808619226ddbac9b2b624b190",
+      "bytes": 85268
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-math.webp",
+      "target": "backend/assets/avatars/study/boy-math.webp",
+      "sha256": "855e5fbd31897c3c49cfa93c6ee2b4d6ebddf0a3049889b7295c46f67df21183",
+      "bytes": 64754
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-read.webp",
+      "target": "backend/assets/avatars/study/boy-read.webp",
+      "sha256": "05ef6f888361c00ecf307d19feffc04a3563316f18eeb1523289240555f509d6",
+      "bytes": 86090
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-sketch.webp",
+      "target": "backend/assets/avatars/study/boy-sketch.webp",
+      "sha256": "594ba1266df5d88e8626c252860a612dd1057de5aaccc38deeea3ee989b36780",
+      "bytes": 79690
+    },
+    {
+      "source": "frontend/public/avatars/study/boy-write.webp",
+      "target": "backend/assets/avatars/study/boy-write.webp",
+      "sha256": "17131d12f4713e9c5ed70ae995720c117f844ba4c2021d2f5f045c099df0ff78",
+      "bytes": 85970
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-botany.webp",
+      "target": "backend/assets/avatars/study/girl-botany.webp",
+      "sha256": "590d92d4093b30a1dae3fadad0e20ebdf85ccef46e842ab8af93854d86a9b569",
+      "bytes": 76124
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-butterfly.webp",
+      "target": "backend/assets/avatars/study/girl-butterfly.webp",
+      "sha256": "72fc8f3b4e82c47ea7d78f42cfa7e180c148ebbfe27b430dc83e3b2bce039bd0",
+      "bytes": 80378
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-flashcards.webp",
+      "target": "backend/assets/avatars/study/girl-flashcards.webp",
+      "sha256": "59d80368485eec93d209ef3ada42ec6c4481625bbc35d2dc048989a66833f1b6",
+      "bytes": 76540
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-globe.webp",
+      "target": "backend/assets/avatars/study/girl-globe.webp",
+      "sha256": "e7c6c0d5608144d9b62a8785001b27b36cd3344eabaece1e7b1d3d5d838bf988",
+      "bytes": 79006
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-handwriting.webp",
+      "target": "backend/assets/avatars/study/girl-handwriting.webp",
+      "sha256": "ec12210efe43b4f9aa6f0686f0131c24782066aa73a0540fa7e7fd5515511f1d",
+      "bytes": 62642
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-journal.webp",
+      "target": "backend/assets/avatars/study/girl-journal.webp",
+      "sha256": "673d00bfd4613500489f704d1b788f6551a36aa4fdcf7a81505660d88e6a5a43",
+      "bytes": 88478
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-music.webp",
+      "target": "backend/assets/avatars/study/girl-music.webp",
+      "sha256": "1714f31d7a23d75e1e0bf05ff07b92ce58e53d9793d27c7954d253a2eee40916",
+      "bytes": 60968
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-poetry.webp",
+      "target": "backend/assets/avatars/study/girl-poetry.webp",
+      "sha256": "743fcf808d3ff519d71b62e9cfa0250f00a77247c99738140c829f5b47acaded",
+      "bytes": 75938
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-read.webp",
+      "target": "backend/assets/avatars/study/girl-read.webp",
+      "sha256": "894eeba569eab1974a3e20d22bd5747afb68b85b8efe500b374b3585143abac1",
+      "bytes": 88712
+    },
+    {
+      "source": "frontend/public/avatars/study/girl-write.webp",
+      "target": "backend/assets/avatars/study/girl-write.webp",
+      "sha256": "811f9cb4025e184df3ca99a46a824912172d9735721de2b0b706c744f9399c7e",
+      "bytes": 77390
+    }
+  ]
+}

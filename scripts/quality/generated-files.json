@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.jar",
+      "generator": "Gradle 8.13 wrapper task",
+      "source": "Gradle distribution with pinned distributionSha256Sum"
+    },
+    {
+      "path": "android/gradlew",
+      "generator": "Gradle 8.13 wrapper task",
+      "source": "Gradle distribution with pinned distributionSha256Sum"
+    },
+    {
+      "path": "android/gradlew.bat",
+      "generator": "Gradle 8.13 wrapper task",
+      "source": "Gradle distribution with pinned distributionSha256Sum"
+    },
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.properties",
+      "generator": "Gradle 8.13 wrapper task",
+      "source": "Gradle distribution with pinned distributionSha256Sum"
+    },
+    {
+      "path": "ios/SocraticMind.xcodeproj/project.pbxproj",
+      "generator": "XcodeGen 2.46.0",
+      "source": "ios/project.yml"
+    },
+    {
+      "path": "ios/SocraticMind.xcodeproj/xcshareddata/xcschemes/SocraticMind.xcscheme",
+      "generator": "XcodeGen 2.46.0",
+      "source": "ios/project.yml"
+    },
+    {
+      "path": "contracts/openapi/socraticmind.json",
+      "generator": "scripts/contracts/export_openapi.py",
+      "source": "backend routes and schemas"
+    },
+    {
+      "path": "android/gradle/verification-metadata.xml",
+      "generator": "Gradle 8.13 dependency locking / SHA-256 metadata",
+      "source": "android/gradle/libs.versions.toml and resolved configurations"
+    },
+    {
+      "path": "android/app/gradle.lockfile",
+      "generator": "Gradle 8.13 dependency locking / SHA-256 metadata",
+      "source": "android/gradle/libs.versions.toml and resolved configurations"
+    },
+    {
+      "path": "android/core/network/gradle.lockfile",
+      "generator": "Gradle 8.13 dependency locking / SHA-256 metadata",
+      "source": "android/gradle/libs.versions.toml and resolved configurations"
+    },
+    {
+      "path": "android/settings-gradle.lockfile",
+      "generator": "Gradle 8.13 dependency locking / SHA-256 metadata",
+      "source": "android/gradle/libs.versions.toml and resolved configurations"
+    },
+    {
+      "path": "android/core/auth/gradle.lockfile",
+      "generator": "Gradle 8.13 dependency locking / SHA-256 metadata",
+      "source": "android/core/auth/build.gradle.kts and resolved configurations"
+    }
+  ]
+}

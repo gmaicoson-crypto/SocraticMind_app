@@ -1,0 +1,178 @@
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scope:
+    if: github.event.deleted != true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      python: ${{ steps.plan.outputs.python }}
+      android: ${{ steps.plan.outputs.android }}
+      ios: ${{ steps.plan.outputs.ios }}
+      mysql: ${{ steps.plan.outputs.mysql }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select changed files and affected tests
+        id: plan
+        run: python3 -m scripts.ci.github_scope --output .tools/ci-plan.json
+      - name: Text structure and physical file limits
+        run: python3 -m scripts.ci.check_structure --plan .tools/ci-plan.json
+
+  python:
+    needs: scope
+    if: needs.scope.outputs.python == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12.14"
+      - name: Install locked Python tools and dependencies
+        run: python -m pip install -r backend/requirements-lock.txt
+      - run: python -m scripts.ci.github_scope --output .tools/ci-plan.json
+      - run: python -m scripts.ci.run_checks python --plan .tools/ci-plan.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: python-checks
+          path: .tools/ci-*.xml
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true
+
+  android:
+    needs: scope
+    if: needs.scope.outputs.android == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "21.0.10"
+      - run: python3 scripts/dev/bootstrap_tools.py ktlint
+      - run: python3 -m scripts.ci.github_scope --output .tools/ci-plan.json
+      - run: python3 -m scripts.ci.run_checks android --plan .tools/ci-plan.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: android-jvm-checks
+          path: android/core/*/build/test-results/test/TEST-*.xml
+          retention-days: 7
+          if-no-files-found: ignore
+
+  ios:
+    needs: scope
+    if: needs.scope.outputs.ios == 'true'
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12.14"
+      - name: Identify the host-only Swift toolchain
+        run: swift --version
+      - run: python scripts/dev/bootstrap_tools.py swiftformat swiftlint
+      - run: python -m scripts.ci.github_scope --output .tools/ci-plan.json
+      - run: python -m scripts.ci.run_checks ios --plan .tools/ci-plan.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: swift-core-checks
+          path: .tools/ci-swift*.xml
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true
+
+  mysql:
+    needs: scope
+    if: needs.scope.outputs.mysql == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4.11@sha256:0f51e63e537a1f176423fa03ef559aabe6fa4372a53160a44bc7e75da7d15364
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        volumes:
+          - /tmp/sm-mysql-ci:/var/run/mysqld
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s --health-timeout=3s --health-retries=30
+    env:
+      SOCRATIC_TEST_MYSQL_SOCKET: /tmp/sm-mysql-ci/mysqld.sock
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12.14"
+      - run: python -m pip install -r backend/requirements-lock.txt
+      - run: python -m scripts.ci.github_scope --output .tools/ci-plan.json
+      - run: python -m scripts.ci.run_checks mysql --plan .tools/ci-plan.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mysql-checks
+          path: .tools/ci-mysql.xml
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true
+
+  summary:
+    name: quality / summary
+    needs: [scope, python, android, ios, mysql]
+    if: always() && github.event.deleted != true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      RESULTS: ${{ toJSON(needs) }}
+    steps:
+      - name: Propagate missing, failed or cancelled required checks
+        run: |
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ["RESULTS"])
+          assert results["scope"]["result"] == "success", "Scope/structure did not succeed"
+          for lane in ("python", "android", "ios", "mysql"):
+              expected = results["scope"]["outputs"].get(lane) == "true"
+              actual = results[lane]["result"]
+              assert actual == ("success" if expected else "skipped"), (lane, expected, actual)
+          print("All required scoped checks passed; device and external-service validation remain separate.")
+          PY

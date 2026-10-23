@@ -1,0 +1,126 @@
+{
+  "reviewed_on": "2026-10-22",
+  "scope": "newly imported backend files only",
+  "reviews": [
+    {
+      "path": "backend/routers/agent.py",
+      "lines": 293,
+      "category": "route",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/routers/attachments.py",
+      "lines": 268,
+      "category": "route",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/routers/auth.py",
+      "lines": 504,
+      "category": "route",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/routers/chat.py",
+      "lines": 1275,
+      "category": "route",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/routers/progress.py",
+      "lines": 345,
+      "category": "route",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/agent/orchestrator.py",
+      "lines": 856,
+      "category": "source",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/services/assessments.py",
+      "lines": 529,
+      "category": "source",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/services/attachments/context.py",
+      "lines": 412,
+      "category": "source",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/attachments/parsers.py",
+      "lines": 356,
+      "category": "source",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/attachments/service.py",
+      "lines": 329,
+      "category": "source",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/attachments/worker.py",
+      "lines": 412,
+      "category": "source",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/chat_context.py",
+      "lines": 576,
+      "category": "source",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/services/chat_lifecycle.py",
+      "lines": 864,
+      "category": "source",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/services/chat_summaries.py",
+      "lines": 441,
+      "category": "source",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/web_evidence.py",
+      "lines": 496,
+      "category": "source",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/services/web_search.py",
+      "lines": 620,
+      "category": "source",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/tests/p0/test_attachment_chat.py",
+      "lines": 541,
+      "category": "test",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/tests/p0/test_chat_summaries.py",
+      "lines": 838,
+      "category": "test",
+      "decision": "register_baseline"
+    },
+    {
+      "path": "backend/tests/p0/test_web_search.py",
+      "lines": 628,
+      "category": "test",
+      "decision": "preserve_on_import_review_when_changed"
+    },
+    {
+      "path": "backend/tests/test_attachments.py",
+      "lines": 528,
+      "category": "test",
+      "decision": "preserve_on_import_review_when_changed"
+    }
+  ]
+}

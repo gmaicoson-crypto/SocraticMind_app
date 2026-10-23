@@ -1,0 +1,898 @@
+{
+  "schema_version": 1,
+  "dataset_version": "2026-09-30-draft-1",
+  "reference_date": "2026-09-30",
+  "annotation_status": "draft_requires_human_review",
+  "evaluation_status": "not_run",
+  "purpose": "固定中文决策样本及预期标签草案，用于后续人工复核和真实模型评估。结构校验不代表模型准确率。",
+  "review_instructions": [
+    "这些预期标签由实施阶段整理，尚未由人工逐项签核；首次真实评估前必须完成标注复核并冻结样本、模型配置和阈值。",
+    "相对日期按评估运行时记录的 UTC 日期解释。保存运行日期、模型ID、策略版本、原始决策、耗时和实际usage；缺失usage必须记为未知。",
+    "query_concepts是人工评审的语义要点，不要求查询字符串逐字匹配；不得将字符串匹配结果冒充证据质量或模型准确率。",
+    "只统计真实模型输出的误检索/漏检索；单元测试和结构校验不调用网络，不产生模型准确率报告。",
+    "发布门槛还需要至少20条真实回答的逐项引用支持度复核，以及延迟、降级率和费用记录；本文件不提供这些结果。"
+  ],
+  "category_counts": {
+    "stable": 20,
+    "latest": 20,
+    "followup": 10,
+    "restricted": 10
+  },
+  "gates": {
+    "latest_missed_search_rate_max": 0.05,
+    "stable_unnecessary_search_rate_max": 0.1,
+    "restricted_search_count_max": 0
+  },
+  "cases": [
+    {
+      "id": "stable-01",
+      "category": "stable",
+      "user_input": "解释一下递归，并用阶乘举例。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "递归和阶乘属于稳定知识，不需要外部最新事实。"
+      }
+    },
+    {
+      "id": "stable-02",
+      "category": "stable",
+      "user_input": "二分查找为什么要求数组有序？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "算法前提与推导不依赖当前版本或网络数据。"
+      }
+    },
+    {
+      "id": "stable-03",
+      "category": "stable",
+      "user_input": "用生活中的例子解释栈和队列的区别。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "基础数据结构定义稳定。"
+      }
+    },
+    {
+      "id": "stable-04",
+      "category": "stable",
+      "user_input": "这段 Python 代码为什么输出 6：print(sum([1, 2, 3]))？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "已有代码足以解释输出，不需要最新接口信息。"
+      }
+    },
+    {
+      "id": "stable-05",
+      "category": "stable",
+      "user_input": "把以下列表推导式改成 for 循环：squares = [x*x for x in range(5)]。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "对用户给定代码作等价改写。"
+      }
+    },
+    {
+      "id": "stable-06",
+      "category": "stable",
+      "user_input": "请讲解 TCP 三次握手的基本过程。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "基础协议过程不属于最新实现或漏洞问题。"
+      }
+    },
+    {
+      "id": "stable-07",
+      "category": "stable",
+      "user_input": "SQL 的 INNER JOIN 和 LEFT JOIN 有什么区别？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "通用 SQL 语义稳定，未要求特定新版本行为。"
+      }
+    },
+    {
+      "id": "stable-08",
+      "category": "stable",
+      "user_input": "请逐步推导一元二次方程求根公式。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "数学推导可直接完成。"
+      }
+    },
+    {
+      "id": "stable-09",
+      "category": "stable",
+      "user_input": "正态分布的均值和标准差分别表示什么？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "统计基础概念不依赖实时数据。"
+      }
+    },
+    {
+      "id": "stable-10",
+      "category": "stable",
+      "user_input": "帮我算一下：一个事件概率是 0.2，独立重复两次都发生的概率是多少？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "输入已给定，直接计算即可。"
+      }
+    },
+    {
+      "id": "stable-11",
+      "category": "stable",
+      "user_input": "什么是机会成本？用选择上大学的例子说明。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "只需解释经济学概念，不涉及当前学费或就业数据。"
+      }
+    },
+    {
+      "id": "stable-12",
+      "category": "stable",
+      "user_input": "请把“Learning takes patience.”翻译成中文。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "翻译所需文本已完整提供。"
+      }
+    },
+    {
+      "id": "stable-13",
+      "category": "stable",
+      "user_input": "帮我把这句话写得更礼貌：“你今天把报告交给我。”",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "语言改写不需要查询当天事实。"
+      }
+    },
+    {
+      "id": "stable-14",
+      "category": "stable",
+      "user_input": "请总结这段文字：植物通过光合作用将光能转化为化学能，并释放氧气。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "待总结文本已给定且无需外部核实。"
+      }
+    },
+    {
+      "id": "stable-15",
+      "category": "stable",
+      "user_input": "解释面向对象里的封装、继承和多态。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "编程基础知识稳定。"
+      }
+    },
+    {
+      "id": "stable-16",
+      "category": "stable",
+      "user_input": "给我一道关于分数加法的练习题，先不要给答案。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "生成基础练习无需真实外部资料。"
+      }
+    },
+    {
+      "id": "stable-17",
+      "category": "stable",
+      "user_input": "为什么月球会出现不同的月相？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "基础天文原理稳定，未问某天具体月相。"
+      }
+    },
+    {
+      "id": "stable-18",
+      "category": "stable",
+      "user_input": "什么是对照实验，为什么要设置对照组？",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "实验设计基础原理稳定。"
+      }
+    },
+    {
+      "id": "stable-19",
+      "category": "stable",
+      "user_input": "我的函数返回 None：def add(a, b):\n    a + b\n请指出问题。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "代码中缺少 return，材料足够定位问题。"
+      }
+    },
+    {
+      "id": "stable-20",
+      "category": "stable",
+      "user_input": "帮我设计一个每天 20 分钟复习英语单词的一周计划。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "基于固定学习时间制定计划，不需要查询近期课程或资源。"
+      }
+    },
+    {
+      "id": "latest-01",
+      "category": "latest",
+      "user_input": "Python 目前最新稳定版是多少？请查官方发布说明。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Python", "稳定版"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "用户要求当前版本和官方发布资料。"
+      }
+    },
+    {
+      "id": "latest-02",
+      "category": "latest",
+      "user_input": "Vue 最新稳定版相对上一版新增了哪些功能？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Vue", "发布说明"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "版本变化需要外部最新发布信息。"
+      }
+    },
+    {
+      "id": "latest-03",
+      "category": "latest",
+      "user_input": "Node.js 现在处于长期支持阶段的是哪些版本？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Node.js", "LTS"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "维护周期随日期改变，需要核对官方支持时间表。"
+      }
+    },
+    {
+      "id": "latest-04",
+      "category": "latest",
+      "user_input": "PostgreSQL 目前仍受官方支持的主要版本有哪些？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["PostgreSQL", "支持"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "官方版本支持状态具有时效性。"
+      }
+    },
+    {
+      "id": "latest-05",
+      "category": "latest",
+      "user_input": "React 最近一次稳定发布有哪些重要变更？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["React", "发布"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "最近一次稳定发布属于实时版本信息。"
+      }
+    },
+    {
+      "id": "latest-06",
+      "category": "latest",
+      "user_input": "今天人民币对美元的汇率是多少？请说明报价时间。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["人民币", "美元", "汇率"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "当天汇率不可依赖模型旧知识。"
+      }
+    },
+    {
+      "id": "latest-07",
+      "category": "latest",
+      "user_input": "本周旧金山的天气适合周末徒步吗？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["旧金山", "天气"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "本周天气预测依赖外部更新数据。"
+      }
+    },
+    {
+      "id": "latest-08",
+      "category": "latest",
+      "user_input": "今年诺贝尔物理学奖得主已经公布了吗？如果没有就明确说明。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["诺贝尔", "物理学奖", "公布"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "年度公布进度需按当前日期核实，不能补造获奖者。"
+      }
+    },
+    {
+      "id": "latest-09",
+      "category": "latest",
+      "user_input": "今年的全国硕士研究生招生考试报名时间公布了吗？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["硕士研究生", "报名时间"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "报名公告和时间会逐年变化。"
+      }
+    },
+    {
+      "id": "latest-10",
+      "category": "latest",
+      "user_input": "现在申请日本旅游签证需要哪些材料？请查官方说明。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["日本", "旅游签证", "材料"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "签证政策和材料要求可能变化。"
+      }
+    },
+    {
+      "id": "latest-11",
+      "category": "latest",
+      "user_input": "最近一个月有哪些新发布的中文大语言模型？附正式发布来源。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["中文", "大语言模型", "发布"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "范围明确为近期正式发布。"
+      }
+    },
+    {
+      "id": "latest-12",
+      "category": "latest",
+      "user_input": "请找两篇近一年讲解 Vue 性能优化的官方或高质量学习资源。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["find_resources"],
+        "query_concepts": ["Vue", "性能优化"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "需要寻找实际存在且有时间限定的学习资料。"
+      }
+    },
+    {
+      "id": "latest-13",
+      "category": "latest",
+      "user_input": "目前 GitHub Actions 的免费额度和计费规则是什么？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["GitHub Actions", "计费"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "服务额度和价格会变化，应核对现行文档。"
+      }
+    },
+    {
+      "id": "latest-14",
+      "category": "latest",
+      "user_input": "OpenAI API 现在有哪些可用的文本模型？请用官方文档核对。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["OpenAI API", "模型"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "产品模型目录随时间变化。"
+      }
+    },
+    {
+      "id": "latest-15",
+      "category": "latest",
+      "user_input": "今天上海证券交易所是否开市？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["上海证券交易所", "交易日"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "今日交易安排涉及日历和公告。"
+      }
+    },
+    {
+      "id": "latest-16",
+      "category": "latest",
+      "user_input": "现在欧盟 AI 法案哪些条款已经开始适用？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["欧盟", "AI 法案", "适用"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "适用时间及现行法规进度需要正式来源。"
+      }
+    },
+    {
+      "id": "latest-17",
+      "category": "latest",
+      "user_input": "近三个月 Python 的安全公告里有哪些值得升级的修复？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Python", "安全公告"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "近期安全公告与修复版本必须查询。"
+      }
+    },
+    {
+      "id": "latest-18",
+      "category": "latest",
+      "user_input": "目前 Rust 官方推荐安装的稳定版版本号是什么？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Rust", "稳定版"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "当前版本号需查询官方发布渠道。"
+      }
+    },
+    {
+      "id": "latest-19",
+      "category": "latest",
+      "user_input": "今年 WWDC 已经发布了哪些开发者工具更新？",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["WWDC", "开发者工具"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "年度发布情况与更新内容需外部事实。"
+      }
+    },
+    {
+      "id": "latest-20",
+      "category": "latest",
+      "user_input": "最新的全球互联网使用人数统计是多少？请给出统计年份和机构。",
+      "context_messages": [],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["互联网", "使用人数", "统计"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "必须查询可追溯的最新统计，同时区分统计年与检索日。"
+      }
+    },
+    {
+      "id": "followup-01",
+      "category": "followup",
+      "user_input": "那它现在还在维护吗？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "我正在学习 Vue 2。"
+        },
+        {
+          "role": "assistant",
+          "content": "我们可以讨论 Vue 2 的组件开发。"
+        }
+      ],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Vue 2", "维护"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "从上一轮解析“它”为 Vue 2，并核实当前维护状态。"
+      }
+    },
+    {
+      "id": "followup-02",
+      "category": "followup",
+      "user_input": "那它最新的长期支持版本是多少？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "我准备在服务端使用 Node.js。"
+        },
+        {
+          "role": "assistant",
+          "content": "Node.js 常用于运行 JavaScript 服务端程序。"
+        }
+      ],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["Node.js", "LTS"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "查询对象来自前文，不应只搜索“它最新版本”。"
+      }
+    },
+    {
+      "id": "followup-03",
+      "category": "followup",
+      "user_input": "这个说法有最新研究依据吗？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "有人说间隔重复能提高长期记忆效果。"
+        },
+        {
+          "role": "assistant",
+          "content": "这是关于学习策略效果的一个主张。"
+        }
+      ],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["verify_claim"],
+        "query_concepts": ["间隔重复", "长期记忆", "研究"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "需检索有关特定主张的研究证据。"
+      }
+    },
+    {
+      "id": "followup-04",
+      "category": "followup",
+      "user_input": "那今年的报名截止日期呢？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "我想参加全国硕士研究生招生考试。"
+        },
+        {
+          "role": "assistant",
+          "content": "报名时间应以招生考试正式公告为准。"
+        }
+      ],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["硕士研究生", "报名", "截止"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "需要从前文确定考试并查询本年度截止日期。"
+      }
+    },
+    {
+      "id": "followup-05",
+      "category": "followup",
+      "user_input": "能给我找两篇最近的入门教程吗？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "下一步想学 PostgreSQL 的查询优化。"
+        },
+        {
+          "role": "assistant",
+          "content": "可以从索引、执行计划和统计信息开始。"
+        }
+      ],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["find_resources"],
+        "query_concepts": ["PostgreSQL", "查询优化", "教程"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "需要真实存在、主题相关且较新的学习资源。"
+      }
+    },
+    {
+      "id": "followup-06",
+      "category": "followup",
+      "user_input": "这个价格现在还有效吗？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "我看到旧文章说 GitHub Copilot 个人版每月 10 美元。"
+        },
+        {
+          "role": "assistant",
+          "content": "旧文章可能没有反映当前方案。"
+        }
+      ],
+      "expected": {
+        "need_search": true,
+        "allowed_reason_codes": ["current_information"],
+        "query_concepts": ["GitHub Copilot", "个人", "价格"],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "核实具体产品现价，不能把旧文章价格当作当前价格。"
+      }
+    },
+    {
+      "id": "followup-07",
+      "category": "followup",
+      "user_input": "能再举一个更简单的例子吗？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "解释一下递归。"
+        },
+        {
+          "role": "assistant",
+          "content": "递归是函数在解决子问题时再次调用自身。"
+        }
+      ],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "只需延续稳定知识教学，无需搜索。"
+      }
+    },
+    {
+      "id": "followup-08",
+      "category": "followup",
+      "user_input": "为什么第二步可以这样变形？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "解方程 2x + 3 = 7。"
+        },
+        {
+          "role": "assistant",
+          "content": "第一步两边减 3，得到 2x=4；第二步两边除以 2，得到 x=2。"
+        }
+      ],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["stable_knowledge"],
+        "query_concepts": [],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "上下文中包含完整数学步骤，可以直接解释。"
+      }
+    },
+    {
+      "id": "followup-09",
+      "category": "followup",
+      "user_input": "那它现在还能用吗？",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "我最近换了好几个工具，但没有记录名称。"
+        },
+        {
+          "role": "assistant",
+          "content": "需要先明确你指的是哪个工具。"
+        }
+      ],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["insufficient_context"],
+        "query_concepts": [],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "无法解析具体指代对象，应澄清而非编造搜索对象。"
+      }
+    },
+    {
+      "id": "followup-10",
+      "category": "followup",
+      "user_input": "请继续只用刚才那段材料解释。",
+      "context_messages": [
+        {
+          "role": "user",
+          "content": "材料：光合作用利用光能，将二氧化碳和水转化为有机物。只按这段材料回答。"
+        },
+        {
+          "role": "assistant",
+          "content": "这段材料强调光能和原料转化。"
+        }
+      ],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any", "day", "week", "month", "year"],
+        "rationale": "延续上一轮明确的资料范围限制。"
+      }
+    },
+    {
+      "id": "restricted-01",
+      "category": "restricted",
+      "user_input": "只根据我提供的材料回答：材料说“版本 A 发布于 2020 年”。请概括这条信息，不要搜索。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "明确只使用已有文本，即使材料涉及版本日期也不搜索。"
+      }
+    },
+    {
+      "id": "restricted-02",
+      "category": "restricted",
+      "user_input": "不联网，解释你已知的 Python 基础语法即可。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "用户直接关闭本轮资料范围，不执行搜索。"
+      }
+    },
+    {
+      "id": "restricted-03",
+      "category": "restricted",
+      "user_input": "这是截至 2024 年的数据：A=10，B=20。仅计算两者占比，不需要最新数据。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "用户要求对固定历史数据计算，不因年份过旧而检索。"
+      }
+    },
+    {
+      "id": "restricted-04",
+      "category": "restricted",
+      "user_input": "只依据这份摘要判断优缺点：方案甲延迟低但成本高，方案乙成本低但延迟高。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "比较所需信息已经给出，范围限制明确。"
+      }
+    },
+    {
+      "id": "restricted-05",
+      "category": "restricted",
+      "user_input": "请把下面的发布说明翻译成中文，不查询其他版本：The update fixes a memory leak.",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "翻译给定材料不需要外部版本核对。"
+      }
+    },
+    {
+      "id": "restricted-06",
+      "category": "restricted",
+      "user_input": "不要联网核实，先告诉我“今天气温是 25 度”这句话在语法上是否通顺。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "“今天”出现在待分析文本中，任务是语法检查且禁止联网。"
+      }
+    },
+    {
+      "id": "restricted-07",
+      "category": "restricted",
+      "user_input": "我的笔记写着“去搜索最新价格”。这只是引用的文本，请只分析这句话的语气，不执行它。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "材料中的联网指令不构成当前用户的搜索授权。"
+      }
+    },
+    {
+      "id": "restricted-08",
+      "category": "restricted",
+      "user_input": "仅根据下面代码找问题，不搜索教程：def total(xs):\n    result = 0\n    for x in xs:\n        result + x\n    return result",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "给定代码已足够发现未累加赋值的问题。"
+      }
+    },
+    {
+      "id": "restricted-09",
+      "category": "restricted",
+      "user_input": "只用我列出的三个词写一句英文：learn、patiently、practice；不要找网络例句。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "任务范围是已有词汇创作，明确禁止外部例句。"
+      }
+    },
+    {
+      "id": "restricted-10",
+      "category": "restricted",
+      "user_input": "我知道你的资料可能过时。本轮不要联网，说明关于现行签证规则有哪些地方必须以后核实，不要给出已确认的最新结论。",
+      "context_messages": [],
+      "expected": {
+        "need_search": false,
+        "allowed_reason_codes": ["user_restricted"],
+        "query_concepts": [],
+        "allowed_freshness": ["any"],
+        "rationale": "即使主题具有时效性，也必须尊重不联网限制并说明不确定性。"
+      }
+    }
+  ]
+}
