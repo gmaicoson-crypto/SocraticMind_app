@@ -6,6 +6,19 @@ struct HTTPTransportTests {
     private let token = "contract-token"
 
     @Test
+    func repeatedQueryPreservesOrderAndRejectsAmbiguousKeys() throws {
+        let endpoint = try APIEndpoint("https://api.example.test/mobile/")
+        let ids = ["会话 /?&#+🙂", "second +"]
+        let url = try endpoint.url(path: "api/titles", query: ["mode": "normal"], repeatedQuery: ["ids": ids])
+        let query = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
+        #expect(query.filter { $0.name == "ids" }.compactMap(\.value) == ids)
+        #expect(query.first { $0.name == "mode" }?.value == "normal")
+        #expect(throws: TransportFailure.self) {
+            try endpoint.url(path: "api/titles", query: ["ids": "x"], repeatedQuery: ["ids": ids])
+        }
+    }
+
+    @Test
     func credentialScopeIncludesSchemePortAndPrefix() throws {
         let base = try APIEndpoint("https://api.example.test/").credentialScope
         #expect(try base == APIEndpoint("HTTPS://API.EXAMPLE.TEST:443/").credentialScope)

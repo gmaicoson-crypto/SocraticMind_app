@@ -21,6 +21,15 @@ def response(method, path, query, headers, body=b""):
     if case == "unsupported":
         return 405, {"detail": "Method Not Allowed"}
     if method == "GET" and path == "/api/chat/session-titles":
+        if case.startswith("batch"):
+            if query != {"ids": DATA["batch_ids"]}:
+                return 400, {"detail": "wrong repeated title query"}
+            rows = DATA["batch_titles"]
+            if case == "batch-duplicate":
+                rows = [rows[0], rows[0]]
+            if case == "batch-unrequested":
+                rows = [{**rows[0], "session_id": "unrequested"}]
+            return 200, rows
         if query != {"ids": [DATA["session_id"]]}:
             return 400, {"detail": "wrong title query"}
         if case == "empty":

@@ -10,6 +10,7 @@ struct ChatLibraryView: View {
     let newConversation: () -> Void
     let selectConversation: (String) -> Void
     let closeConversation: () -> Void
+    @Environment(\.scenePhase) private var scenePhase
     @State private var renderer = MarkdownRenderer()
     @State private var discardDraft = false
 
@@ -24,6 +25,9 @@ struct ChatLibraryView: View {
                 .padding(.horizontal, 20).padding(.vertical, 8)
             }
             Divider()
+            if model.state.account == HistoryAccount.from(account), let notice = model.state.titleNotice {
+                Text(notice).padding(.horizontal, 20)
+            }
             if model.state.account != HistoryAccount.from(account) || turn.state.account != model.state
                 .account || actions.state.account != model.state.account
             {
@@ -95,7 +99,12 @@ struct ChatLibraryView: View {
             Button("放弃草稿", role: .destructive, action: closeConversation)
             Button("继续编辑", role: .cancel) {}
         } message: { Text("返回会话列表会清空当前草稿。") }
-        .onDisappear { Task { await renderer.clear() } }
+        .onAppear { model.setTitlePollingActive(scenePhase == .active) }
+        .onChange(of: scenePhase) { _, phase in model.setTitlePollingActive(phase == .active) }
+        .onDisappear {
+            model.setTitlePollingActive(false)
+            Task { await renderer.clear() }
+        }
     }
 
     private func back() {

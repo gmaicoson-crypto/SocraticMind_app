@@ -4,7 +4,7 @@ import Foundation
 /// Owns one account's finite reads. The app binds account updates before publishing them to the UI.
 @MainActor
 public final class ChatLibraryModel: ObservableObject {
-    private enum Lane { case conversations, messages }
+    private enum Lane { case conversations, messages, titles }
     private struct Read {
         let ticket: UInt64
         let task: Task<Void, Never>
@@ -13,15 +13,32 @@ public final class ChatLibraryModel: ObservableObject {
     @Published public private(set) var state = ChatLibraryState()
     private let session: SessionStore
     private let gateway: any ChatHistoryGateway
+    private let titles: any ChatTitlesGateway
+    private let titlePollDelays: [UInt64]
+    private var titlePollingActive = false
     private let mode: ChatMode
     private var reads: [Lane: Read] = [:]
     private var sequence: UInt64 = 0
     private var closed = false
 
-    public init(session: SessionStore, gateway: any ChatHistoryGateway, mode: ChatMode = .normal) {
+    public init(session: SessionStore, gateway: any ChatHistoryGateway, titles: any ChatTitlesGateway,
+                mode: ChatMode = .normal,
+                titlePollDelays: [UInt64] = [500, 1000, 2000, 4000, 8000, 8000, 8000])
+    {
+        precondition(titlePollDelays.count <= 7 && titlePollDelays.allSatisfy { $0 <= 8000 })
+        self.titles = titles; self.titlePollDelays = titlePollDelays
         self.session = session
         self.gateway = gateway
         self.mode = mode
+    }
+
+    /// Repeated visibility callbacks do not restart an exhausted cycle.
+    public func setTitlePollingActive(_ active: Bool) {
+        guard !closed, titlePollingActive != active else { return }
+        titlePollingActive = active; stopTitles()
+        if active {
+            refreshTitles()
+        }
     }
 
     public func bindAccount(_ value: SessionState) {
@@ -62,6 +79,7 @@ public final class ChatLibraryModel: ObservableObject {
 
     func accept(_ change: ChatLibraryChange, account: HistoryAccount) {
         guard !closed, state.account == account else { return }
+        stopTitles()
         reads.removeValue(forKey: .conversations)?.task.cancel()
         let selected = state.selected?.sessionID == change.sessionID
         var refresh = false
@@ -95,6 +113,7 @@ public final class ChatLibraryModel: ObservableObject {
         reads.removeValue(forKey: .messages)?.task.cancel()
         state.selected = ChatConversation(target: target, title: summary.title)
         state.messages = HistoryPageState()
+        stopTitles(); refreshTitles()
         refreshMessages()
     }
 
@@ -159,6 +178,9 @@ public final class ChatLibraryModel: ObservableObject {
         if operation == .more, current.loading != nil || !current.loaded || current.nextCursor == nil {
             return
         }
+        if lane == .conversations {
+            stopTitles()
+        }
         reads.removeValue(forKey: lane)?.task.cancel()
         sequence += 1
         let ticket = sequence
@@ -194,8 +216,67 @@ public final class ChatLibraryModel: ObservableObject {
             {
                 state.selected = ChatConversation(target: selected.target, title: summary.title)
             }
+            if lane == .conversations, case .success = result {
+                refreshTitles(newerPageFirst: operation == .more)
+            }
         }
         reads[lane] = Read(ticket: ticket, task: task)
+    }
+
+    private func stopTitles() {
+        reads.removeValue(forKey: .titles)?.task.cancel()
+        state.refreshingTitles = false; state.titleNotice = nil
+    }
+
+    private func refreshTitles(newerPageFirst: Bool = false) {
+        guard !closed, titlePollingActive, let account = state.account,
+              state.conversations.loading == nil, reads[.titles] == nil else { return }
+        let candidates = state.titleCandidates(newerPageFirst: newerPageFirst)
+        guard !candidates.isEmpty else { return }
+        sequence += 1; let ticket = sequence
+        state.refreshingTitles = true; state.titleNotice = nil
+        let session = session, titles = titles, delays = titlePollDelays
+        let task = Task { [weak self] in
+            var ids = candidates, failed = false
+            var notice: String?
+            do {
+                for pause in [0] + delays {
+                    try await Task.sleep(for: .milliseconds(pause))
+                    let requestedIDs = ids
+                    let result = try await session.authenticated { token in
+                        guard await HistoryAccount.from(session.state) == account
+                        else { throw SessionFailure.superseded }
+                        try Task.checkCancellation()
+                        return try await titles.titles(token: token, sessionIDs: requestedIDs)
+                    }
+                    try Task.checkCancellation()
+                    let actualAccount = await HistoryAccount.from(session.state)
+                    guard let self, reads[.titles]?.ticket == ticket, state.account == account else { return }
+                    guard actualAccount == account else { clear(); return }
+                    state.applyTitles(result)
+                    failed = failed || result.contains { $0.status == .failed && !$0.retryPending }
+                    ids = result.filter(\.awaitingGeneration).map(\.sessionID)
+                    if ids.isEmpty {
+                        break
+                    }
+                }
+                if !ids.isEmpty {
+                    notice = "部分标题仍在生成，可稍后刷新。"
+                } else if failed {
+                    notice = "部分自动标题生成失败，可手动命名或刷新。"
+                }
+            } catch {
+                if !(error is CancellationError) {
+                    notice = "标题更新失败，可稍后刷新。"
+                }
+            }
+            let actualAccount = await HistoryAccount.from(session.state)
+            guard let self, reads[.titles]?.ticket == ticket, state.account == account else { return }
+            reads.removeValue(forKey: .titles)
+            guard actualAccount == account else { clear(); return }
+            state.refreshingTitles = false; state.titleNotice = notice
+        }
+        reads[.titles] = Read(ticket: ticket, task: task)
     }
 
     deinit { reads.values.forEach { $0.task.cancel() } }

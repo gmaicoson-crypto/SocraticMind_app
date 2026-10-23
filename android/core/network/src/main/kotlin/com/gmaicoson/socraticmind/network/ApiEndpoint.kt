@@ -21,7 +21,9 @@ class ApiEndpoint(
     fun url(
         path: String,
         query: Map<String, String> = emptyMap(),
+        repeatedQuery: Map<String, List<String>> = emptyMap(),
     ): HttpUrl {
+        require(query.keys.intersect(repeatedQuery.keys).isEmpty()) { "Ambiguous query parameters" }
         val parts = path.removePrefix("/").split('/')
         require(parts.all { it.isNotEmpty() && it != "." && it != ".." }) { "Invalid API path" }
         require(path.none { it in "?#\\%" }) { "Use separate path and query arguments" }
@@ -30,6 +32,9 @@ class ApiEndpoint(
             .apply {
                 parts.forEach(::addPathSegment)
                 query.toSortedMap().forEach { (name, value) -> addQueryParameter(name, value) }
+                repeatedQuery.toSortedMap().forEach { (name, values) ->
+                    values.forEach { addQueryParameter(name, it) }
+                }
             }.build()
     }
 }

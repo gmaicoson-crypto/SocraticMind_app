@@ -20,6 +20,37 @@ private fun actionsFixture() =
 
 class ChatActionsApiContractTest {
     @Test
+    fun `bulk title reads encode repeated IDs and validate returned subsets`(): Unit =
+        runBlocking {
+            LoopbackFixture().use { server ->
+                HttpTransport(server.endpoint).use { transport ->
+                    val api = ChatActionsApi(transport)
+                    val data = actionsFixture()
+                    val ids =
+                        data
+                            .historyArray(
+                                "batch_ids",
+                            ).map { (it as kotlinx.serialization.json.JsonPrimitive).content }
+                    val expected = data.historyArray("batch_titles").map(ChatTitle::decode)
+                    assertEquals(expected, api.titles("actions-batch", ids))
+                    for (case in listOf("duplicate", "unrequested")) {
+                        assertTrue(runCatching { api.titles("actions-batch-$case", ids) }.isFailure)
+                    }
+                    for (invalid in listOf(emptyList(), listOf("x", "x"), listOf(""), (1..101).map { "s$it" })) {
+                        assertTrue(
+                            runCatching {
+                                api.titles(
+                                    "actions-batch",
+                                    invalid,
+                                )
+                            }.exceptionOrNull() is IllegalArgumentException,
+                        )
+                    }
+                }
+            }
+        }
+
+    @Test
     fun `title rename and deletes preserve opaque identity and exact JSON`(): Unit =
         runBlocking {
             LoopbackFixture().use { server ->

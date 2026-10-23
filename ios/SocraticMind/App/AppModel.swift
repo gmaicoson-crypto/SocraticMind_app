@@ -36,7 +36,9 @@ final class AppModel: ObservableObject {
             let journal = try FileChatTurnJournal(directory: directory, endpointScope: endpoint.credentialScope)
             store = session
             form = AuthFormModel(session: session, recovery: api)
-            let library = ChatLibraryModel(session: session, gateway: ChatHistoryAPI(transport: transport))
+            let actionsAPI = ChatActionsAPI(transport: transport)
+            let library = ChatLibraryModel(session: session, gateway: ChatHistoryAPI(transport: transport),
+                                           titles: actionsAPI)
             let coordinator = ChatTurnModel(
                 session: session,
                 gateway: ChatTurnAPI(transport: transport),
@@ -45,7 +47,7 @@ final class AppModel: ObservableObject {
             history = library; turn = coordinator
             actions = ChatActionsModel(
                 session: session,
-                gateway: ChatActionsAPI(transport: transport),
+                gateway: actionsAPI,
                 library: library,
                 turn: coordinator
             )

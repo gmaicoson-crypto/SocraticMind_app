@@ -3,6 +3,8 @@ import Foundation
 import Testing
 
 private struct ActionsFixture: Decodable {
+    let batch_ids: [String]
+    let batch_titles: [ChatTitle]
     let session_id: String
     let renamed: ChatTitle
     let rename: Rename
@@ -24,6 +26,22 @@ private func actionsFixture() throws -> ActionsFixture {
 }
 
 struct ChatActionsAPIContractTests {
+    @Test
+    func bulkTitleReadsEncodeRepeatedIDsAndValidateReturnedSubsets() async throws {
+        let server = try LoopbackFixture(); defer { server.close() }
+        let transport = try HTTPTransport(endpoint: server.endpoint); defer { transport.close() }
+        let api = ChatActionsAPI(transport: transport), data = try actionsFixture()
+        #expect(try await api.titles(token: "actions-batch", sessionIDs: data.batch_ids) == data.batch_titles)
+        for value in ["duplicate", "unrequested"] {
+            await #expect(throws: HistoryContractFailure.self) {
+                try await api.titles(token: "actions-batch-" + value, sessionIDs: data.batch_ids)
+            }
+        }
+        for ids in [[], ["x", "x"], [""], (1 ... 101).map { "s\($0)" }] {
+            await #expect(throws: (any Error).self) { try await api.titles(token: "actions-batch", sessionIDs: ids) }
+        }
+    }
+
     @Test
     func titleRenameAndDeletesPreserveOpaqueIdentityAndExactBody() async throws {
         let server = try LoopbackFixture(); defer { server.close() }

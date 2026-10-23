@@ -57,10 +57,14 @@ class HttpTransport(
         json: JsonElement? = null,
         form: Map<String, String>? = null,
         query: Map<String, String> = emptyMap(),
+        repeatedQuery: Map<String, List<String>> = emptyMap(),
     ): JsonElement =
         suspendCancellableCoroutine { continuation ->
             val requestClient = if (method == "GET") finiteClient else finiteMutationClient
-            val call = requestClient.newCall(buildRequest(method, path, bearer, json, form, query, "application/json"))
+            val call =
+                requestClient.newCall(
+                    buildRequest(method, path, bearer, json, form, query, "application/json", repeatedQuery),
+                )
             continuation.invokeOnCancellation { call.cancel() }
             call.enqueue(
                 object : Callback {
@@ -168,6 +172,7 @@ class HttpTransport(
         form: Map<String, String>?,
         query: Map<String, String>,
         accept: String,
+        repeatedQuery: Map<String, List<String>> = emptyMap(),
     ): Request {
         require(method in setOf("GET", "POST", "PUT", "PATCH", "DELETE"))
         require(json == null || form == null)
@@ -181,7 +186,7 @@ class HttpTransport(
             }
         return Request
             .Builder()
-            .url(endpoint.url(path, query))
+            .url(endpoint.url(path, query, repeatedQuery))
             .method(method, body)
             .header("Accept", accept)
             .apply {

@@ -26,7 +26,10 @@ public struct APIEndpoint: Sendable {
         base = normalized
     }
 
-    public func url(path: String, query: [String: String] = [:]) throws -> URL {
+    public func url(path: String, query: [String: String] = [:],
+                    repeatedQuery: [String: [String]] = [:]) throws -> URL
+    {
+        guard Set(query.keys).isDisjoint(with: repeatedQuery.keys) else { throw TransportFailure.invalidRequest }
         let relative = path.hasPrefix("/") ? String(path.dropFirst()) : path
         let parts = relative.split(separator: "/", omittingEmptySubsequences: false)
         guard parts.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." }),
@@ -39,11 +42,13 @@ public struct APIEndpoint: Sendable {
         guard var components = URLComponents(url: result, resolvingAgainstBaseURL: false) else {
             throw TransportFailure.invalidEndpoint
         }
-        if !query.isEmpty {
+        if !query.isEmpty || !repeatedQuery.isEmpty {
             components.queryItems = query.sorted(by: { $0.key < $1.key }).map { URLQueryItem(
                 name: $0.key,
                 value: $0.value
-            ) }
+            ) } + repeatedQuery.sorted(by: { $0.key < $1.key }).flatMap { name, values in
+                values.map { URLQueryItem(name: name, value: $0) }
+            }
         }
         components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         guard let url = components.url else { throw TransportFailure.invalidEndpoint }

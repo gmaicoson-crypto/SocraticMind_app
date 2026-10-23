@@ -36,10 +36,11 @@ public final class HTTPTransport: Sendable {
         bearer: String? = nil,
         json: Data? = nil,
         form: [String: String]? = nil,
-        query: [String: String] = [:]
+        query: [String: String] = [:],
+        repeatedQuery: [String: [String]] = [:]
     ) async throws -> Data {
         let request = try makeRequest(method: method, path: path, bearer: bearer, json: json, form: form,
-                                      query: query, accept: "application/json")
+                                      query: query, accept: "application/json", repeatedQuery: repeatedQuery)
         let (bytes, response) = try await session.bytes(for: request)
         defer { bytes.task.cancel() }
         guard let response = response as? HTTPURLResponse else { throw TransportFailure.invalidResponse }
@@ -102,12 +103,12 @@ public final class HTTPTransport: Sendable {
 
     private func makeRequest(
         method: String, path: String, bearer: String?, json: Data?, form: [String: String]?,
-        query: [String: String], accept: String
+        query: [String: String], accept: String, repeatedQuery: [String: [String]] = [:]
     ) throws -> URLRequest {
         guard ["GET", "POST", "PUT", "PATCH", "DELETE"].contains(method), json == nil || form == nil,
               method != "GET" || (json == nil && form == nil)
         else { throw TransportFailure.invalidRequest }
-        var request = try URLRequest(url: endpoint.url(path: path, query: query))
+        var request = try URLRequest(url: endpoint.url(path: path, query: query, repeatedQuery: repeatedQuery))
         request.httpMethod = method
         request.timeoutInterval = accept == "text/event-stream" ? idleTimeout : 30
         request.setValue(accept, forHTTPHeaderField: "Accept")

@@ -96,3 +96,9 @@ actions-state-android / ios 纳入操作状态、宿主注入与确认 / 多选�
 ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改动校验当前 Swift 源文件、唯一文件名和本地 MindCore 引用，同时运行配置 / 包锁检查；新增同名宿主文件需先扩展为按 target 检查。Package.swift、Package.resolved 和 project.yml 变化仍扩展依赖消费者。未经明确授权，静态登记不会触发应用构建。
 
 本批固定工具覆盖 Kotlin 13、Swift 13、Python 2 个变化文件；391 / 301 行发送协调器与 598 行影响测试的预警结论见[动作实施](chat-actions-implementation.md)。没有新的工具版本、依赖锁或例外。
+
+## 自动标题更新的增量验证
+
+2026-10-24：双端公共 URL / HTTP 入口支持重复查询参数，用于批量读取标题；因此按显式映射扩展账号、历史、发送及标题接口消费者。每批最多 100 个 ID、每周期最多 8 次读取，历史状态测试新增可见性与迟到结果验证。没有新增依赖、应用构建或远端执行。
+
+初次 Android 16 类 122 项、Swift 16 suite 119 项通过；补齐旧会话优先读取后，相关 7 类 / suite 分别得到 73 / 72 项有效结果。分批合并为 Android 123、Swift 120 项，详见[实施状态](execution-status.md)。后端 24 项、工具 60 项通过；变化 Kotlin 13、Swift 13、Python 3 个文件的固定格式 / lint 通过。两个行数预警的职责审查见[自动标题更新](chat-title-refresh.md)，未提高上限。

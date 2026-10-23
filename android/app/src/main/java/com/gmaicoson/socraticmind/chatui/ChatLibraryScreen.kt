@@ -31,6 +31,9 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.chat.ChatActionsController
@@ -53,6 +56,20 @@ fun ChatLibraryScreen(
     selectConversation: (String) -> Unit,
     closeConversation: () -> Unit,
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(model, lifecycleOwner) {
+        val lifecycle = lifecycleOwner.lifecycle
+        val observer =
+            LifecycleEventObserver { _, _ ->
+                model.setTitlePollingActive(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+            }
+        lifecycle.addObserver(observer)
+        model.setTitlePollingActive(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+        onDispose {
+            lifecycle.removeObserver(observer)
+            model.setTitlePollingActive(false)
+        }
+    }
     val state by model.state.collectAsStateWithLifecycle()
     val turnState by turn.state.collectAsStateWithLifecycle()
     val actionState by actions.state.collectAsStateWithLifecycle()
@@ -83,6 +100,7 @@ fun ChatLibraryScreen(
         ) {
             CircularProgressIndicator(Modifier.padding(24.dp))
         } else {
+            state.titleNotice?.let { Text(it, Modifier.padding(horizontal = 12.dp)) }
             val selected = state.selected
             BackHandler(enabled = selected != null, onBack = back)
             if (selected == null) {

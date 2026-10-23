@@ -48,6 +48,8 @@ public struct ChatConversation: Sendable {
 }
 
 public struct ChatLibraryState: Sendable {
+    public internal(set) var refreshingTitles = false
+    public internal(set) var titleNotice: String?
     public internal(set) var account: HistoryAccount?
     public internal(set) var conversations = HistoryPageState<ConversationSummary>()
     public internal(set) var selected: ChatConversation?

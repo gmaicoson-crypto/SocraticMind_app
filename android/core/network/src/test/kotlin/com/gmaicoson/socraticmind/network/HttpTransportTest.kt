@@ -18,6 +18,18 @@ import org.junit.jupiter.api.Test
 
 class HttpTransportTest {
     @Test
+    fun repeatedQueryPreservesOrderAndRejectsAmbiguousKeys() {
+        val endpoint = ApiEndpoint("https://api.example.test/mobile/")
+        val ids = listOf("会话 /?&#+🙂", "second +")
+        val url = endpoint.url("api/titles", mapOf("mode" to "normal"), mapOf("ids" to ids))
+        assertEquals(ids, url.queryParameterValues("ids"))
+        assertEquals("normal", url.queryParameter("mode"))
+        assertThrows(IllegalArgumentException::class.java) {
+            endpoint.url("api/titles", mapOf("ids" to "x"), mapOf("ids" to ids))
+        }
+    }
+
+    @Test
     fun mutationsAvoidAnIdleReadOrMutationConnectionWithoutRetrying() =
         withTransport { transport ->
             transport.request("GET", "idle-seed")

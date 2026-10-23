@@ -34,20 +34,27 @@ public protocol ChatActionsGateway: Sendable {
 }
 
 /// Finite account-scoped reads and writes, using the common transport's no-replay mutation policy.
-public struct ChatActionsAPI: ChatActionsGateway {
+public struct ChatActionsAPI: ChatActionsGateway, ChatTitlesGateway {
     private let transport: HTTPTransport
     public init(transport: HTTPTransport) {
         self.transport = transport
     }
 
     public func title(token: String, sessionID: String) async throws -> ChatTitle? {
-        try validateHistorySession(sessionID)
+        try await titles(token: token, sessionIDs: [sessionID]).first
+    }
+
+    public func titles(token: String, sessionIDs: [String]) async throws -> [ChatTitle] {
+        guard (1 ... 100).contains(sessionIDs.count), Set(sessionIDs).count == sessionIDs.count
+        else { throw ChatTurnFailure.invalidRequest }
+        try sessionIDs.forEach(validateHistorySession)
         let data = try await transport.request(method: "GET", path: "api/chat/session-titles", bearer: token,
-                                               query: ["ids": sessionID])
+                                               repeatedQuery: ["ids": sessionIDs])
         let values = try JSONDecoder().decode([ChatTitle].self, from: data)
-        guard values.count <= 1, values.allSatisfy({ $0.sessionID == sessionID })
+        guard values.count <= sessionIDs.count, Set(values.map(\.sessionID)).count == values.count,
+              values.allSatisfy({ sessionIDs.contains($0.sessionID) })
         else { throw HistoryContractFailure.invalidPage }
-        return values.first
+        return values
     }
 
     public func rename(token: String, sessionID: String, title: String) async throws -> ChatTitle {

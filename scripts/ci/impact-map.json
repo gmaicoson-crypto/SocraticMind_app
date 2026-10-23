@@ -631,21 +631,27 @@
         "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt",
-        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt"
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTitleRefresh.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTitleRefreshTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTitleRefreshTestDoubles.kt"
       ],
       "depends_on": [
         "history-android",
         "session-android",
-        "credential-storage-android"
+        "credential-storage-android",
+        "actions-android"
       ],
       "checks": {
         "android": [
           "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
-          "com.gmaicoson.socraticmind.auth.SessionStoreTest"
+          "com.gmaicoson.socraticmind.auth.SessionStoreTest",
+          "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest"
         ]
       },
       "manual": [
-        "会话列表与历史已接入 Compose；主机竞态测试不覆盖页面渲染、系统返回、滚动和进程恢复。本批页面需另行获准构建后定向验证。"
+        "会话列表与历史已接入 Compose；主机竞态测试不覆盖页面渲染、系统返回、滚动和进程恢复。本批页面需另行获准构建后定向验证。",
+        "自动标题按页面可见性读取，每批至多 100 个会话、每周期最多 8 次读取；真实生命周期与后端任务耗时仍需设备验证。"
       ]
     },
     "history-state-ios": {
@@ -659,21 +665,27 @@
         "ios/SocraticMind/App/AppModel.swift",
         "ios/SocraticMind/App/AppRootView.swift",
         "ios/SocraticMind/Chat/MessageHistoryView.swift",
-        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift"
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTitleRefresh.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTitleRefreshTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTitleRefreshTestDoubles.swift"
       ],
       "depends_on": [
         "history-ios",
         "session-ios",
-        "credential-storage-ios"
+        "credential-storage-ios",
+        "actions-ios"
       ],
       "checks": {
         "ios": [
           "ChatLibraryModelTests",
-          "SessionStoreTests"
+          "SessionStoreTests",
+          "ChatTitleRefreshTests"
         ]
       },
       "manual": [
-        "会话列表与历史已接入 SwiftUI；主机竞态测试不覆盖页面渲染、导航、滚动和进程恢复。本批页面需另行获准构建后定向验证。"
+        "会话列表与历史已接入 SwiftUI；主机竞态测试不覆盖页面渲染、导航、滚动和进程恢复。本批页面需另行获准构建后定向验证。",
+        "自动标题按页面可见性读取，每批至多 100 个会话、每周期最多 8 次读取；真实生命周期与后端任务耗时仍需设备验证。"
       ]
     },
     "markdown-fixtures": {

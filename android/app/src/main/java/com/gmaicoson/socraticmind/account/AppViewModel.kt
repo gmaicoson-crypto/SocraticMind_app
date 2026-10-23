@@ -25,7 +25,7 @@ class AppViewModel(
     val configurationError = if (graph == null) "服务地址未正确配置，请检查当前开发配置。" else null
     val session = graph?.session?.state ?: MutableStateFlow<SessionState>(SessionState.Uninitialized).asStateFlow()
     val form = graph?.let { AuthFormController(it.session, it.auth) }
-    val history = graph?.let { ChatLibraryController(it.session, it.history, viewModelScope) }
+    val history = graph?.let { ChatLibraryController(it.session, it.history, viewModelScope, it.actions) }
     val turn = graph?.let { ChatTurnController(it.session, it.turn, it.journal, viewModelScope) }
     val actions =
         graph?.let {

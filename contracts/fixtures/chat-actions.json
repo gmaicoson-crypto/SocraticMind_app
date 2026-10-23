@@ -74,5 +74,24 @@
         "retry_pending": "false"
       }
     }
+  ],
+  "batch_ids": [
+    "会话 /?&#+💡",
+    "等待 + /?&#+🙂",
+    "不存在 /+"
+  ],
+  "batch_titles": [
+    {
+      "session_id": "等待 + /?&#+🙂",
+      "title": null,
+      "status": "failed",
+      "retry_pending": true
+    },
+    {
+      "session_id": "会话 /?&#+💡",
+      "title": "递归与边界🙂",
+      "status": "manual",
+      "retry_pending": false
+    }
   ]
 }

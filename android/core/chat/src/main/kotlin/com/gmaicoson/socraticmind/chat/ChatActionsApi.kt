@@ -70,22 +70,30 @@ interface ChatActionsGateway {
 /** Authenticated, finite mutations; the common transport never automatically replays writes. */
 class ChatActionsApi(
     private val transport: HttpTransport,
-) : ChatActionsGateway {
+) : ChatActionsGateway,
+    ChatTitlesGateway {
     override suspend fun title(
         token: String,
         sessionId: String,
-    ): ChatTitle? {
-        requireSessionId(sessionId)
+    ): ChatTitle? = titles(token, listOf(sessionId)).singleOrNull()
+
+    override suspend fun titles(
+        token: String,
+        sessionIds: List<String>,
+    ): List<ChatTitle> {
+        require(sessionIds.size in 1..100 && sessionIds.distinct().size == sessionIds.size)
+        sessionIds.forEach(::requireSessionId)
         val value =
             transport.request(
                 "GET",
                 "api/chat/session-titles",
                 bearer = token,
-                query = mapOf("ids" to sessionId),
+                repeatedQuery = mapOf("ids" to sessionIds),
             )
-        val rows = value as? JsonArray ?: error("Expected titles")
-        require(rows.size <= 1)
-        return rows.singleOrNull()?.let(ChatTitle::decode)?.also { require(it.sessionId == sessionId) }
+        val rows = (value as? JsonArray ?: error("Expected titles")).map(ChatTitle::decode)
+        require(rows.size <= sessionIds.size && rows.map { it.sessionId }.distinct().size == rows.size)
+        require(rows.all { it.sessionId in sessionIds })
+        return rows
     }
 
     override suspend fun rename(

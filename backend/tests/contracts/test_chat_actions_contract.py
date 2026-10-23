@@ -1,6 +1,7 @@
 """Provider contracts for mobile title and deletion actions, with isolated synthetic histories."""
 
 import json
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -190,3 +191,50 @@ def test_json_rename_invalidates_inflight_title_worker_and_legacy_route_stays_co
         client.put("/api/chat/session-titles/legacy", json={"title": "旧客户端"}).json()["title"]
         == "旧客户端"
     )
+
+
+def test_bulk_titles_preserve_opaque_ids_return_subset_and_scope_owner(
+    client, app, db_session, auth_user
+):
+    for item in DATA["batch_titles"]:
+        db_session.add(
+            ChatSessionTitle(
+                user_id=auth_user.id,
+                session_id=item["session_id"],
+                mode="normal",
+                title=item["title"],
+                status=item["status"],
+                next_retry_at=datetime(2026, 10, 24) if item["retry_pending"] else None,
+            )
+        )
+    other = User(username="titles-other", email="titles-other@example.test", hashed_password="test")
+    db_session.add(other)
+    db_session.commit()
+    db_session.add(
+        ChatSessionTitle(
+            user_id=other.id,
+            session_id=DATA["batch_ids"][2],
+            mode="normal",
+            title="其他账号",
+            status="manual",
+        )
+    )
+    db_session.commit()
+    response = client.get(
+        "/api/chat/session-titles", params=[("ids", x) for x in DATA["batch_ids"]]
+    )
+    assert response.status_code == 200
+    assert sorted(response.json(), key=lambda x: x["session_id"]) == sorted(
+        DATA["batch_titles"], key=lambda x: x["session_id"]
+    )
+    assert (
+        client.get(
+            "/api/chat/session-titles", params=[("ids", f"s{x}") for x in range(101)]
+        ).status_code
+        == 422
+    )
+    app.dependency_overrides[get_current_user] = lambda: other
+    response = client.get(
+        "/api/chat/session-titles", params=[("ids", x) for x in DATA["batch_ids"]]
+    )
+    assert [row["session_id"] for row in response.json()] == [DATA["batch_ids"][2]]

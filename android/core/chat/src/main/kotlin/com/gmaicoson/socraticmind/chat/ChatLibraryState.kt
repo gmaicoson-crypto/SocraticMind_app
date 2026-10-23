@@ -47,6 +47,8 @@ data class ChatConversation(
 
 data class ChatLibraryState(
     val account: HistoryAccount? = null,
+    val refreshingTitles: Boolean = false,
+    val titleNotice: String? = null,
     val conversations: HistoryPageState<ConversationSummary> = HistoryPageState(),
     val selected: ChatConversation? = null,
     val messages: HistoryPageState<StoredChatMessage> = HistoryPageState(),

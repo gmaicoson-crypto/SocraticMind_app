@@ -114,7 +114,8 @@ internal class HistoryHarness(
             },
         )
     val gateway = QueuedHistoryGateway()
-    val model = ChatLibraryController(session, gateway, scope)
+    val titles = QueuedTitlesGateway()
+    val model = ChatLibraryController(session, gateway, scope, titles, titlePollDelays = List(7) { 0 })
 
     suspend fun login(id: Long = 1) {
         if (session.state.value == com.gmaicoson.socraticmind.auth.SessionState.Uninitialized) session.restore()
@@ -130,6 +131,7 @@ internal class HistoryHarness(
     fun close() {
         model.close()
         gateway.releasePending()
+        titles.releasePending()
     }
 }
 

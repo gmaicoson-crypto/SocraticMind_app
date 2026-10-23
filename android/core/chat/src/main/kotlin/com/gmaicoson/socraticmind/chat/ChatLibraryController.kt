@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,9 +21,11 @@ class ChatLibraryController(
     private val session: SessionStore,
     private val gateway: ChatHistoryGateway,
     parentScope: CoroutineScope,
+    private val titles: ChatTitlesGateway,
     private val mode: ChatMode = ChatMode.NORMAL,
+    private val titlePollDelays: List<Long> = listOf(500, 1000, 2000, 4000, 8000, 8000, 8000),
 ) {
-    private enum class Lane { CONVERSATIONS, MESSAGES }
+    private enum class Lane { CONVERSATIONS, MESSAGES, TITLES }
 
     private data class Read(
         val ticket: Long,
@@ -36,6 +39,20 @@ class ChatLibraryController(
     private val reads = mutableMapOf<Lane, Read>()
     private var sequence = 0L
     private var closed = false
+    private var titlePollingActive = false
+
+    init {
+        require(titlePollDelays.size <= 7 && titlePollDelays.all { it in 0..8000 })
+    }
+
+    /** The visible app lifecycle activates reads; recomposition cannot restart an exhausted cycle. */
+    fun setTitlePollingActive(active: Boolean) =
+        synchronized(lock) {
+            if (closed || titlePollingActive == active) return@synchronized
+            titlePollingActive = active
+            stopTitlesLocked()
+            if (active) refreshTitlesLocked()
+        }
 
     fun bindAccount(value: SessionState) {
         synchronized(lock) {
@@ -76,6 +93,7 @@ class ChatLibraryController(
         var refreshSelected = false
         synchronized(lock) {
             if (!isCurrentAccount() || state.value.account != account) return
+            stopTitlesLocked()
             reads.remove(Lane.CONVERSATIONS)?.job?.cancel()
             if (state.value.selected?.sessionId == change.sessionId && change !is ChatLibraryChange.Renamed) {
                 reads.remove(Lane.MESSAGES)?.job?.cancel()
@@ -102,6 +120,8 @@ class ChatLibraryController(
             reads.remove(Lane.MESSAGES)?.job?.cancel()
             mutableState.value =
                 state.value.copy(selected = ChatConversation(target, summary.title), messages = HistoryPageState())
+            stopTitlesLocked()
+            refreshTitlesLocked()
         }
         refreshMessages()
     }
@@ -205,6 +225,7 @@ class ChatLibraryController(
                 ) {
                     return
                 }
+                if (lane == Lane.CONVERSATIONS) stopTitlesLocked()
                 reads.remove(lane)?.job?.cancel()
                 val ticket = ++sequence
                 val cursor = if (operation == HistoryLoad.MORE) page.nextCursor else null
@@ -234,12 +255,80 @@ class ChatLibraryController(
                                     { current.copy(loading = null, failure = historyFailure(operation, it)) },
                                 )
                             mutableState.value = update(state.value, finished)
+                            if (lane == Lane.CONVERSATIONS && result.isSuccess) {
+                                refreshTitlesLocked(operation == HistoryLoad.MORE)
+                            }
                         }
                     }
                 reads[lane] = Read(ticket, next)
                 next
             }
         job.start()
+    }
+
+    private fun stopTitlesLocked() {
+        reads.remove(Lane.TITLES)?.job?.cancel()
+        mutableState.value = state.value.copy(refreshingTitles = false, titleNotice = null)
+    }
+
+    private fun refreshTitlesLocked(newerPageFirst: Boolean = false) {
+        if (!titlePollingActive || !isCurrentAccount() || state.value.conversations.loading != null ||
+            reads[Lane.TITLES] != null
+        ) {
+            return
+        }
+        var ids = state.value.titleCandidates(newerPageFirst)
+        if (ids.isEmpty()) return
+        val account = checkNotNull(state.value.account)
+        val ticket = ++sequence
+        mutableState.value = state.value.copy(refreshingTitles = true, titleNotice = null)
+        val task =
+            scope.launch(start = CoroutineStart.LAZY) {
+                var failed = false
+                var notice: String? = null
+                try {
+                    for (pause in listOf(0L) + titlePollDelays) {
+                        delay(pause)
+                        val result =
+                            session.authenticated { token ->
+                                if (HistoryAccount.from(session.state.value) != account) {
+                                    throw SessionException(SessionFailure.SUPERSEDED)
+                                }
+                                titles.titles(token, ids)
+                            }
+                        synchronized(lock) {
+                            if (reads[Lane.TITLES]?.ticket != ticket || state.value.account != account) return@launch
+                            if (!isCurrentAccount()) {
+                                clearLocked()
+                                return@launch
+                            }
+                            mutableState.value = state.value.withTitles(result)
+                        }
+                        failed = failed || result.any { it.status == ChatTitleStatus.FAILED && !it.retryPending }
+                        ids = result.filter { it.awaitingGeneration }.map { it.sessionId }
+                        if (ids.isEmpty()) break
+                    }
+                    notice =
+                        when {
+                            ids.isNotEmpty() -> "部分标题仍在生成，可稍后刷新。"
+                            failed -> "部分自动标题生成失败，可手动命名或刷新。"
+                            else -> null
+                        }
+                } catch (error: Exception) {
+                    if (error !is CancellationException) notice = "标题更新失败，可稍后刷新。"
+                }
+                synchronized(lock) {
+                    if (reads[Lane.TITLES]?.ticket != ticket || state.value.account != account) return@synchronized
+                    reads.remove(Lane.TITLES)
+                    if (!isCurrentAccount()) {
+                        clearLocked()
+                        return@synchronized
+                    }
+                    mutableState.value = state.value.copy(refreshingTitles = false, titleNotice = notice)
+                }
+            }
+        reads[Lane.TITLES] = Read(ticket, task)
+        task.start()
     }
 
     private fun isCurrentAccount() =

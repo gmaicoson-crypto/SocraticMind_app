@@ -84,12 +84,14 @@ final class HistoryHarness {
     let session: SessionStore
     let auth: FakeSessionGateway
     let gateway = QueuedHistoryGateway()
+    let titles = QueuedTitlesGateway()
     let model: ChatLibraryModel
 
     init() throws {
         auth = try FakeSessionGateway(sessionGrant())
         session = SessionStore(gateway: auth, vault: MemoryTokenVault())
-        model = ChatLibraryModel(session: session, gateway: gateway)
+        model = ChatLibraryModel(session: session, gateway: gateway, titles: titles,
+                                 titlePollDelays: Array(repeating: 0, count: 7))
     }
 
     func login(_ id: Int64 = 1) async throws {
@@ -131,9 +133,11 @@ func withHistory(_ body: (HistoryHarness) async throws -> Void) async throws {
         try await body(harness)
         harness.model.close()
         await harness.gateway.releasePending()
+        await harness.titles.releasePending()
     } catch {
         harness.model.close()
         await harness.gateway.releasePending()
+        await harness.titles.releasePending()
         throw error
     }
 }
