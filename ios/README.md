@@ -25,8 +25,8 @@ swift test --package-path ios/Packages/MindCore --force-resolved-versions --filt
 
 以上命令从仓库根运行，仅生成工程文件。共享 scheme 已纳入版本管理；应用与 SocraticMindUITests 已在 iOS 26.5 模拟器编译运行。后续模拟器验证、archive / IPA 构建及上传继续独立触发；命令和范围见 [原生验证](../docs/native-auth-verification.md)。
 
-格式与静态规则分别见 .swiftformat / .swiftlint.yml，版本及命令见 [工具链](../docs/toolchain.md)。未知 SSE 扩展保留，不能把 DONE、断流或未知状态当作业务成功。HTTP / POST SSE 已接入，见 [传输说明](../docs/network-transport.md)；聊天与学习导航尚未实现。
+格式与静态规则分别见 .swiftformat / .swiftlint.yml，版本及命令见 [工具链](../docs/toolchain.md)。未知 SSE 扩展保留，不能把 DONE、断流或未知状态当作业务成功。HTTP / POST SSE 已接入，见 [传输说明](../docs/network-transport.md)；聊天页面已接线，学习导航继续实施。
 
 Debug 默认连接 `http://127.0.0.1:8765/`，Release 无本地默认地址。MindCore/Authentication 的 AuthAPI 使用同一个 HTTPTransport；契约、会话、原生表单与剩余设备边界见 [账号实施](../docs/auth-implementation.md)。
 
-MindCore/Chat 提供会话摘要 / 分页 API、ChatLibraryModel 与 Markdown 核心；SwiftUI 已接线列表、历史、消息组件和退出清理，XcodeGen 已登记页面。本批应用未重新编译 / 运行，主机测试不验证 UI。入口见[会话读取核心](../docs/chat-history-implementation.md)和[消息展示](../docs/message-rendering.md)，发送继续实施。
+MindCore/Chat 提供会话摘要 / 分页 API、ChatLibraryModel 与 Markdown 核心；SwiftUI 已接线列表、历史、消息组件和退出清理，XcodeGen 已登记页面。本批应用未重新编译 / 运行，主机测试不验证 UI。入口见[会话读取核心](../docs/chat-history-implementation.md)和[消息展示](../docs/message-rendering.md)；[发送 / 停止 / 恢复](../docs/chat-turn-implementation.md)已接线，主机核心通过，原生页面仍待构建与设备验证。

@@ -38,9 +38,16 @@ data class HistoryPageState<T>(
     }
 }
 
+data class ChatConversation(
+    val target: ChatTarget,
+    val title: String? = null,
+) {
+    val sessionId: String get() = target.sessionId
+}
+
 data class ChatLibraryState(
     val account: HistoryAccount? = null,
     val conversations: HistoryPageState<ConversationSummary> = HistoryPageState(),
-    val selected: ConversationSummary? = null,
+    val selected: ChatConversation? = null,
     val messages: HistoryPageState<StoredChatMessage> = HistoryPageState(),
 )

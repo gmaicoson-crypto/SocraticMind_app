@@ -76,7 +76,19 @@ fun AppRoot(model: AppViewModel) {
 
                     is SessionState.SignedIn -> {
                         key(current.revision) {
-                            model.history?.let { ChatLibraryScreen(it, current, model::logout) }
+                            val history = model.history
+                            val turn = model.turn
+                            if (history != null && turn != null) {
+                                ChatLibraryScreen(
+                                    history,
+                                    turn,
+                                    current,
+                                    model::logout,
+                                    model::newConversation,
+                                    model::selectConversation,
+                                    model::closeConversation,
+                                )
+                            }
                         }
                     }
                 }

@@ -8,11 +8,14 @@ import com.gmaicoson.socraticmind.auth.AuthFormController
 import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.auth.accountErrorMessage
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
+import com.gmaicoson.socraticmind.chat.ChatTarget
+import com.gmaicoson.socraticmind.chat.ChatTurnController
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class AppViewModel(
     result: Result<AppGraph>,
@@ -22,6 +25,7 @@ class AppViewModel(
     val session = graph?.session?.state ?: MutableStateFlow<SessionState>(SessionState.Uninitialized).asStateFlow()
     val form = graph?.let { AuthFormController(it.session, it.auth) }
     val history = graph?.let { ChatLibraryController(it.session, it.history, viewModelScope) }
+    val turn = graph?.let { ChatTurnController(it.session, it.turn, it.journal, viewModelScope) }
     private val mutableError = MutableStateFlow<String?>(null)
     val error = mutableError.asStateFlow()
     private var formJob: Job? = null
@@ -33,10 +37,28 @@ class AppViewModel(
                 var accountRevision: Long? = null
                 session.collect { state ->
                     history?.bindAccount(state)
+                    turn?.bindAccount(state)
                     val next = (state as? SessionState.SignedIn)?.revision
                     if (next != accountRevision) {
                         form?.reset()
                         accountRevision = next
+                    }
+                }
+            }
+            viewModelScope.launch {
+                val coordinator = turn ?: return@launch
+                coordinator.state.collect { state ->
+                    val account = state.account
+                    val library = history
+                    if (account != null && library != null && library.state.value.account == account) {
+                        state.pending?.let { pending -> library.openConversation(pending.target) }
+                        state.receipt?.let { receipt ->
+                            if (library.state.value.selected == null && state.target == receipt.pending.target) {
+                                library.openConversation(receipt.pending.target)
+                            }
+                            library.accept(receipt, account)
+                            coordinator.acknowledge(receipt)
+                        }
                     }
                 }
             }
@@ -56,16 +78,46 @@ class AppViewModel(
 
     fun restore() = runSession { graph?.session?.restore() }
 
+    fun newConversation() {
+        val coordinator = turn ?: return
+        if (!coordinator.state.value.editable) return
+        val target = ChatTarget(UUID.randomUUID().toString())
+        coordinator.select(target)
+        history?.openConversation(target)
+    }
+
+    fun selectConversation(id: String) {
+        val coordinator = turn ?: return
+        if (!coordinator.state.value.editable) return
+        history?.selectConversation(id)
+        turn.select(
+            history
+                ?.state
+                ?.value
+                ?.selected
+                ?.target,
+        )
+    }
+
+    fun closeConversation() {
+        val coordinator = turn ?: return
+        if (!coordinator.state.value.editable) return
+        history?.closeConversation()
+        coordinator.select(null)
+    }
+
     fun logout() {
         if (sessionJob?.isActive == true) return
         formJob?.cancel()
         form?.reset()
         history?.clear()
+        turn?.clear()
         runSession { graph?.session?.logout() }
     }
 
     override fun onCleared() {
         history?.close()
+        turn?.close()
         super.onCleared()
     }
 

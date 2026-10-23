@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ChatMode: String, Sendable { case normal, socratic }
+public enum ChatMode: String, Codable, Sendable { case normal, socratic }
 
 public enum HistoryContractFailure: Error { case invalidCursor, invalidPage, invalidSession }
 

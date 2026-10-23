@@ -114,7 +114,8 @@
         "contracts/fixtures/chat-streams.json",
         "backend/core/errors.py",
         "backend/tests/p0/test_errors.py",
-        "backend/routers/chat.py"
+        "backend/routers/chat.py",
+        "backend/services/chat_lifecycle.py"
       ],
       "depends_on": [
         "import-baseline"
@@ -752,6 +753,130 @@
         ]
       },
       "manual": []
+    },
+    "turn-provider": {
+      "paths": [
+        "backend/tests/contracts/test_chat_turn_contract.py",
+        "contracts/fixtures/chat-turns.json"
+      ],
+      "depends_on": [
+        "chat-provider",
+        "history-provider"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_chat_turn_contract.py",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_request_replay_and_fingerprint",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_expired_same_request_replay_returns_interrupted",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_cancel_before_begin_is_durable_and_prevents_generation",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_lease_refresh_preserves_partial_answer_then_cancel_prevents_completion",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_stop_intent_blocks_model_start_and_completion_before_cancel_transition"
+        ]
+      },
+      "manual": []
+    },
+    "turn-fixtures": {
+      "paths": [
+        "scripts/contracts/chat_turn_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "turn-api-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnModels.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnApi.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnApiContractTest.kt"
+      ],
+      "depends_on": [
+        "turn-provider",
+        "turn-fixtures",
+        "history-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "turn-api-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnModels.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnAPI.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTurnAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "turn-provider",
+        "turn-fixtures",
+        "history-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatTurnAPIContractTests"
+        ]
+      },
+      "manual": []
+    },
+    "turn-state-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnController.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnState.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/FileChatTurnJournal.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnControllerTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnTestDoubles.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/FileChatTurnJournalTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatComposer.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt"
+      ],
+      "depends_on": [
+        "turn-api-android",
+        "history-state-android",
+        "session-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
+          "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
+          "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest"
+        ]
+      },
+      "manual": [
+        "发送 / 停止 / 恢复主机核心已接线；Compose 输入法、滚动、进程终止和 Android 私有文件行为须在明确获准构建后验证，核心测试不等于原生验收。"
+      ]
+    },
+    "turn-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnModel.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnState.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/FileChatTurnJournal.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTurnModelTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTurnTestDoubles.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/FileChatTurnJournalTests.swift",
+        "ios/SocraticMind/App/AppModel.swift",
+        "ios/SocraticMind/App/AppRootView.swift",
+        "ios/SocraticMind/Chat/ChatComposerView.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift"
+      ],
+      "depends_on": [
+        "turn-api-ios",
+        "history-state-ios",
+        "session-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatTurnModelTests",
+          "FileChatTurnJournalTests",
+          "ChatLibraryModelTests"
+        ]
+      },
+      "manual": [
+        "发送 / 停止 / 恢复主机核心已接线；SwiftUI 输入法、滚动、进程终止、文件保护和备份排除须在明确获准构建后验证，核心测试不等于原生验收。"
+      ]
     }
   },
   "metadata": [

@@ -39,9 +39,17 @@ public struct HistoryPageState<Item: Sendable>: Sendable {
     }
 }
 
+public struct ChatConversation: Sendable {
+    public let target: ChatTarget
+    public let title: String?
+    public var sessionID: String {
+        target.sessionID
+    }
+}
+
 public struct ChatLibraryState: Sendable {
     public internal(set) var account: HistoryAccount?
     public internal(set) var conversations = HistoryPageState<ConversationSummary>()
-    public internal(set) var selected: ConversationSummary?
+    public internal(set) var selected: ChatConversation?
     public internal(set) var messages = HistoryPageState<StoredChatMessage>()
 }

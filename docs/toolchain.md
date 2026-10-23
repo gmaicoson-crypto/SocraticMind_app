@@ -71,3 +71,10 @@ Markdown 的双端固定依赖、许可证、SwiftPM / Xcode 两份锁及受限�
 quality.yml 的 GitHub Actions 固定完整 commit SHA；MySQL 服务固定 8.4.11 容器摘要。Python 固定 3.12.14，Android JDK 使用 Temurin 21.0.10。Swift job 选择 macos-26 上的 Xcode 26.6，包的语言版本保持 Swift 6；当前本机为 Xcode 27.1，两者验证结果分别记录。runner 不提供约定 Xcode 时应失败并重新审阅配置，不能悄悄切换 default。[GitHub runner 软件清单](https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md)
 
 本地工作流静态检查使用下载摘要已校验的 actionlint 1.7.12（Darwin arm64 归档 SHA-256 为 aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f）。该辅助检查器未加入日常语言 bootstrap；工作流实际运行仍待远端就绪。
+
+
+## 普通聊天发送的定向集合
+
+新增 ChatTurn API、状态与 FileChatTurnJournal 使用现有 JDK / Foundation / CryptoKit 和传输依赖，没有新版本或锁文件变更。`turn-provider` / `turn-fixtures` / `turn-api-*` / `turn-state-*` 在影响映射中登记明确路径、账号 / 历史依赖和测试选择；共享回环服务器变化扩展实际使用它的双端消费者。新建源码仍必须登记映射，不能由通配规则自动跳过。
+
+当前提供方 10 项、工具 58 项，Android 12 类 87 项有效报告、Swift 13 suite 91 项通过；实际执行与缓存复用边界见[实施状态](execution-status.md)。变化源码通过固定格式 / lint；306 行发送协调器和 503 行影响映射测试达到预警，职责审查见[发送实施](chat-turn-implementation.md)，无硬上限突破或新豁免。XcodeGen 只登记组件，没有应用编译或安装；平台文件保护、备份和生命周期仍属独立原生验证。

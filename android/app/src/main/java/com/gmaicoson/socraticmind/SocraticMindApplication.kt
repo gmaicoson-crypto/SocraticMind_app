@@ -4,6 +4,8 @@ import android.app.Application
 import com.gmaicoson.socraticmind.auth.AuthApi
 import com.gmaicoson.socraticmind.auth.SessionStore
 import com.gmaicoson.socraticmind.chat.ChatHistoryApi
+import com.gmaicoson.socraticmind.chat.ChatTurnApi
+import com.gmaicoson.socraticmind.chat.FileChatTurnJournal
 import com.gmaicoson.socraticmind.network.ApiEndpoint
 import com.gmaicoson.socraticmind.network.HttpTransport
 import com.gmaicoson.socraticmind.storage.keystoreTokenVault
@@ -18,7 +20,13 @@ class SocraticMindApplication : Application() {
                 )
             val transport = HttpTransport(endpoint)
             val api = AuthApi(transport)
-            AppGraph(api, SessionStore(api, keystoreTokenVault(this, endpoint)), ChatHistoryApi(transport))
+            AppGraph(
+                api,
+                SessionStore(api, keystoreTokenVault(this, endpoint)),
+                ChatHistoryApi(transport),
+                ChatTurnApi(transport),
+                FileChatTurnJournal(noBackupFilesDir, endpoint.credentialScope),
+            )
         }
     }
 }
@@ -27,4 +35,6 @@ class AppGraph(
     val auth: AuthApi,
     val session: SessionStore,
     val history: ChatHistoryApi,
+    val turn: ChatTurnApi,
+    val journal: FileChatTurnJournal,
 )

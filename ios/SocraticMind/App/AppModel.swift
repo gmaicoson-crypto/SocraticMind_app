@@ -1,3 +1,4 @@
+import Combine
 import MindCore
 import SwiftUI
 
@@ -7,6 +8,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var error: String?
     let form: AuthFormModel?
     let history: ChatLibraryModel?
+    let turn: ChatTurnModel?
     let configurationError: String?
     private let store: SessionStore?
     private var observation: Task<Void, Never>?
@@ -14,6 +16,7 @@ final class AppModel: ObservableObject {
     private var sessionTask: Task<Void, Never>?
     private var formRunning = false
     private var sessionRunning = false
+    private var turnObservation: AnyCancellable?
 
     init() {
         do {
@@ -27,15 +30,24 @@ final class AppModel: ObservableObject {
             let transport = try HTTPTransport(endpoint: endpoint)
             let api = AuthAPI(transport: transport)
             let session = SessionStore(gateway: api, vault: KeychainTokenVault(endpoint: endpoint))
+            let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
+                                                        appropriateFor: nil, create: true)
+            let journal = try FileChatTurnJournal(directory: directory, endpointScope: endpoint.credentialScope)
             store = session
             form = AuthFormModel(session: session, recovery: api)
             history = ChatLibraryModel(session: session, gateway: ChatHistoryAPI(transport: transport))
+            turn = ChatTurnModel(session: session, gateway: ChatTurnAPI(transport: transport), journal: journal)
             configurationError = nil
         } catch {
             store = nil
             form = nil
             history = nil
+            turn = nil
             configurationError = "服务地址未正确配置，请检查当前开发配置。"
+        }
+        // @Published emits before storing state; acknowledge on the next main-actor turn.
+        turnObservation = turn?.$state.sink { [weak self] state in
+            Task { @MainActor [weak self] in self?.acceptTurn(state) }
         }
     }
 
@@ -54,6 +66,7 @@ final class AppModel: ObservableObject {
                     form?.reset(); revision = next
                 }
                 history?.bindAccount(state)
+                turn?.bindAccount(state)
                 session = state
             }
         }
@@ -77,7 +90,38 @@ final class AppModel: ObservableObject {
         formTask?.cancel()
         form?.reset()
         history?.clear()
+        turn?.clear()
         runSession { try await $0.logout() }
+    }
+
+    func newConversation() {
+        guard turn?.state.editable == true, let target = try? ChatTarget(sessionID: UUID().uuidString) else { return }
+        turn?.select(target); history?.openConversation(target)
+    }
+
+    func selectConversation(_ id: String) {
+        guard turn?.state.editable == true else { return }
+        history?.selectConversation(id); turn?.select(history?.state.selected?.target)
+    }
+
+    func closeConversation() {
+        guard turn?.state.editable == true else { return }
+        history?.closeConversation(); turn?.select(nil)
+    }
+
+    private func acceptTurn(_ state: ChatTurnState) {
+        guard let account = state.account, history?.state.account == account,
+              turn?.state.account == account else { return }
+        if let pending = state.pending, turn?.state.pending == pending {
+            history?.openConversation(pending.target)
+        }
+        if let receipt = state.receipt, turn?.state.receipt == receipt {
+            if history?.state.selected == nil, turn?.state.target == receipt.pending.target {
+                history?.openConversation(receipt.pending.target)
+            }
+            history?.accept(receipt, account: account)
+            turn?.acknowledge(receipt)
+        }
     }
 
     private func runForm(_ action: @escaping @MainActor (AuthFormModel) async -> Void) {

@@ -72,10 +72,49 @@ class ChatLibraryController(
             val summary =
                 state.value.conversations.items
                     .find { it.sessionId == sessionId } ?: return
+            val target =
+                runCatching {
+                    ChatTarget(summary.sessionId, mode, summary.nodeKey, summary.topicId ?: 0)
+                }.getOrNull() ?: return
             reads.remove(Lane.MESSAGES)?.job?.cancel()
-            mutableState.value = state.value.copy(selected = summary, messages = HistoryPageState())
+            mutableState.value =
+                state.value.copy(selected = ChatConversation(target, summary.title), messages = HistoryPageState())
         }
         refreshMessages()
+    }
+
+    fun openConversation(target: ChatTarget) {
+        synchronized(lock) {
+            if (!isCurrentAccount() || state.value.selected?.target == target || target.mode != mode) return
+            reads.remove(Lane.MESSAGES)?.job?.cancel()
+            mutableState.value = state.value.copy(selected = ChatConversation(target), messages = HistoryPageState())
+        }
+        refreshMessages()
+    }
+
+    /** Authoritative turn rows replace matching IDs; invalidate old reads before they can drop the new rows. */
+    fun accept(
+        receipt: ChatTurnReceipt,
+        account: HistoryAccount,
+    ) {
+        var refresh = false
+        synchronized(lock) {
+            if (!isCurrentAccount() || state.value.account != account ||
+                receipt.pending.ownerId != account.userId
+            ) {
+                return
+            }
+            if (state.value.selected?.target == receipt.pending.target) {
+                reads.remove(Lane.MESSAGES)?.job?.cancel()
+                val page = state.value.messages
+                refresh = !page.loaded || receipt.messages.isEmpty()
+                val items = (receipt.messages + page.items).distinctBy { it.id }.sortedByDescending { it.id }
+                mutableState.value =
+                    state.value.copy(messages = page.copy(items = items, loaded = true, loading = null, failure = null))
+            }
+        }
+        if (refresh) refreshMessages()
+        refreshConversations()
     }
 
     fun closeConversation() =

@@ -13,6 +13,83 @@ import java.io.IOException
 
 class ChatLibraryControllerTest {
     @Test
+    fun `confirmed turn merges stable IDs and invalidates a stale history refresh`() =
+        runBlocking {
+            val h = HistoryHarness(this)
+            try {
+                val pending = turnRequest().pending
+                h.login()
+                h.conversations().succeed(listOf(summary(100, pending.target.sessionId)))
+                awaitHistory { h.model.state.value.conversations.loaded }
+                h.model.selectConversation(pending.target.sessionId)
+                h.messages().succeed(listOf(message(100, pending.target.sessionId)))
+                awaitHistory { h.model.state.value.messages.loaded }
+                h.model.refreshMessages()
+                val stale = h.messages()
+                val account = checkNotNull(h.model.state.value.account)
+                val receipt =
+                    ChatTurnReceipt(
+                        pending,
+                        ChatTurnStatus.COMPLETE,
+                        turnFixture().historyArray("messages").map(StoredChatMessage::decode),
+                    )
+                h.model.accept(receipt, account)
+                assertEquals(
+                    listOf(102L, 101L, 100L),
+                    h.model.state.value.messages.items
+                        .map { it.id },
+                )
+                stale.succeed(listOf(message(99, pending.target.sessionId)))
+                stale.completed.await()
+                yield()
+                assertEquals(
+                    listOf(102L, 101L, 100L),
+                    h.model.state.value.messages.items
+                        .map { it.id },
+                )
+                h.model.accept(receipt.copy(messages = emptyList()), account.copy(revision = account.revision + 1))
+                assertEquals(
+                    listOf(102L, 101L, 100L),
+                    h.model.state.value.messages.items
+                        .map { it.id },
+                )
+            } finally {
+                h.close()
+            }
+        }
+
+    @Test
+    fun `new draft target does not require a fabricated server message`() =
+        runBlocking {
+            val h = HistoryHarness(this)
+            try {
+                h.login()
+                h.conversations().succeed(emptyList())
+                val target = ChatTarget("new-session")
+                h.model.openConversation(target)
+                val read = h.messages()
+                assertEquals(target.sessionId, read.sessionId)
+                assertEquals(
+                    target,
+                    h.model.state.value.selected
+                        ?.target,
+                )
+                read.succeed(emptyList())
+                awaitHistory { h.model.state.value.messages.loaded }
+                assertTrue(
+                    h.model.state.value.messages.items
+                        .isEmpty(),
+                )
+                assertTrue(
+                    h.model.state.value.conversations.items
+                        .isEmpty(),
+                )
+            } finally {
+                h.close()
+            }
+        }
+
+    @Test
     fun `empty and failed initial loads are distinct and retryable`() =
         runBlocking {
             val h = HistoryHarness(this)

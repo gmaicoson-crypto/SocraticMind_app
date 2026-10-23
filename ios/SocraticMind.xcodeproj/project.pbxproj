@@ -19,6 +19,7 @@
 		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
 		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
 		C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4648BB5C680AAE1441E028BF /* AuthTextInput.swift */; };
+		D6D8D428875A919AF0ED79A1 /* ChatComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */; };
 		E39ABE4A8138E47D7C469462 /* AuthFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */; };
 		E5213532C63BE3DEA427FA76 /* MessageCopyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */; };
 		E68A9A2A5BA6651F1369D0FA /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DDBEDD8CAC3E583E97292B /* AppModel.swift */; };
@@ -42,6 +43,7 @@
 		2C45889AB397FDA45D84D37D /* MindCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MindCore; path = Packages/MindCore; sourceTree = SOURCE_ROOT; };
 		3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCopyButton.swift; sourceTree = "<group>"; };
 		4648BB5C680AAE1441E028BF /* AuthTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextInput.swift; sourceTree = "<group>"; };
+		5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatComposerView.swift; sourceTree = "<group>"; };
 		69DFA684F16FC815A3CAA454 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPageControls.swift; sourceTree = "<group>"; };
 		7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLibraryView.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 		D313D2081763C8A0C7440170 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */,
 				7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */,
 				7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */,
 			);
@@ -244,6 +247,7 @@
 				1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */,
 				11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */,
 				C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */,
+				D6D8D428875A919AF0ED79A1 /* ChatComposerView.swift in Sources */,
 				1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */,
 				56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */,
 				0DDFAC9AD1AF7F04071639E9 /* MarkdownBlockView.swift in Sources */,

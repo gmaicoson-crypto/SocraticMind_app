@@ -11,6 +11,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from auth_fixture import response as auth_response
 from chat_history_fixture import response as history_response
+from chat_turn_fixture import frames as turn_frames
+from chat_turn_fixture import response as turn_response
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -47,6 +49,11 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path.startswith("/api/auth/"):
             self.respond(*auth_response("GET", url.path, self.headers))
+        elif url.path.startswith("/api/chat/requests/") or (
+            url.path == "/api/chat/session-messages"
+            and self.headers.get("Authorization", "").startswith("Bearer turn-")
+        ):
+            self.respond(*turn_response("GET", url.path, parse_qs(url.query), self.headers))
         elif url.path in {"/api/chat/sessions", "/api/chat/session-messages"}:
             self.respond(*history_response(url.path, parse_qs(url.query), self.headers))
         elif url.path == "/health":
@@ -80,6 +87,18 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path.startswith("/api/auth/"):
             self.respond(*auth_response("POST", self.path, self.headers, body))
+            return
+        if self.path in {"/api/chat/stream", "/api/chat/cancel"}:
+            status, payload = turn_response("POST", self.path, {}, self.headers, body)
+            if self.path == "/api/chat/stream" and status == 200:
+                wire = turn_frames()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(len(wire)))
+                self.end_headers()
+                self.wfile.write(wire)
+            else:
+                self.respond(status, payload)
             return
         if self.path == "/echo-form":
             values = parse_qs(body.decode())

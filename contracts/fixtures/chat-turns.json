@@ -1,0 +1,231 @@
+{
+  "request": {
+    "request_id": "turn-contract-id",
+    "session_id": "会话 /?&#+💡",
+    "mode": "normal",
+    "node_key": "__normal__",
+    "topic_id": 0,
+    "kind": "qa",
+    "user_input": "  为什么？\n```python\nprint(\"好\")\n```  ",
+    "ai_style": "标准"
+  },
+  "status": {
+    "request_id": "turn-contract-id",
+    "session_id": "会话 /?&#+💡",
+    "status": "complete",
+    "msg_ids": {
+      "user": 101,
+      "ai": 102
+    },
+    "preparation": null,
+    "error_code": null,
+    "error": null
+  },
+  "messages": [
+    {
+      "id": 101,
+      "session_id": "会话 /?&#+💡",
+      "mode": "normal",
+      "node_key": "__normal__",
+      "topic_id": null,
+      "role": "user",
+      "content": "  为什么？\n```python\nprint(\"好\")\n```  ",
+      "message_type": "chat",
+      "metadata": null,
+      "created_at": null,
+      "attachments": []
+    },
+    {
+      "id": 102,
+      "session_id": "会话 /?&#+💡",
+      "mode": "normal",
+      "node_key": "__normal__",
+      "topic_id": null,
+      "role": "ai",
+      "content": "你好，世界🙂",
+      "message_type": "chat",
+      "metadata": null,
+      "created_at": null,
+      "attachments": []
+    }
+  ],
+  "invalid_status": [
+    {
+      "id": "other-request",
+      "payload": {
+        "request_id": "other",
+        "session_id": "会话 /?&#+💡",
+        "status": "complete",
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "other-session",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "other",
+        "status": "complete",
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "unknown-status",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "会话 /?&#+💡",
+        "status": "future",
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "missing-ids",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "会话 /?&#+💡",
+        "status": "complete",
+        "msg_ids": null,
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "string-ids",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "会话 /?&#+💡",
+        "status": "complete",
+        "msg_ids": {
+          "user": "101",
+          "ai": 102
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "zero-id",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "会话 /?&#+💡",
+        "status": "complete",
+        "msg_ids": {
+          "user": 0,
+          "ai": 102
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "duplicate-id",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "会话 /?&#+💡",
+        "status": "complete",
+        "msg_ids": {
+          "user": 101,
+          "ai": 101
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    },
+    {
+      "id": "missing-status",
+      "payload": {
+        "request_id": "turn-contract-id",
+        "session_id": "会话 /?&#+💡",
+        "status": null,
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        },
+        "preparation": null,
+        "error_code": null,
+        "error": null
+      }
+    }
+  ],
+  "cancel_cases": [
+    {
+      "id": "stopped",
+      "payload": {
+        "status": "interrupted",
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "complete",
+      "payload": {
+        "status": "complete",
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "tombstone",
+      "payload": {
+        "status": "interrupted"
+      },
+      "valid": true
+    },
+    {
+      "id": "generating",
+      "payload": {
+        "status": "generating",
+        "msg_ids": {
+          "user": 101,
+          "ai": 102
+        }
+      },
+      "valid": false
+    },
+    {
+      "id": "complete-no-ids",
+      "payload": {
+        "status": "complete"
+      },
+      "valid": false
+    },
+    {
+      "id": "invalid-ids",
+      "payload": {
+        "status": "interrupted",
+        "msg_ids": {
+          "user": -1,
+          "ai": 2
+        }
+      },
+      "valid": false
+    }
+  ]
+}

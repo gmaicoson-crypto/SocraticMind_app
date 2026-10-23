@@ -40,6 +40,22 @@ public struct ChatHistoryAPI: ChatHistoryGateway {
         return page
     }
 
+    /// Exact lookup reuses the bounded endpoint, without confusing a neighbour with a deleted message.
+    public func message(token: String, sessionID: String, id: Int64) async throws -> StoredChatMessage? {
+        try validateHistorySession(sessionID)
+        guard id > 0 else { throw HistoryContractFailure.invalidPage }
+        let data = try await transport.request(
+            method: "GET", path: "api/chat/session-messages", bearer: token,
+            query: ["session_id": sessionID, "snapshot_id": String(id), "limit": "1"]
+        )
+        let payload = try JSONDecoder().decode(HistoryPagePayload<StoredChatMessage>.self, from: data)
+        let page = try payload.validated(limit: 1, cursor: nil, identifier: { $0.id })
+        guard page.snapshotID == id, page.items.allSatisfy({ $0.sessionID == sessionID }) else {
+            throw HistoryContractFailure.invalidPage
+        }
+        return page.items.first.flatMap { $0.id == id ? $0 : nil }
+    }
+
     private func pageQuery(limit: Int, cursor: HistoryCursor?) throws -> [String: String] {
         guard (1 ... 100).contains(limit) else { throw HistoryContractFailure.invalidPage }
         var query = ["limit": String(limit)]

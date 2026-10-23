@@ -4,6 +4,46 @@ import Testing
 
 @MainActor
 struct ChatLibraryModelTests {
+    @Test
+    func confirmedTurnMergesStableIDsAndInvalidatesStaleHistoryRefresh() async throws {
+        try await withHistory { h in
+            let pending = try turnRequest().pending
+            try await h.login()
+            try await h.conversations().succeed([historySummary(100, pending.target.sessionID)])
+            try await awaitHistory { h.model.state.conversations.loaded }
+            h.model.selectConversation(pending.target.sessionID)
+            try await h.messages().succeed([historyMessage(100, pending.target.sessionID)])
+            try await awaitHistory { h.model.state.messages.loaded }
+            h.model.refreshMessages()
+            let stale = try await h.messages()
+            let account = try #require(h.model.state.account)
+            let receipt = try ChatTurnReceipt(pending: pending, status: .complete, messages: turnFixture().messages)
+            h.model.accept(receipt, account: account)
+            #expect(h.model.state.messages.items.map(\.id) == [102, 101, 100])
+            try await stale.succeed([historyMessage(99, pending.target.sessionID)])
+            try await awaitHistory { await stale.completed }
+            #expect(h.model.state.messages.items.map(\.id) == [102, 101, 100])
+            h.model.accept(ChatTurnReceipt(pending: pending, status: .complete, messages: []),
+                           account: HistoryAccount(userID: account.userID, revision: account.revision + 1))
+            #expect(h.model.state.messages.items.map(\.id) == [102, 101, 100])
+        }
+    }
+
+    @Test
+    func newDraftDoesNotRequireFabricatedStoredMessage() async throws {
+        try await withHistory { h in
+            try await h.login(); try await h.conversations().succeed([])
+            let target = try ChatTarget(sessionID: "new-session")
+            h.model.openConversation(target)
+            let read = try await h.messages()
+            #expect(read.sessionID == target.sessionID)
+            #expect(h.model.state.selected?.target == target)
+            await read.succeed([])
+            try await awaitHistory { h.model.state.messages.loaded }
+            #expect(h.model.state.messages.items.isEmpty && h.model.state.conversations.items.isEmpty)
+        }
+    }
+
     @Test func emptyFailureAndRetry() async throws {
         try await withHistory { h in
             h.model.refreshConversations()

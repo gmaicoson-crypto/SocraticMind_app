@@ -35,7 +35,9 @@ Repository 对外暴露业务操作与结果，内部复用网络和存储接口
 
 当前会话读取已落到 core:chat 的 ChatLibraryController 与 MindCore/Chat 的 ChatLibraryModel：同一所有者管理列表、选中会话与消息页，复用 SessionStore 的凭证租约。两种页共用 HistoryPageState 和失败 / 分页控件；请求取消与迟到结果检查留在核心，页面只消费状态。Android core:chat 依赖 core:auth 与 core:network；Swift 核心使用 Combine，不引入 SwiftUI / UIKit。
 
-Markdown 在既有 chat 核心内按文档模型、库 AST 投影、链接策略、调度缓存拆职责，不新建空壳 module。app 的消息展示复用行内组件、代码 / 表格块及复制按钮，核心模型不引用原生 UI；普通历史页已接入，后续节点聊天复用同一入口。解析 / 缓存通过不代表宿主完成，范围与取舍见[消息展示](message-rendering.md)。Composer、来源引用及结构化学习卡片继续实施。
+Markdown 在既有 chat 核心内按文档模型、库 AST 投影、链接策略、调度缓存拆职责，不新建空壳 module。app 的消息展示复用行内组件、代码 / 表格块及复制按钮，核心模型不引用原生 UI；普通历史页已接入，后续节点聊天复用同一入口。解析 / 缓存通过不代表宿主完成，范围与取舍见[消息展示](message-rendering.md)。Composer 已接入发送 / 停止 / 状态核对；来源引用及结构化学习卡片继续实施。
+
+发送协调器与历史状态分工见[普通聊天发送与恢复](chat-turn-implementation.md)。ChatTurnController / ChatTurnModel 只拥有一次待确认请求，FileChatTurnJournal 保存无正文的恢复引用；终态内容通过精确历史查询交给原历史所有者，显式确认接收后才能发下一次请求。页面继续复用 MessageContent，无新增跨端框架或后端实现。
 
 ## 后端核心职责
 

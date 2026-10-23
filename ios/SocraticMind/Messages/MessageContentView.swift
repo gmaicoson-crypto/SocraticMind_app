@@ -2,19 +2,36 @@ import MindCore
 import SwiftUI
 
 struct MessageContentView: View {
-    let message: StoredChatMessage
+    let role: String
+    let content: String
+    let attachmentCount: Int
     let renderer: MarkdownRenderer
+    let provisional: Bool
+
+    init(message: StoredChatMessage, renderer: MarkdownRenderer) {
+        role = message.role; content = message.content; attachmentCount = message.attachments.count
+        self.renderer = renderer; provisional = false
+    }
+
+    init(role: String, content: String, renderer: MarkdownRenderer, provisional: Bool = false) {
+        self.role = role; self.content = content; attachmentCount = 0
+        self.renderer = renderer; self.provisional = provisional
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(message.role == "user" ? "你" : "SocraticMind").font(.caption).foregroundStyle(.tint)
+                Text(role == "user" ? "你" : "SocraticMind").font(.caption).foregroundStyle(.tint)
                 Spacer()
-                MessageCopyButton(text: message.content, label: "复制原文")
+                MessageCopyButton(text: content, label: provisional ? "复制当前文字" : "复制原文")
             }
-            MarkdownBodyView(source: message.content, renderer: renderer)
-            if !message.attachments.isEmpty {
-                Text("包含 \(message.attachments.count) 个附件").font(.caption).foregroundStyle(.secondary)
+            if provisional {
+                Text(content.isEmpty ? "正在等待回复…" : content).lineLimit(32).textSelection(.enabled)
+            } else {
+                MarkdownBodyView(source: content, renderer: renderer)
+            }
+            if attachmentCount > 0 {
+                Text("包含 \(attachmentCount) 个附件").font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 8)

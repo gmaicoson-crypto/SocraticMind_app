@@ -62,12 +62,39 @@ public final class ChatLibraryModel: ObservableObject {
 
     public func selectConversation(_ sessionID: String) {
         guard !closed, state.account != nil, state.selected?.sessionID != sessionID,
-              let summary = state.conversations.items.first(where: { $0.sessionID == sessionID })
+              let summary = state.conversations.items.first(where: { $0.sessionID == sessionID }),
+              let target = try? ChatTarget(sessionID: summary.sessionID, mode: mode, nodeKey: summary.nodeKey,
+                                           topicID: summary.topicID ?? 0)
         else { return }
         reads.removeValue(forKey: .messages)?.task.cancel()
-        state.selected = summary
+        state.selected = ChatConversation(target: target, title: summary.title)
         state.messages = HistoryPageState()
         refreshMessages()
+    }
+
+    public func openConversation(_ target: ChatTarget) {
+        guard !closed, state.account != nil, state.selected?.target != target, target.mode == mode else { return }
+        reads.removeValue(forKey: .messages)?.task.cancel()
+        state.selected = ChatConversation(target: target, title: nil)
+        state.messages = HistoryPageState()
+        refreshMessages()
+    }
+
+    /// Invalidate earlier reads before merging authoritative IDs, so a late page cannot erase a completed turn.
+    public func accept(_ receipt: ChatTurnReceipt, account: HistoryAccount) {
+        guard !closed, state.account == account, receipt.pending.ownerID == account.userID else { return }
+        if state.selected?.target == receipt.pending.target {
+            reads.removeValue(forKey: .messages)?.task.cancel()
+            let refresh = !state.messages.loaded || receipt.messages.isEmpty
+            var seen: Set<Int64> = []
+            state.messages.items = (receipt.messages + state.messages.items)
+                .filter { seen.insert($0.id).inserted }.sorted { $0.id > $1.id }
+            state.messages.loaded = true; state.messages.loading = nil; state.messages.failure = nil
+            if refresh {
+                refreshMessages()
+            }
+        }
+        refreshConversations()
     }
 
     public func closeConversation() {

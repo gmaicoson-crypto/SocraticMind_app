@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gmaicoson.socraticmind.chat.StoredChatMessage
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownDocument
@@ -29,6 +30,15 @@ import kotlinx.coroutines.CancellationException
 fun MessageContent(
     message: StoredChatMessage,
     renderer: MarkdownRenderer,
+) = MessageContent(message.role, message.content, renderer, attachments = message.attachments.size)
+
+@Composable
+fun MessageContent(
+    role: String,
+    content: String,
+    renderer: MarkdownRenderer,
+    provisional: Boolean = false,
+    attachments: Int = 0,
 ) {
     Column(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -36,16 +46,20 @@ fun MessageContent(
     ) {
         Row(Modifier.fillMaxWidth()) {
             Text(
-                if (message.role == "user") "你" else "SocraticMind",
+                if (role == "user") "你" else "SocraticMind",
                 Modifier.weight(1f).padding(vertical = 12.dp),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
-            MessageCopyButton(message.content, "复制原文")
+            MessageCopyButton(content, if (provisional) "复制当前文字" else "复制原文")
         }
-        MarkdownBody(message.content, renderer)
-        if (message.attachments.isNotEmpty()) {
-            Text("包含 ${message.attachments.size} 个附件", style = MaterialTheme.typography.labelMedium)
+        if (provisional) {
+            Text(content.ifEmpty { "正在等待回复…" }, maxLines = 32, overflow = TextOverflow.Ellipsis)
+        } else {
+            MarkdownBody(content, renderer)
+        }
+        if (attachments > 0) {
+            Text("包含 $attachments 个附件", style = MaterialTheme.typography.labelMedium)
         }
     }
 }

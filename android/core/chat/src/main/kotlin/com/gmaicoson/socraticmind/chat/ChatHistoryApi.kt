@@ -49,6 +49,26 @@ class ChatHistoryApi(
         return page
     }
 
+    /** Exact lookup through the existing bounded endpoint; never substitutes a neighbouring message. */
+    suspend fun message(
+        token: String,
+        sessionId: String,
+        id: Long,
+    ): StoredChatMessage? {
+        requireSessionId(sessionId)
+        require(id > 0)
+        val value =
+            transport.request(
+                "GET",
+                "api/chat/session-messages",
+                bearer = token,
+                query = mapOf("session_id" to sessionId, "snapshot_id" to id.toString(), "limit" to "1"),
+            )
+        val page = decodeHistoryPage(value, 1, null, StoredChatMessage::decode) { it.id }
+        require(page.snapshotId == id && page.items.all { it.sessionId == sessionId })
+        return page.items.singleOrNull()?.takeIf { it.id == id }
+    }
+
     private fun pageQuery(
         limit: Int,
         cursor: HistoryCursor?,
