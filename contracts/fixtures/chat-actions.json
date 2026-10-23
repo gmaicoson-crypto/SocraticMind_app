@@ -1,0 +1,78 @@
+{
+  "session_id": "会话 /?&#+💡",
+  "rename": {
+    "session_id": "会话 /?&#+💡",
+    "title": "  递归与边界🙂  "
+  },
+  "renamed": {
+    "session_id": "会话 /?&#+💡",
+    "title": "递归与边界🙂",
+    "status": "manual",
+    "retry_pending": false
+  },
+  "titles": [
+    {
+      "session_id": "会话 /?&#+💡",
+      "title": "递归与边界🙂",
+      "status": "manual",
+      "retry_pending": false
+    }
+  ],
+  "message_ids": [
+    101,
+    102
+  ],
+  "deleted_messages": {
+    "deleted": 2
+  },
+  "deleted_session": {
+    "deleted": 2
+  },
+  "invalid_titles": [
+    {
+      "id": "wrong-session",
+      "payload": {
+        "session_id": "other",
+        "title": "x",
+        "status": "manual",
+        "retry_pending": false
+      }
+    },
+    {
+      "id": "wrong-status",
+      "payload": {
+        "session_id": "会话 /?&#+💡",
+        "title": "x",
+        "status": "future",
+        "retry_pending": false
+      }
+    },
+    {
+      "id": "blank-title",
+      "payload": {
+        "session_id": "会话 /?&#+💡",
+        "title": " ",
+        "status": "manual",
+        "retry_pending": false
+      }
+    },
+    {
+      "id": "missing-title",
+      "payload": {
+        "session_id": "会话 /?&#+💡",
+        "title": null,
+        "status": "manual",
+        "retry_pending": false
+      }
+    },
+    {
+      "id": "string-retry",
+      "payload": {
+        "session_id": "会话 /?&#+💡",
+        "title": "递归与边界🙂",
+        "status": "manual",
+        "retry_pending": "false"
+      }
+    }
+  ]
+}

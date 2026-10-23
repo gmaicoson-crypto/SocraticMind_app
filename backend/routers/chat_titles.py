@@ -8,7 +8,7 @@ from core.ai_client import resolve_model_id
 from core.database import get_db
 from core.deps import get_current_user
 from core.user_llm import load_user_profiles
-from models import ChatSessionTitle, User
+from models import ChatMessage, ChatSessionTitle, User
 from services.chat_titles import schedule_title
 
 router = APIRouter(prefix="/api/chat/session-titles", tags=["chat"])
@@ -97,6 +97,46 @@ class RenameRequest(BaseModel):
     @classmethod
     def strip_title(cls, value):
         return value.strip() if isinstance(value, str) else value
+
+
+class RenameSessionRequest(RenameRequest):
+    session_id: str = Field(min_length=1, max_length=100)
+
+    @field_validator("session_id")
+    @classmethod
+    def nonblank_session(cls, value):
+        return TitleRequest.nonblank_session(value)
+
+
+@router.put("")
+def rename_session_title(
+    req: RenameSessionRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """JSON keeps opaque session IDs out of URL routing; legacy histories need no AI title job."""
+    row = db.query(ChatSessionTitle).filter_by(user_id=user.id, session_id=req.session_id).first()
+    if row is None:
+        source = (
+            db.query(ChatMessage.mode)
+            .filter_by(user_id=user.id, session_id=req.session_id, message_type="chat")
+            .order_by(ChatMessage.id.desc())
+            .first()
+        )
+        if source is None:
+            raise HTTPException(status_code=404, detail="对话不存在，请先发送消息")
+        if source.mode not in {"normal", "socratic"}:
+            raise HTTPException(status_code=409, detail="对话模式不一致")
+        # Reuse the unique-row/savepoint behavior, then make it manual before this transaction commits.
+        schedule_title(
+            db,
+            user_id=user.id,
+            session_id=req.session_id,
+            mode=source.mode,
+            source_text="",
+            model_id="",
+        )
+    return rename_title(req.session_id, req, user, db)
 
 
 @router.put("/{session_id}")

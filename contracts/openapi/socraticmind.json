@@ -1570,6 +1570,28 @@
         "title": "RenameRequest",
         "type": "object"
       },
+      "RenameSessionRequest": {
+        "properties": {
+          "session_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Session Id",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "session_id"
+        ],
+        "title": "RenameSessionRequest",
+        "type": "object"
+      },
       "ReplanRequest": {
         "properties": {
           "request_id": {
@@ -4264,6 +4286,49 @@
           }
         ],
         "summary": "Request Title",
+        "tags": [
+          "chat"
+        ]
+      },
+      "put": {
+        "description": "JSON keeps opaque session IDs out of URL routing; legacy histories need no AI title job.",
+        "operationId": "rename_session_title_api_chat_session_titles_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Rename Session Title",
         "tags": [
           "chat"
         ]

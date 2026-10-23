@@ -82,3 +82,9 @@ quality.yml 的 GitHub Actions 固定完整 commit SHA；MySQL 服务固定 8.4.
 ## 普通文字重生成的定向集合
 
 重生成资格与状态测试加入既有 turn-state 双端组；提供方增加 2 项既有生命周期选择。共享发送 fixture 及回环服务器变化扩展已登记的 HTTP、账号、历史、Markdown 与发送消费者，仍为显式类 / suite，没有全量测试或应用构建。最终结果和历史临时行的修正见[实施状态](execution-status.md)。schema 1 / 2 兼容和请求 ID 去重由主机测试覆盖，设备生命周期与原生 UI 单独验收。
+
+## 标题与删除接口的定向集合
+
+actions-provider / actions-fixtures / actions-android / actions-ios 登记后端、共享样例与双端适配。标题路由变化选择既有标题测试及关联删除生命周期；新增 PUT 进入 OpenAPI 快照，保留旧 operation / schema。通用回环 fixture 变化扩展已登记 HTTP、账号、历史和发送消费者，最终 Android 12 类 92 项、Swift 12 suite 89 项、后端 23 项及工具 57 项通过，证据见[实施状态](execution-status.md)。
+
+本批没有新增依赖或数据库迁移；Kotlin 2、Swift 2、Python 6 个变化源码通过固定工具，test_impact.py 536 行的职责复查见[动作实施](chat-actions-implementation.md)。适配器尚未注入应用容器，Swift 包与 Android JVM 通过不能代替操作界面编译、删除确认或设备验证。

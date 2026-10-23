@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 from auth_fixture import response as auth_response
+from chat_actions_fixture import response as actions_response
 from chat_history_fixture import response as history_response
 from chat_turn_fixture import frames as turn_frames
 from chat_turn_fixture import response as turn_response
@@ -49,6 +50,8 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path.startswith("/api/auth/"):
             self.respond(*auth_response("GET", url.path, self.headers))
+        elif url.path == "/api/chat/session-titles":
+            self.respond(*actions_response("GET", url.path, parse_qs(url.query), self.headers))
         elif url.path.startswith("/api/chat/requests/") or (
             url.path == "/api/chat/session-messages"
             and self.headers.get("Authorization", "").startswith("Bearer turn-")
@@ -70,6 +73,25 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(200, result)
         else:
             self.respond(404, {"detail": "not found"})
+
+    def chat_action(self, method):
+        length = int(self.headers.get("Content-Length", "0"))
+        if length < 0 or length > 65536:
+            self.respond(413, {"detail": "fixture request too large"})
+            self.close_connection = True
+            return
+        url = urlsplit(self.path)
+        self.respond(
+            *actions_response(
+                method, url.path, parse_qs(url.query), self.headers, self.rfile.read(length)
+            )
+        )
+
+    def do_PUT(self):
+        self.chat_action("PUT")
+
+    def do_DELETE(self):
+        self.chat_action("DELETE")
 
     def do_POST(self):
         if self.path == "/fresh-mutation" and getattr(self, "drop_next_mutation", False):

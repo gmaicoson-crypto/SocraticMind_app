@@ -7,6 +7,17 @@ import sys
 ROOT = Path(__file__).resolve().parents[3]
 
 
+def test_native_title_json_entry_and_legacy_route_coexist():
+    schema = json.loads((ROOT / "contracts/openapi/socraticmind.json").read_text())
+    entry = schema["paths"]["/api/chat/session-titles"]["put"]
+    reference = entry["requestBody"]["content"]["application/json"]["schema"]["$ref"]
+    request = schema["components"]["schemas"][reference.rsplit("/", 1)[1]]
+    assert set(request["required"]) == {"session_id", "title"}
+    assert request["properties"]["title"]["maxLength"] == 40
+    assert request["properties"]["session_id"]["maxLength"] == 100
+    assert "put" in schema["paths"]["/api/chat/session-titles/{session_id}"]
+
+
 def test_snapshot_matches_isolated_provider():
     result = subprocess.run(
         [sys.executable, str(ROOT / "scripts/contracts/export_openapi.py"), "--check"],

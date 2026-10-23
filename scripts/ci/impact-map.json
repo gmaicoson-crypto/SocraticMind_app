@@ -97,7 +97,8 @@
       "depends_on": [
         "configuration",
         "import-baseline",
-        "history-provider"
+        "history-provider",
+        "actions-provider"
       ],
       "checks": {
         "python": [
@@ -884,6 +885,73 @@
       },
       "manual": [
         "发送 / 停止 / 恢复主机核心已接线；SwiftUI 输入法、滚动、进程终止、文件保护和备份排除须在明确获准构建后验证，核心测试不等于原生验收。"
+      ]
+    },
+    "actions-provider": {
+      "paths": [
+        "backend/routers/chat_titles.py",
+        "backend/tests/p0/test_chat_titles.py",
+        "backend/tests/contracts/test_chat_actions_contract.py",
+        "contracts/fixtures/chat-actions.json"
+      ],
+      "depends_on": [
+        "chat-provider",
+        "history-provider"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_chat_actions_contract.py",
+          "pytest:tests/p0/test_chat_titles.py",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_delete_invalidates_summary_and_prevents_inflight_completion",
+          "pytest:tests/p0/test_chat_lifecycle.py::test_delete_session_removes_jobs_and_recreated_session_rejects_old_writer"
+        ]
+      },
+      "manual": []
+    },
+    "actions-fixtures": {
+      "paths": [
+        "scripts/contracts/chat_actions_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "actions-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsApi.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsApiContractTest.kt"
+      ],
+      "depends_on": [
+        "actions-provider",
+        "actions-fixtures",
+        "http-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatActionsApiContractTest"
+        ]
+      },
+      "manual": [
+        "标题 / 删除适配器尚未接入原生操作界面；对话并发、确认、错误恢复和设备行为继续验收。"
+      ]
+    },
+    "actions-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsAPI.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatActionsAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "actions-provider",
+        "actions-fixtures",
+        "http-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatActionsAPIContractTests"
+        ]
+      },
+      "manual": [
+        "标题 / 删除适配器尚未接入原生操作界面；对话并发、确认、错误恢复和设备行为继续验收。"
       ]
     }
   },
