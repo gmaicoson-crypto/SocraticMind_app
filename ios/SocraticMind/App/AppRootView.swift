@@ -24,7 +24,14 @@ struct AppRootView: View {
         case .clearing:
             SessionPanel(title: "正在退出", message: "正在清理本机登录信息…", loading: true)
         case let .signedIn(user, revision):
-            SessionPanel(title: "你好，\(user.username)", message: user.email, clear: model.logout).id(revision)
+            if let history = model.history {
+                ChatLibraryView(
+                    model: history,
+                    account: .signedIn(user: user, revision: revision),
+                    logout: model.logout
+                )
+                .id(revision)
+            }
         case let .unavailable(storage, retry):
             SessionPanel(title: storage ? "登录信息暂不可用" : "暂时无法验证账号",
                          message: model.error ?? (storage ? "请解锁设备后重试；也可以清理本机登录信息。" : "请检查服务和网络，恢复后重试。"),

@@ -27,4 +27,4 @@ HTTP / POST SSE 已接入纯 JVM 网络核心，验证范围与取消语义见 [
 
 账号接口位于独立 core:auth，依赖 core:network；共享测试服务器通过 network 的 testFixtures 复用。接口、会话与表单均有明确的主机测试集合，凭证实际写入 / 恢复 / 清理另由模拟器验证，见 [账号实施](../docs/auth-implementation.md)。
 
-core:chat 新增会话摘要与分页读取，复用 network 传输和 testFixtures；当前尚未加入 app 的功能容器。契约、定向测试和剩余页面工作见[会话读取核心](../docs/chat-history-implementation.md)。
+core:chat 复用 network 传输、testFixtures 和 auth 会话，提供会话摘要 / 分页读取与 ChatLibraryController。app 容器现已接线列表、历史和退出清理；页面源码仅完成静态检查，尚未重新构建 / 运行。契约、定向测试和后续 Markdown / 发送工作见[会话读取核心](../docs/chat-history-implementation.md)。

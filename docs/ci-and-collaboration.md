@@ -176,17 +176,9 @@ git fetch origin
 git branch -r
 ```
 
-如果远端已有 README 或提交，先比较历史并选择基于远端分支承接本地文档；不强推、不自动覆盖、不盲目合并无关历史。若远端确实为空，审阅本地文件后可首次提交并推送：
+本地基础已于 2026-10-23 提交为 `ebbe07f`（`feat: 建立双端原生工程与后端基础`），docs 已在版本管理中。若远端已有 README 或提交，应先比较历史再承接，不强推或盲目合并无关历史；远端为空时也需先确认当前分支与默认分支安排。没有 push 或远端 CI 执行证据。
 
-```bash
-git add README.md AGENTS.md .gitignore .editorconfig docs
-git diff --cached --check
-git diff --cached
-git commit -m "docs: 初始化移动端开发规划与协作规范"
-git push -u origin chore/gy/mobile-planning
-```
-
-空远端的首个分支可能成为默认分支；远端接通后再单独建立 / 配置长期主分支，不把规划分支永久当主分支。上述是未来操作说明，本轮未执行 commit 或 push。
+开发与提交按用户要求分为两个会话。开发会话完成代码、定向验证和文档后，交接基线 HEAD、精确文件清单及 SHA-256、验证结果和剩余限制，并冻结该批文件。提交会话只读审查，确认没有其他暂存内容、敏感数据或文件漂移，再精确暂存并 commit；代码问题返回开发会话修复。不修改功能代码，不重跑全量测试，不自动 push。若交接后文件变化，重新提供校验信息，不凭旧报告提交新内容。
 
 分支使用 `<type>/gy/<topic>`，如 `feat/gy/mobile-shell`、`fix/gy/chat-resume`。提交采用英文类型与中文描述，如 `feat: 新增双端登录与会话恢复`。
 
@@ -198,7 +190,7 @@ git push -u origin chore/gy/mobile-planning
 - scripts.ci.impact 根据 impact-map.json 选择命名测试集合，并沿 depends_on 扩展到消费者；报告保留输入、原因和需独立验证的项目。未知业务文件、未映射的测试 / 改名目标直接失败，需要本次改动补映射。
 - 首次固定后端迁入使用已审查的 import-baseline 明列集合。这个特殊集合仅适用于初始范围中的 upstream-manifest 路径；它不代表全部旧功能已覆盖，后续未映射的旧服务修改仍会失败。
 - scripts.ci.check_structure 检查相关文本 / JSON / TOML / 文档链接及规模。scripts.ci.run_checks 按平台执行变化文件格式 / lint 和明确测试选择，检查零用例与结果文件；Swift Testing 的独立 XML 报告也验证每个选中的 suite / method。
-- Android 执行器先检查 dry-run 图仅包含已登记的纯 JVM network / auth 模块，拒绝打包 / 设备任务；Swift 只使用 MindCore 包。新增模块必须更新执行器和映射，不能通过把任务改成通用 build 绕开限制。
+- Android 执行器先检查 dry-run 图仅包含已登记的纯 JVM network / auth / chat 模块，拒绝打包 / 设备任务；Swift 只使用 MindCore 包。新增模块必须更新执行器和映射，不能通过把任务改成通用 build 绕开限制。
 - MySQL job 使用本次 workflow 的临时服务容器与共享 Unix socket，没有映射宿主 TCP 端口；用例创建并删除随机测试库。持久本地服务的进程生命周期仍在本机单独验证，不把服务容器结果当作本地启动器结果。
 
 当前 .github/workflows/quality.yml 有稳定的 quality / summary，始终传播所需任务的失败、异常取消和非预期跳过。纯文档只运行范围 / 结构，不安装三方运行依赖。Actions commit、MySQL 镜像摘要及 Python / JDK / Xcode 选择已固定；CI 不部署、不打包、不自动提交，也不注入模型或签名凭证。[工作流语法](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
@@ -212,3 +204,5 @@ auth-form-android / auth-form-ios 已映射可复用表单状态与账号容器�
 history-provider / history-android / history-ios 映射新的分页契约、双端 API 适配和共享无效响应；history-mysql 选择一次性 MySQL 投影用例。Android 执行器仅新增 core:chat 到 JVM 允许列表，继续先检查任务图并拒绝 app、package 或设备任务。未知 chat 业务文件仍必须补充测试映射。当前 chat.py 同时包含旧流业务，修改此文件会联动原流 / 生命周期消费者；后续按职责拆开后再缩小映射，不能省略受影响检查来减少次数。
 
 三个 JVM 核心 test 任务已将 contracts/fixtures 的 JSON 与 scripts/contracts 的 Python fixture 声明为输入；样例 / 服务脚本变化时不能使用旧的 UP-TO-DATE 测试结果。仍按影响映射传递明确测试类，声明输入不扩大为根 test 或应用打包。
+
+history-state-android / history-state-ios 映射会话页状态、分页合并、账号隔离、迟到响应以及原生页面接线；依赖对应平台的 history、session 和 credential-storage。容器改动同时选择表单与历史状态测试，新增业务文件仍需明确登记。两个页面组的 manual 记录持续保留应用编译 / 运行和滚动、返回、进程恢复缺口；已有账号 UI 报告不能充当新页面的验收结果。

@@ -5,12 +5,12 @@ import com.gmaicoson.socraticmind.network.HttpTransport
 /** Call through SessionStore.authenticated; this adapter never owns or persists credentials. */
 class ChatHistoryApi(
     private val transport: HttpTransport,
-) {
-    suspend fun conversations(
+) : ChatHistoryGateway {
+    override suspend fun conversations(
         token: String,
-        mode: ChatMode = ChatMode.NORMAL,
-        limit: Int = 30,
-        cursor: HistoryCursor? = null,
+        mode: ChatMode,
+        limit: Int,
+        cursor: HistoryCursor?,
     ): ChatHistoryPage<ConversationSummary> {
         val value =
             transport.request(
@@ -30,11 +30,11 @@ class ChatHistoryApi(
         return page
     }
 
-    suspend fun messages(
+    override suspend fun messages(
         token: String,
         sessionId: String,
-        limit: Int = 30,
-        cursor: HistoryCursor? = null,
+        limit: Int,
+        cursor: HistoryCursor?,
     ): ChatHistoryPage<StoredChatMessage> {
         requireSessionId(sessionId)
         val value =

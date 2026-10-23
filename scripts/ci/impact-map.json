@@ -581,7 +581,8 @@
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryModels.kt",
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryDecoding.kt",
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryApi.kt",
-        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryApiContractTest.kt"
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryApiContractTest.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatHistoryGateway.kt"
       ],
       "depends_on": [
         "history-provider",
@@ -600,7 +601,8 @@
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryModels.swift",
         "ios/Packages/MindCore/Sources/MindCore/Chat/StoredChatMessage.swift",
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryAPI.swift",
-        "ios/Packages/MindCore/Tests/MindCoreTests/ChatHistoryAPIContractTests.swift"
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatHistoryAPIContractTests.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryGateway.swift"
       ],
       "depends_on": [
         "history-provider",
@@ -613,6 +615,59 @@
         ]
       },
       "manual": []
+    },
+    "history-state-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatLibraryController.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatLibraryState.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatLibraryControllerTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatLibraryTestDoubles.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/HistoryPageControls.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt"
+      ],
+      "depends_on": [
+        "history-android",
+        "session-android",
+        "credential-storage-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+          "com.gmaicoson.socraticmind.auth.SessionStoreTest"
+        ]
+      },
+      "manual": [
+        "会话列表与历史已接入 Compose；主机竞态测试不覆盖页面渲染、系统返回、滚动和进程恢复。本批页面需另行获准构建后定向验证。"
+      ]
+    },
+    "history-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatLibraryModel.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatLibraryState.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatLibraryModelTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatLibraryTestDoubles.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/SocraticMind/Chat/HistoryPageControls.swift",
+        "ios/SocraticMind/App/AppModel.swift",
+        "ios/SocraticMind/App/AppRootView.swift"
+      ],
+      "depends_on": [
+        "history-ios",
+        "session-ios",
+        "credential-storage-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatLibraryModelTests",
+          "SessionStoreTests"
+        ]
+      },
+      "manual": [
+        "会话列表与历史已接入 SwiftUI；主机竞态测试不覆盖页面渲染、导航、滚动和进程恢复。本批页面需另行获准构建后定向验证。"
+      ]
     }
   },
   "metadata": [

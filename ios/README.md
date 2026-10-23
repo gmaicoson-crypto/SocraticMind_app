@@ -29,4 +29,4 @@ swift test --package-path ios/Packages/MindCore --filter SSEContractTests
 
 Debug 默认连接 `http://127.0.0.1:8765/`，Release 无本地默认地址。MindCore/Authentication 的 AuthAPI 使用同一个 HTTPTransport；契约、会话、原生表单与剩余设备边界见 [账号实施](../docs/auth-implementation.md)。
 
-MindCore/Chat 新增会话摘要与分页历史 API，继续复用 HTTPTransport；与 Android 消费同一份样例和无效页用例，未接入页面。进度与验证入口见[会话读取核心](../docs/chat-history-implementation.md)。
+MindCore/Chat 提供会话摘要 / 分页 API 和 ChatLibraryModel，复用 HTTPTransport 与 SessionStore。SwiftUI 已接线列表、历史和退出清理，XcodeGen 已登记页面；本批应用未重新编译 / 运行，主机测试不验证 UI。进度、定向入口及 Markdown / 发送待办见[会话读取核心](../docs/chat-history-implementation.md)。

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gmaicoson.socraticmind.auth.SessionState
+import com.gmaicoson.socraticmind.chatui.ChatLibraryScreen
 
 @Composable
 fun AppRoot(model: AppViewModel) {
@@ -75,7 +76,7 @@ fun AppRoot(model: AppViewModel) {
 
                     is SessionState.SignedIn -> {
                         key(current.revision) {
-                            SessionPanel("你好，${current.user.username}", current.user.email, clear = model::logout)
+                            model.history?.let { ChatLibraryScreen(it, current, model::logout) }
                         }
                     }
                 }

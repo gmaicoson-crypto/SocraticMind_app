@@ -1,7 +1,7 @@
 import Foundation
 
 /// Call through SessionStore.authenticated. This adapter never owns or persists credentials.
-public struct ChatHistoryAPI: Sendable {
+public struct ChatHistoryAPI: ChatHistoryGateway {
     private let transport: HTTPTransport
 
     public init(transport: HTTPTransport) {

@@ -6,6 +6,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var session: SessionState = .uninitialized
     @Published private(set) var error: String?
     let form: AuthFormModel?
+    let history: ChatLibraryModel?
     let configurationError: String?
     private let store: SessionStore?
     private var observation: Task<Void, Never>?
@@ -23,14 +24,17 @@ final class AppModel: ObservableObject {
                 let allowed: Set<String> = []
             #endif
             let endpoint = try APIEndpoint(address, developmentHTTPHosts: allowed)
-            let api = try AuthAPI(transport: HTTPTransport(endpoint: endpoint))
+            let transport = try HTTPTransport(endpoint: endpoint)
+            let api = AuthAPI(transport: transport)
             let session = SessionStore(gateway: api, vault: KeychainTokenVault(endpoint: endpoint))
             store = session
             form = AuthFormModel(session: session, recovery: api)
+            history = ChatLibraryModel(session: session, gateway: ChatHistoryAPI(transport: transport))
             configurationError = nil
         } catch {
             store = nil
             form = nil
+            history = nil
             configurationError = "服务地址未正确配置，请检查当前开发配置。"
         }
     }
@@ -49,6 +53,7 @@ final class AppModel: ObservableObject {
                 if next != revision {
                     form?.reset(); revision = next
                 }
+                history?.bindAccount(state)
                 session = state
             }
         }
@@ -68,8 +73,10 @@ final class AppModel: ObservableObject {
     }
 
     func logout() {
+        guard !sessionRunning else { return }
         formTask?.cancel()
         form?.reset()
+        history?.clear()
         runSession { try await $0.logout() }
     }
 

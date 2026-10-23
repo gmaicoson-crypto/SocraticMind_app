@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072095AA102764FA32FE2A9C /* AuthScreen.swift */; };
 		1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB4AB36687E098F09045608 /* AuthFields.swift */; };
+		1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */; };
 		1EDDD242011246266AB5C4BF /* AuthUITestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F189D44C9164E612C194209 /* AuthUITestFixture.swift */; };
 		2855770B90E837BC2E36EB68 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DFA684F16FC815A3CAA454 /* AppRootView.swift */; };
+		56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */; };
 		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
 		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
 		C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4648BB5C680AAE1441E028BF /* AuthTextInput.swift */; };
@@ -34,6 +36,8 @@
 		2C45889AB397FDA45D84D37D /* MindCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MindCore; path = Packages/MindCore; sourceTree = SOURCE_ROOT; };
 		4648BB5C680AAE1441E028BF /* AuthTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextInput.swift; sourceTree = "<group>"; };
 		69DFA684F16FC815A3CAA454 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPageControls.swift; sourceTree = "<group>"; };
+		7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLibraryView.swift; sourceTree = "<group>"; };
 		84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowTests.swift; sourceTree = "<group>"; };
 		C2DFEB354734BE9B1218B7B9 /* SocraticMindUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SocraticMindUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6DDBEDD8CAC3E583E97292B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -101,6 +105,15 @@
 			);
 			sourceTree = "<group>";
 		};
+		D313D2081763C8A0C7440170 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */,
+				7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
 		E230DB14413FC185FE443BDC /* UITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +128,7 @@
 			children = (
 				96640CF4405DA51087373CF5 /* Account */,
 				25910EC35AA2FA841EBD535A /* App */,
+				D313D2081763C8A0C7440170 /* Chat */,
 			);
 			path = SocraticMind;
 			sourceTree = "<group>";
@@ -210,6 +224,8 @@
 				1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */,
 				11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */,
 				C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */,
+				1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */,
+				56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */,
 				8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

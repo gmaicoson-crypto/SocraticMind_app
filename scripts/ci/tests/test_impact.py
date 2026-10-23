@@ -30,7 +30,7 @@ class ImpactTests(unittest.TestCase):
             "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt"
         )
         result = load_plan(scope(value))
-        self.assertEqual(7, len(result["checks"]["android"]))
+        self.assertEqual(8, len(result["checks"]["android"]))
         self.assertFalse(result["checks"]["ios"])
         self.assertFalse(result["checks"]["python"])
         self.assertEqual([value], result["files"]["android"])
@@ -52,6 +52,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.AuthFormControllerTest",
                 "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
+                "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
             ],
             result["checks"]["android"],
         )
@@ -59,6 +60,7 @@ class ImpactTests(unittest.TestCase):
             [
                 "AuthAPIContractTests",
                 "AuthFormModelTests",
+                "ChatLibraryModelTests",
                 "KeychainTokenVaultTests",
                 "SessionStoreTests",
             ],
@@ -80,10 +82,17 @@ class ImpactTests(unittest.TestCase):
             "pytest:tests/contracts/test_chat_history_contract.py", result["checks"]["python"]
         )
         self.assertEqual(
-            ["com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest"],
+            [
+                "com.gmaicoson.socraticmind.auth.SessionStoreTest",
+                "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+            ],
             result["checks"]["android"],
         )
-        self.assertEqual(["ChatHistoryAPIContractTests"], result["checks"]["ios"])
+        self.assertEqual(
+            ["ChatHistoryAPIContractTests", "ChatLibraryModelTests", "SessionStoreTests"],
+            result["checks"]["ios"],
+        )
         self.assertEqual(
             [
                 "pytest:tests/integration/test_mysql_chat_history.py::test_mysql_history_window_and_unicode_projection"
@@ -98,7 +107,11 @@ class ImpactTests(unittest.TestCase):
         )
         result = load_plan(scope(value))
         self.assertEqual(
-            ["com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest"],
+            [
+                "com.gmaicoson.socraticmind.auth.SessionStoreTest",
+                "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+            ],
             result["checks"]["android"],
         )
         self.assertFalse(result["checks"]["ios"])
@@ -161,7 +174,10 @@ class ImpactTests(unittest.TestCase):
         result = load_plan(
             scope("ios/Packages/MindCore/Sources/MindCore/Authentication/KeychainTokenVault.swift")
         )
-        self.assertEqual(["KeychainTokenVaultTests", "SessionStoreTests"], result["checks"]["ios"])
+        self.assertEqual(
+            ["ChatLibraryModelTests", "KeychainTokenVaultTests", "SessionStoreTests"],
+            result["checks"]["ios"],
+        )
         self.assertFalse(result["checks"]["android"])
         self.assertFalse(result["checks"]["python"])
         self.assertTrue(any("Keychain" in value for value in result["manual"]))
@@ -176,11 +192,36 @@ class ImpactTests(unittest.TestCase):
             [
                 "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
+                "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
             ],
             result["checks"]["android"],
         )
         self.assertFalse(result["checks"]["ios"])
         self.assertTrue(any("AndroidKeyStore" in value for value in result["manual"]))
+
+    def test_history_state_selects_only_its_account_dependency_and_keeps_ui_gap(self):
+        result = load_plan(
+            scope("ios/Packages/MindCore/Sources/MindCore/Chat/ChatLibraryModel.swift")
+        )
+        self.assertEqual(["ChatLibraryModelTests", "SessionStoreTests"], result["checks"]["ios"])
+        self.assertFalse(result["checks"]["android"])
+        self.assertFalse(result["checks"]["python"])
+        self.assertFalse(result["checks"]["mysql"])
+        self.assertTrue(any("滚动" in item for item in result["manual"]))
+
+    def test_account_container_covers_both_form_and_history_state(self):
+        result = load_plan(
+            scope("android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt")
+        )
+        self.assertEqual(
+            [
+                "com.gmaicoson.socraticmind.auth.AuthFormControllerTest",
+                "com.gmaicoson.socraticmind.auth.SessionStoreTest",
+                "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+            ],
+            result["checks"]["android"],
+        )
+        self.assertFalse(result["checks"]["ios"])
 
     def test_unknown_business_change_fails_instead_of_full_suite_or_noop(self):
         with self.assertRaisesRegex(ValueError, "Add affected test selectors"):

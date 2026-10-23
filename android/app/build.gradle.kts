@@ -41,6 +41,7 @@ kotlin {
 }
 dependencies {
     implementation(project(":core:auth"))
+    implementation(project(":core:chat"))
     implementation(project(":core:network"))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.material3)
