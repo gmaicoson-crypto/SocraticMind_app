@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlsplit
 from auth_fixture import response as auth_response
 from chat_actions_fixture import response as actions_response
 from chat_history_fixture import response as history_response
+from chat_suggestions_fixture import response as suggestions_response
 from chat_turn_fixture import frames as turn_frames
 from chat_turn_fixture import response as turn_response
 
@@ -50,6 +51,8 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path.startswith("/api/auth/"):
             self.respond(*auth_response("GET", url.path, self.headers))
+        elif url.path == "/api/chat/suggestions":
+            self.respond(*suggestions_response(parse_qs(url.query), self.headers))
         elif url.path == "/api/chat/session-titles":
             self.respond(*actions_response("GET", url.path, parse_qs(url.query), self.headers))
         elif url.path.startswith("/api/chat/requests/") or (

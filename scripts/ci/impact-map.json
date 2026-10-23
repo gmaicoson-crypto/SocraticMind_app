@@ -98,7 +98,8 @@
         "configuration",
         "import-baseline",
         "history-provider",
-        "actions-provider"
+        "actions-provider",
+        "suggestions-provider"
       ],
       "checks": {
         "python": [
@@ -1045,6 +1046,127 @@
       },
       "manual": [
         "Xcode 宿主登记仅做来源与配置静态检查；应用编译及运行仍须独立构建授权，Swift 包测试按变化源码选择。"
+      ]
+    },
+    "suggestions-provider": {
+      "paths": [
+        "backend/routers/chat.py",
+        "backend/tests/p0/test_chat_suggestions.py",
+        "backend/tests/contracts/test_chat_suggestions_contract.py",
+        "contracts/fixtures/chat-suggestions.json"
+      ],
+      "depends_on": [
+        "chat-provider"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_chat_suggestions.py",
+          "pytest:tests/contracts/test_chat_suggestions_contract.py"
+        ]
+      },
+      "manual": [
+        "建议提供方使用合成模型验证；真实模型、费用和延迟另验。"
+      ]
+    },
+    "suggestions-fixtures": {
+      "paths": [
+        "scripts/contracts/chat_suggestions_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "suggestions-api-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionsApi.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionsApiContractTest.kt"
+      ],
+      "depends_on": [
+        "suggestions-provider",
+        "suggestions-fixtures",
+        "http-android",
+        "history-android",
+        "turn-api-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatSuggestionsApiContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "suggestions-state-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionsController.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionsState.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionDefaults.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionsControllerTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatSuggestionsTestDoubles.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatSuggestionsBar.kt"
+      ],
+      "depends_on": [
+        "suggestions-api-android",
+        "history-state-android",
+        "turn-state-android",
+        "session-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest"
+        ]
+      },
+      "manual": [
+        "建议列表、换一批与草稿确认已接线；点击、滚动、后台取消、账号切换与真实生命周期待明确获准构建后验证。"
+      ]
+    },
+    "suggestions-api-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatSuggestionsAPI.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatSuggestionsAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "suggestions-provider",
+        "suggestions-fixtures",
+        "http-ios",
+        "history-ios",
+        "turn-api-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatSuggestionsAPIContractTests"
+        ]
+      },
+      "manual": []
+    },
+    "suggestions-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatSuggestionsModel.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatSuggestionsState.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatSuggestionDefaults.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatSuggestionsModelTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatSuggestionsTestDoubles.swift",
+        "ios/SocraticMind/App/AppModel.swift",
+        "ios/SocraticMind/App/AppRootView.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/SocraticMind/Chat/ChatSuggestionsBar.swift"
+      ],
+      "depends_on": [
+        "suggestions-api-ios",
+        "history-state-ios",
+        "turn-state-ios",
+        "session-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatSuggestionsModelTests"
+        ]
+      },
+      "manual": [
+        "建议列表、换一批与草稿确认已接线；点击、滚动、后台取消、账号切换与真实生命周期待明确获准构建后验证。"
       ]
     }
   },

@@ -102,6 +102,38 @@ class ChatTurnController(
             if (current() && state.value.editable) mutableState.value = state.value.copy(draft = value, notice = null)
         }
 
+    /** Compare-and-send prevents a delayed suggestion tap from replacing a newer draft or target. */
+    internal fun sendSuggestion(
+        account: HistoryAccount,
+        target: ChatTarget,
+        text: String,
+        style: String,
+        expectedDraft: String,
+    ): Boolean =
+        synchronized(lock) {
+            val value = state.value
+            if (!current() || !value.canRegenerate || value.account != account || value.target != target ||
+                value.draft != expectedDraft
+            ) {
+                return@synchronized false
+            }
+            if (runCatching {
+                    ChatTurnRequest(
+                        PendingChatTurn(account.userId, target, "suggestion-check"),
+                        text,
+                        style,
+                    )
+                }.isFailure
+            ) {
+                return@synchronized false
+            }
+            mutableState.value = value.copy(draft = text)
+            start(style, null)
+            val started = state.value.pending != null
+            if (!started) mutableState.value = state.value.copy(draft = expectedDraft)
+            started
+        }
+
     fun send(style: String): Unit = start(style, null)
 
     fun regenerate(

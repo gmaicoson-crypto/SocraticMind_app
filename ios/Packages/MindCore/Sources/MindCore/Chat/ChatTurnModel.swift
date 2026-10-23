@@ -80,6 +80,23 @@ public final class ChatTurnModel: ObservableObject {
         state.draft = value; state.notice = nil
     }
 
+    /// Compare-and-send keeps stale taps from replacing a newer draft or target.
+    func sendSuggestion(account: HistoryAccount, target: ChatTarget, text: String,
+                        style: String, expectedDraft: String) -> Bool
+    {
+        guard !closed, state.canRegenerate, state.account == account, state.target == target,
+              state.draft == expectedDraft,
+              (try? ChatTurnRequest(pending: PendingChatTurn(ownerID: account.userID, target: target,
+                                                             requestID: "suggestion-check"),
+                                    input: text, style: style)) != nil else { return false }
+        state.draft = text; start(style: style, regeneration: nil)
+        let started = state.pending != nil
+        if !started {
+            state.draft = expectedDraft
+        }
+        return started
+    }
+
     public func send(style: String) {
         start(style: style, regeneration: nil)
     }

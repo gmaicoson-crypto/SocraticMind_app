@@ -9,6 +9,7 @@ import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.auth.accountErrorMessage
 import com.gmaicoson.socraticmind.chat.ChatActionsController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
+import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTarget
 import com.gmaicoson.socraticmind.chat.ChatTurnController
 import kotlinx.coroutines.CancellationException
@@ -31,6 +32,16 @@ class AppViewModel(
         graph?.let {
             ChatActionsController(it.session, it.actions, checkNotNull(history), checkNotNull(turn), viewModelScope)
         }
+    val suggestions =
+        graph?.let {
+            ChatSuggestionsController(
+                it.session,
+                it.suggestions,
+                checkNotNull(history),
+                checkNotNull(turn),
+                viewModelScope,
+            )
+        }
     private val mutableError = MutableStateFlow<String?>(null)
     val error = mutableError.asStateFlow()
     private var formJob: Job? = null
@@ -46,6 +57,7 @@ class AppViewModel(
                     actions?.bindAccount(state)
                     val next = (state as? SessionState.SignedIn)?.revision
                     if (next != accountRevision) {
+                        suggestions?.clear()
                         form?.reset()
                         accountRevision = next
                     }
@@ -119,6 +131,7 @@ class AppViewModel(
         if (sessionJob?.isActive == true) return
         formJob?.cancel()
         form?.reset()
+        suggestions?.clear()
         actions?.clear()
         history?.clear()
         turn?.clear()
@@ -126,6 +139,7 @@ class AppViewModel(
     }
 
     override fun onCleared() {
+        suggestions?.close()
         actions?.close()
         history?.close()
         turn?.close()

@@ -21,6 +21,30 @@ def scope(*files, initial=False):
 
 
 class ImpactTests(unittest.TestCase):
+    def test_suggestion_contract_and_state_keep_exact_consumers(self):
+        result = load_plan(scope("contracts/fixtures/chat-suggestions.json"))
+        self.assertEqual(
+            ["ChatSuggestionsAPIContractTests", "ChatSuggestionsModelTests"],
+            result["checks"]["ios"],
+        )
+        self.assertEqual(
+            [
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
+            ],
+            result["checks"]["android"],
+        )
+        self.assertIn("pytest:tests/p0/test_chat_suggestions.py", result["checks"]["python"])
+        self.assertTrue(result["schema"])
+        self.assertFalse(result["checks"]["mysql"])
+        result = load_plan(
+            scope("ios/Packages/MindCore/Sources/MindCore/Chat/ChatSuggestionsModel.swift")
+        )
+        self.assertEqual(["ChatSuggestionsModelTests"], result["checks"]["ios"])
+        self.assertFalse(result["checks"]["android"])
+        self.assertFalse(result["checks"]["python"])
+        self.assertTrue(result["manual"])
+
     def test_title_reads_keep_visibility_checks_and_platform_scope(self):
         result = load_plan(
             scope("ios/Packages/MindCore/Sources/MindCore/Chat/ChatTitleRefresh.swift")
@@ -44,6 +68,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -80,6 +105,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -92,6 +118,7 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsModelTests",
                 "ChatTitleRefreshTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -115,6 +142,8 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -126,6 +155,8 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsAPIContractTests",
+                "ChatSuggestionsModelTests",
                 "ChatTurnAPIContractTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -142,6 +173,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
             ],
@@ -164,6 +196,7 @@ class ImpactTests(unittest.TestCase):
                     "ChatActionsModelTests",
                     "ChatLibraryModelTests",
                     "ChatRegenerationTests",
+                    "ChatSuggestionsModelTests",
                     "ChatTurnModelTests",
                     "FileChatTurnJournalTests",
                 ],
@@ -181,7 +214,7 @@ class ImpactTests(unittest.TestCase):
             "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt"
         )
         result = load_plan(scope(value))
-        self.assertEqual(15, len(result["checks"]["android"]))
+        self.assertEqual(17, len(result["checks"]["android"]))
         self.assertFalse(result["checks"]["ios"])
         self.assertFalse(result["checks"]["python"])
         self.assertEqual([value], result["files"]["android"])
@@ -206,6 +239,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -219,6 +253,7 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsModelTests",
                 "ChatTitleRefreshTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -250,6 +285,8 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
@@ -264,6 +301,8 @@ class ImpactTests(unittest.TestCase):
                 "ChatHistoryAPIContractTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsAPIContractTests",
+                "ChatSuggestionsModelTests",
                 "ChatTitleRefreshTests",
                 "ChatTurnAPIContractTests",
                 "ChatTurnModelTests",
@@ -293,6 +332,8 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
@@ -369,6 +410,7 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsModelTests",
                 "ChatTitleRefreshTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -387,7 +429,7 @@ class ImpactTests(unittest.TestCase):
             "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         ]:
             result = load_plan(scope(value))
-            self.assertEqual(17, len(result["checks"]["ios"]))
+            self.assertEqual(19, len(result["checks"]["ios"]))
             self.assertIn("MarkdownContractTests", result["checks"]["ios"])
             self.assertEqual(
                 ["unittest:scripts.ci.tests.test_package_resolution"], result["checks"]["python"]
@@ -424,6 +466,7 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsModelTests",
                 "ChatTitleRefreshTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -449,6 +492,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
@@ -467,6 +511,7 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
+                "ChatSuggestionsModelTests",
                 "ChatTitleRefreshTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
@@ -490,6 +535,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+                "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",

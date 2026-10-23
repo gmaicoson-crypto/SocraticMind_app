@@ -5,6 +5,7 @@ import com.gmaicoson.socraticmind.auth.AuthApi
 import com.gmaicoson.socraticmind.auth.SessionStore
 import com.gmaicoson.socraticmind.chat.ChatActionsApi
 import com.gmaicoson.socraticmind.chat.ChatHistoryApi
+import com.gmaicoson.socraticmind.chat.ChatSuggestionsApi
 import com.gmaicoson.socraticmind.chat.ChatTurnApi
 import com.gmaicoson.socraticmind.chat.FileChatTurnJournal
 import com.gmaicoson.socraticmind.network.ApiEndpoint
@@ -28,6 +29,7 @@ class SocraticMindApplication : Application() {
                 ChatTurnApi(transport),
                 FileChatTurnJournal(noBackupFilesDir, endpoint.credentialScope),
                 ChatActionsApi(transport),
+                ChatSuggestionsApi(transport),
             )
         }
     }
@@ -40,4 +42,5 @@ class AppGraph(
     val turn: ChatTurnApi,
     val journal: FileChatTurnJournal,
     val actions: ChatActionsApi,
+    val suggestions: ChatSuggestionsApi,
 )

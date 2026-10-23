@@ -17,6 +17,7 @@
 		2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E844435E044814A28ED5D442 /* MarkdownInlineView.swift */; };
 		393D26A5169372F78A7EC93F /* MessageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808D06957854C2FE245352E /* MessageContentView.swift */; };
 		56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */; };
+		8959D81C0451B2AF0D509C27 /* ChatSuggestionsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */; };
 		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
 		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
 		C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4648BB5C680AAE1441E028BF /* AuthTextInput.swift */; };
@@ -46,6 +47,7 @@
 		3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCopyButton.swift; sourceTree = "<group>"; };
 		4648BB5C680AAE1441E028BF /* AuthTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextInput.swift; sourceTree = "<group>"; };
 		5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatComposerView.swift; sourceTree = "<group>"; };
+		626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSuggestionsBar.swift; sourceTree = "<group>"; };
 		69DFA684F16FC815A3CAA454 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPageControls.swift; sourceTree = "<group>"; };
 		7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLibraryView.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				FEA3DAA7E55A2D7AC384F470 /* ChatActionsControls.swift */,
 				5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */,
 				7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */,
+				626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */,
 				7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */,
 				B0A4EDCBFDD1E89414A126F5 /* MessageHistoryView.swift */,
 			);
@@ -256,6 +259,7 @@
 				03F1E45EECCD6CAF5C2674A7 /* ChatActionsControls.swift in Sources */,
 				D6D8D428875A919AF0ED79A1 /* ChatComposerView.swift in Sources */,
 				1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */,
+				8959D81C0451B2AF0D509C27 /* ChatSuggestionsBar.swift in Sources */,
 				56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */,
 				0DDFAC9AD1AF7F04071639E9 /* MarkdownBlockView.swift in Sources */,
 				2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */,

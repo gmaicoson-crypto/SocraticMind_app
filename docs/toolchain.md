@@ -102,3 +102,9 @@ ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改�
 2026-10-24：双端公共 URL / HTTP 入口支持重复查询参数，用于批量读取标题；因此按显式映射扩展账号、历史、发送及标题接口消费者。每批最多 100 个 ID、每周期最多 8 次读取，历史状态测试新增可见性与迟到结果验证。没有新增依赖、应用构建或远端执行。
 
 初次 Android 16 类 122 项、Swift 16 suite 119 项通过；补齐旧会话优先读取后，相关 7 类 / suite 分别得到 73 / 72 项有效结果。分批合并为 Android 123、Swift 120 项，详见[实施状态](execution-status.md)。后端 24 项、工具 60 项通过；变化 Kotlin 13、Swift 13、Python 3 个文件的固定格式 / lint 通过。两个行数预警的职责审查见[自动标题更新](chat-title-refresh.md)，未提高上限。
+
+## 上下文建议的增量验证
+
+2026-10-24：suggestions-provider / suggestions-fixtures / suggestions-api-* / suggestions-state-* 登记后端、共享数据、双端接口、状态和宿主接线。复用现有重复查询参数与发送流程，无新依赖、锁变更或数据库迁移；共享回环服务改变后扩展已登记消费者，未运行全量测试。
+
+最终 Android 18 类 138 项、Swift 18 suite 135 项、backend 16 项与工具 66 项通过，原始报告按本批保存；Kotlin 13、Swift 12、Python 4 个变化文件通过固定格式 / lint。XcodeGen 仅生成组件登记，原生交互仍需另行授权构建。三个行数预警及缓存预算见[上下文建议](chat-suggestions-implementation.md)，执行证据与限制见[实施状态](execution-status.md)。

@@ -39,6 +39,7 @@ import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.chat.ChatActionsController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
 import com.gmaicoson.socraticmind.chat.ChatRegeneration
+import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTurnController
 import com.gmaicoson.socraticmind.chat.ConversationSummary
 import com.gmaicoson.socraticmind.chat.HistoryAccount
@@ -50,6 +51,7 @@ fun ChatLibraryScreen(
     model: ChatLibraryController,
     turn: ChatTurnController,
     actions: ChatActionsController,
+    suggestions: ChatSuggestionsController,
     account: SessionState.SignedIn,
     logout: () -> Unit,
     newConversation: () -> Unit,
@@ -57,17 +59,20 @@ fun ChatLibraryScreen(
     closeConversation: () -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(model, lifecycleOwner) {
+    DisposableEffect(model, suggestions, lifecycleOwner) {
         val lifecycle = lifecycleOwner.lifecycle
         val observer =
             LifecycleEventObserver { _, _ ->
                 model.setTitlePollingActive(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+                suggestions.setActive(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
             }
         lifecycle.addObserver(observer)
         model.setTitlePollingActive(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
+        suggestions.setActive(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))
         onDispose {
             lifecycle.removeObserver(observer)
             model.setTitlePollingActive(false)
+            suggestions.setActive(false)
         }
     }
     val state by model.state.collectAsStateWithLifecycle()
@@ -158,6 +163,9 @@ fun ChatLibraryScreen(
             }
             if (actionState.dialog == null) actionState.notice?.let { Text(it, Modifier.padding(12.dp)) }
             if (actionState.selectionSessionId == null) {
+                if (actionState.dialog == null && selected != null && selected.target == turnState.target) {
+                    ChatSuggestionsBar(suggestions, checkNotNull(state.account), selected.target, account.user.aiStyle)
+                }
                 ChatComposer(
                     turnState,
                     turn,

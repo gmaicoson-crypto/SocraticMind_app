@@ -5,6 +5,7 @@ struct ChatLibraryView: View {
     @ObservedObject var model: ChatLibraryModel
     @ObservedObject var turn: ChatTurnModel
     @ObservedObject var actions: ChatActionsModel
+    let suggestions: ChatSuggestionsModel
     let account: SessionState
     let logout: () -> Void
     let newConversation: () -> Void
@@ -80,6 +81,11 @@ struct ChatLibraryView: View {
                actions.state.selectionSessionID == nil,
                case let .signedIn(user, _) = account
             {
+                if actions.state.dialog == nil, let selected = model.state.selected,
+                   selected.target == turn.state.target, let owner = model.state.account
+                {
+                    ChatSuggestionsBar(model: suggestions, account: owner, target: selected.target, style: user.aiStyle)
+                }
                 ChatComposerView(model: turn, style: user.aiStyle,
                                  selected: model.state.selected != nil && model.state.selected?.target == turn.state
                                      .target)
@@ -99,10 +105,12 @@ struct ChatLibraryView: View {
             Button("放弃草稿", role: .destructive, action: closeConversation)
             Button("继续编辑", role: .cancel) {}
         } message: { Text("返回会话列表会清空当前草稿。") }
-        .onAppear { model.setTitlePollingActive(scenePhase == .active) }
-        .onChange(of: scenePhase) { _, phase in model.setTitlePollingActive(phase == .active) }
+        .onAppear { model.setTitlePollingActive(scenePhase == .active); suggestions.setActive(scenePhase == .active) }
+        .onChange(of: scenePhase) { _, phase in
+            model.setTitlePollingActive(phase == .active); suggestions.setActive(phase == .active)
+        }
         .onDisappear {
-            model.setTitlePollingActive(false)
+            model.setTitlePollingActive(false); suggestions.setActive(false)
             Task { await renderer.clear() }
         }
     }

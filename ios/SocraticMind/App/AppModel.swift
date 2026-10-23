@@ -10,6 +10,7 @@ final class AppModel: ObservableObject {
     let history: ChatLibraryModel?
     let turn: ChatTurnModel?
     let actions: ChatActionsModel?
+    let suggestions: ChatSuggestionsModel?
     let configurationError: String?
     private let store: SessionStore?
     private var observation: Task<Void, Never>?
@@ -51,6 +52,8 @@ final class AppModel: ObservableObject {
                 library: library,
                 turn: coordinator
             )
+            suggestions = ChatSuggestionsModel(session: session, gateway: ChatSuggestionsAPI(transport: transport),
+                                               history: library, turn: coordinator)
             configurationError = nil
         } catch {
             store = nil
@@ -58,6 +61,7 @@ final class AppModel: ObservableObject {
             history = nil
             turn = nil
             actions = nil
+            suggestions = nil
             configurationError = "服务地址未正确配置，请检查当前开发配置。"
         }
         // @Published emits before storing state; acknowledge on the next main-actor turn.
@@ -78,6 +82,7 @@ final class AppModel: ObservableObject {
                     nil
                 }
                 if next != revision {
+                    suggestions?.clear()
                     form?.reset(); revision = next
                 }
                 history?.bindAccount(state)
@@ -105,6 +110,7 @@ final class AppModel: ObservableObject {
         guard !sessionRunning else { return }
         formTask?.cancel()
         form?.reset()
+        suggestions?.clear()
         actions?.clear()
         history?.clear()
         turn?.clear()
