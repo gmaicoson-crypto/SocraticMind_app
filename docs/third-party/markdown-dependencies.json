@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "identity": "commonmark-java",
+      "version": "0.31.0",
+      "revision": "210a18286b023ab0e18e62c0fbec86690a9f57cd",
+      "location": "https://github.com/commonmark/commonmark-java",
+      "license": "docs/third-party/commonmark-java-LICENSE.txt",
+      "license_sha256": "db0ca9fbe898f07ba8a637e6f7b53ce7f8669c67673a8edcf30562e62935e8bb"
+    },
+    {
+      "identity": "swift-markdown",
+      "version": "0.9.0",
+      "revision": "25cb61d3482054b09ae76ca4f281b1bfe7fe5a43",
+      "location": "https://github.com/swiftlang/swift-markdown.git",
+      "license": "docs/third-party/swift-markdown-LICENSE.txt",
+      "license_sha256": "167beb36f181bd163c93c6feb45c68e5f9462fe1af55b278f7bfd1df20e673a3"
+    },
+    {
+      "identity": "swift-cmark",
+      "version": "0.9.0",
+      "revision": "08ddb528923cc1a6527e02b7a1aee9e516ca749a",
+      "location": "https://github.com/swiftlang/swift-cmark.git",
+      "license": "docs/third-party/swift-cmark-COPYING.txt",
+      "license_sha256": "c22e885f33b821bddb24cf007145e5540655b6c0f403e49e6c76a93c28e6d9a9"
+    }
+  ]
+}

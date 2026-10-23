@@ -5,6 +5,7 @@ struct ChatLibraryView: View {
     @ObservedObject var model: ChatLibraryModel
     let account: SessionState
     let logout: () -> Void
+    @State private var renderer = MarkdownRenderer()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,6 +26,7 @@ struct ChatLibraryView: View {
                        refresh: model.refreshMessages)
                 MessageHistoryView(
                     page: model.state.messages,
+                    renderer: renderer,
                     refresh: model.refreshMessages,
                     more: model.loadMoreMessages
                 )
@@ -34,6 +36,7 @@ struct ChatLibraryView: View {
                 conversations
             }
         }
+        .onDisappear { Task { await renderer.clear() } }
     }
 
     private var conversations: some View {
@@ -72,6 +75,7 @@ struct ChatLibraryView: View {
 
 private struct MessageHistoryView: View {
     let page: HistoryPageState<StoredChatMessage>
+    let renderer: MarkdownRenderer
     let refresh: () -> Void
     let more: () -> Void
 
@@ -81,15 +85,7 @@ private struct MessageHistoryView: View {
                 HistoryPageControls(page: page, emptyText: "暂无可读取的消息", moreText: "加载更早消息",
                                     refresh: refresh, more: more)
                 ForEach(page.items.reversed(), id: \.id) { message in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(message.role == "user" ? "你" : "SocraticMind").font(.caption).foregroundStyle(.tint)
-                        Text(verbatim: message.content).textSelection(.enabled)
-                        if !message.attachments.isEmpty {
-                            Text("包含 \(message.attachments.count) 个附件").font(.caption).foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 8)
-                    .listRowSeparator(.hidden)
+                    MessageContentView(message: message, renderer: renderer).listRowSeparator(.hidden)
                 }
             }
             .listStyle(.plain)

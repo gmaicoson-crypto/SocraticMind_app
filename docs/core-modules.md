@@ -33,7 +33,9 @@ UI 拆分示例：ChatScreen 负责页面组合，MessageList 负责列表与滚
 
 Repository 对外暴露业务操作与结果，内部复用网络和存储接口。新增 use case 仅用于跨 repository 操作或被多个界面复用的流程；不能把每个 API 方法机械包一层。
 
-当前会话读取已落到 core:chat 的 ChatLibraryController 与 MindCore/Chat 的 ChatLibraryModel：同一所有者管理列表、选中会话与消息页，复用 SessionStore 的凭证租约。两种页共用 HistoryPageState 和失败 / 分页控件；请求取消与迟到结果检查留在核心，页面只消费状态。Android core:chat 现在依赖 core:auth 与 core:network；Swift 核心使用 Combine，不引入 SwiftUI / UIKit。此轮原文消息展示是接线步骤，尚不能代替 Markdown、Composer 或结构化学习消息组件。
+当前会话读取已落到 core:chat 的 ChatLibraryController 与 MindCore/Chat 的 ChatLibraryModel：同一所有者管理列表、选中会话与消息页，复用 SessionStore 的凭证租约。两种页共用 HistoryPageState 和失败 / 分页控件；请求取消与迟到结果检查留在核心，页面只消费状态。Android core:chat 依赖 core:auth 与 core:network；Swift 核心使用 Combine，不引入 SwiftUI / UIKit。
+
+Markdown 在既有 chat 核心内按文档模型、库 AST 投影、链接策略、调度缓存拆职责，不新建空壳 module。app 的消息展示复用行内组件、代码 / 表格块及复制按钮，核心模型不引用原生 UI；普通历史页已接入，后续节点聊天复用同一入口。解析 / 缓存通过不代表宿主完成，范围与取舍见[消息展示](message-rendering.md)。Composer、来源引用及结构化学习卡片继续实施。
 
 ## 后端核心职责
 

@@ -149,6 +149,60 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(["AuthFormModelTests"], result["checks"]["ios"])
         self.assertFalse(result["checks"]["python"])
 
+    def test_markdown_fixture_selects_exactly_both_rendering_cores(self):
+        result = load_plan(scope("contracts/fixtures/message-markdown.json"))
+        self.assertEqual(
+            [
+                "com.gmaicoson.socraticmind.chat.MarkdownContractTest",
+                "com.gmaicoson.socraticmind.chat.MarkdownRendererTest",
+            ],
+            result["checks"]["android"],
+        )
+        self.assertEqual(
+            ["MarkdownContractTests", "MarkdownRendererTests"], result["checks"]["ios"]
+        )
+        self.assertFalse(result["checks"]["python"])
+        self.assertFalse(result["checks"]["mysql"])
+        self.assertFalse(result["schema"])
+
+    def test_markdown_logic_stays_platform_scoped_and_unknown_files_fail(self):
+        value = "ios/Packages/MindCore/Sources/MindCore/Chat/Markdown/MarkdownParser.swift"
+        result = load_plan(scope(value))
+        self.assertEqual(
+            ["MarkdownContractTests", "MarkdownRendererTests"], result["checks"]["ios"]
+        )
+        self.assertFalse(result["checks"]["android"])
+        self.assertFalse(result["checks"]["python"])
+        with self.assertRaises(ValueError):
+            load_plan(scope(value.replace("MarkdownParser", "UnknownLogic")))
+
+    def test_history_page_change_includes_its_renderer_and_account_state(self):
+        result = load_plan(scope("ios/SocraticMind/Chat/ChatLibraryView.swift"))
+        self.assertEqual(
+            [
+                "ChatLibraryModelTests",
+                "MarkdownContractTests",
+                "MarkdownRendererTests",
+                "SessionStoreTests",
+            ],
+            result["checks"]["ios"],
+        )
+        self.assertFalse(result["checks"]["android"])
+        self.assertTrue(any("代码复制" in item for item in result["manual"]))
+
+    def test_swift_lock_files_expand_registered_consumers_and_pin_consistency(self):
+        for value in [
+            "ios/Packages/MindCore/Package.resolved",
+            "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+        ]:
+            result = load_plan(scope(value))
+            self.assertEqual(10, len(result["checks"]["ios"]))
+            self.assertIn("MarkdownContractTests", result["checks"]["ios"])
+            self.assertEqual(
+                ["unittest:scripts.ci.tests.test_package_resolution"], result["checks"]["python"]
+            )
+            self.assertFalse(result["checks"]["android"])
+
     def test_native_network_config_selects_configuration_guard_and_keeps_device_gap(self):
         result = load_plan(scope("android/app/src/debug/res/xml/network_security_config.xml"))
         self.assertEqual(

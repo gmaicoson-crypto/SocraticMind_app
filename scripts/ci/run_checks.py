@@ -121,6 +121,7 @@ def swift_tests(selectors: list[str]) -> None:
             "test",
             "--package-path",
             "ios/Packages/MindCore",
+            "--force-resolved-versions",
             "--filter",
             "|".join(selectors),
             "--xunit-output",

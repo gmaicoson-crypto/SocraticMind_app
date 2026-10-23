@@ -14,6 +14,16 @@ dependencies {
     implementation(project(":core:network"))
     implementation(libs.serialization.json)
     implementation(libs.coroutines.core)
+    implementation(libs.okhttp)
+    constraints {
+        implementation(libs.okio) {
+            because("Use the same reviewed Okio version as core:network for URL parsing")
+        }
+    }
+    implementation(libs.commonmark)
+    implementation(libs.commonmark.tables)
+    implementation(libs.commonmark.strikethrough)
+    implementation(libs.commonmark.tasks)
     testImplementation(testFixtures(project(":core:network")))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.launcher)

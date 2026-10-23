@@ -12,16 +12,17 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -35,6 +36,8 @@ import com.gmaicoson.socraticmind.chat.HistoryAccount
 import com.gmaicoson.socraticmind.chat.HistoryLoad
 import com.gmaicoson.socraticmind.chat.HistoryPageState
 import com.gmaicoson.socraticmind.chat.StoredChatMessage
+import com.gmaicoson.socraticmind.chat.markdown.MarkdownRenderer
+import com.gmaicoson.socraticmind.messageui.MessageContent
 
 @Composable
 fun ChatLibraryScreen(
@@ -44,6 +47,8 @@ fun ChatLibraryScreen(
 ) {
     val state by model.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val renderer = remember(account.revision) { MarkdownRenderer() }
+    DisposableEffect(renderer) { onDispose { renderer.clear() } }
     Column(Modifier.fillMaxSize().safeDrawingPadding()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
             Text("你好，${account.user.username}", style = MaterialTheme.typography.titleMedium)
@@ -80,7 +85,13 @@ fun ChatLibraryScreen(
                     model::refreshMessages,
                 )
                 key(selected.sessionId) {
-                    MessageHistory(state.messages, model::refreshMessages, model::loadMoreMessages, Modifier.weight(1f))
+                    MessageHistory(
+                        state.messages,
+                        model::refreshMessages,
+                        model::loadMoreMessages,
+                        renderer,
+                        Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -138,6 +149,7 @@ private fun MessageHistory(
     page: HistoryPageState<StoredChatMessage>,
     refresh: () -> Unit,
     more: () -> Unit,
+    renderer: MarkdownRenderer,
     modifier: Modifier,
 ) {
     val scroll = rememberLazyListState()
@@ -149,20 +161,7 @@ private fun MessageHistory(
             HistoryPageControls(page, "暂无可读取的消息", "加载更早消息", refresh, more)
         }
         items(page.items.asReversed(), key = { it.id }) { message ->
-            Column(
-                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    if (message.role == "user") "你" else "SocraticMind",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                SelectionContainer { Text(message.content, style = MaterialTheme.typography.bodyLarge) }
-                if (message.attachments.isNotEmpty()) {
-                    Text("包含 ${message.attachments.size} 个附件", style = MaterialTheme.typography.labelMedium)
-                }
-            }
+            MessageContent(message, renderer)
         }
     }
 }

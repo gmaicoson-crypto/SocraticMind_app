@@ -150,7 +150,7 @@ domain use case 只在跨 repository 编排或多处复用时新增。页面区�
 
 普通聊天与节点聊天在各端共用消息列表和输入组件，模式通过参数表达。基础组件先检查系统组件和本平台已有实现；组件不内置全局账号、请求或数据库。
 
-Vue、Pinia、marked / DOMPurify、Three.js、HTML Canvas 仅作行为参考，不迁入原生运行路径。原生 Markdown 的表格、代码块、引用能力需另行验证并封装渲染器；不执行任意 HTML / 脚本，外链限制协议。原生控件不等于天然支持完整 Web Markdown 语法。
+Vue、Pinia、marked / DOMPurify、Three.js、HTML Canvas 仅作行为参考，不迁入原生运行路径。Markdown 已选固定 CommonMark Java / Swift Markdown，投影为纯核心模型，再交给 Compose / SwiftUI；不执行 HTML / 脚本，外链限制协议。支持范围、解析预算、账号缓存与尚未验证的宿主行为见[消息展示](message-rendering.md)，不把主机核心通过等同于完整 Web 语法或设备渲染验收。
 
 ## 图谱、笔记与移动交互
 

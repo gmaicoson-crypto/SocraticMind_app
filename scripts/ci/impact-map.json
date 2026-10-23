@@ -244,7 +244,8 @@
       "paths": [
         "ios/Packages/MindCore/Package.swift",
         "ios/project.yml",
-        "ios/SocraticMind.xcodeproj/*"
+        "ios/SocraticMind.xcodeproj/*",
+        "ios/Packages/MindCore/Package.resolved"
       ],
       "depends_on": [],
       "checks": {},
@@ -668,6 +669,89 @@
       "manual": [
         "会话列表与历史已接入 SwiftUI；主机竞态测试不覆盖页面渲染、导航、滚动和进程恢复。本批页面需另行获准构建后定向验证。"
       ]
+    },
+    "markdown-fixtures": {
+      "paths": [
+        "contracts/fixtures/message-markdown.json"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "markdown-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/markdown/MarkdownDocument.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/markdown/MarkdownLink.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/markdown/MarkdownInlineProjection.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/markdown/MarkdownParser.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/markdown/MarkdownRenderer.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/MarkdownContractTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/MarkdownRendererTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MarkdownInline.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MarkdownBlocks.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MessageCopyButton.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MessageContent.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/core/chat/build.gradle.kts",
+        "android/core/chat/gradle.lockfile"
+      ],
+      "depends_on": [
+        "markdown-fixtures",
+        "android-dependencies"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.MarkdownContractTest",
+          "com.gmaicoson.socraticmind.chat.MarkdownRendererTest"
+        ]
+      },
+      "manual": [
+        "Markdown 主机核心验证不覆盖 Compose 文字选择、代码复制、外链、表格滚动、最低系统与长消息布局；另行明确获准构建后验证。"
+      ]
+    },
+    "markdown-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/Markdown/MarkdownDocument.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/Markdown/MarkdownLink.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/Markdown/MarkdownInlineProjection.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/Markdown/MarkdownParser.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/Markdown/MarkdownRenderer.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/MarkdownContractTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/MarkdownRendererTests.swift",
+        "ios/SocraticMind/Messages/MarkdownInlineView.swift",
+        "ios/SocraticMind/Messages/MarkdownBlockView.swift",
+        "ios/SocraticMind/Messages/MessageCopyButton.swift",
+        "ios/SocraticMind/Messages/MessageContentView.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift"
+      ],
+      "depends_on": [
+        "markdown-fixtures",
+        "ios-dependencies"
+      ],
+      "checks": {
+        "ios": [
+          "MarkdownContractTests",
+          "MarkdownRendererTests"
+        ]
+      },
+      "manual": [
+        "Markdown 主机核心验证不覆盖 SwiftUI 文字选择、代码复制、外链、表格滚动、动态字体与长消息布局；另行明确获准构建后验证。"
+      ]
+    },
+    "swift-resolution": {
+      "paths": [
+        "scripts/ci/tests/test_package_resolution.py",
+        "docs/third-party/markdown-dependencies.json"
+      ],
+      "depends_on": [
+        "ios-dependencies"
+      ],
+      "checks": {
+        "python": [
+          "unittest:scripts.ci.tests.test_package_resolution"
+        ]
+      },
+      "manual": []
     }
   },
   "metadata": [
@@ -676,7 +760,10 @@
     "backend/LICENSE.upstream",
     "backend/upstream-manifest.json",
     "docs/*.json",
-    "contracts/compatibility/*"
+    "contracts/compatibility/*",
+    "docs/third-party/commonmark-java-LICENSE.txt",
+    "docs/third-party/swift-markdown-LICENSE.txt",
+    "docs/third-party/swift-cmark-COPYING.txt"
   ],
   "format_expansion": {
     "pyproject.toml": [

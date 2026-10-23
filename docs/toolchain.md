@@ -12,6 +12,7 @@
 | Compose / Activity / Lifecycle | BOM 2025.12.01、activity-compose 1.12.2、lifecycle 2.9.4 | 应用已编译并安装到 API 36 模拟器；最低系统与真机另验 |
 | Kotlin JSON / JUnit | kotlinx.serialization 1.9.0、JUnit 5.10.1 | network / auth 核心消费，无跨语言运行时 |
 | Android HTTP / 协程 | OkHttp 5.4.0、Okio 3.18.1、Coroutines 1.10.2 | 固定兼容 compileSDK 36 的 AAR，显式约束 Okio；严格锁及 SHA-256 校验下编译与相关测试通过 |
+| Markdown | CommonMark Java 0.31.0 + tables / strikethrough / task-list-items；Swift Markdown / swift-cmark 0.9.0 | 共享语义与缓存核心通过；9 个 Maven 文件摘要核对，Gradle / SwiftPM / Xcode 锁定；应用宿主与最低设备待验 |
 | ktlint | 1.8.0 | Compose 注解函数允许平台命名风格；其余命名规则保留 |
 | Xcode / Swift | 27.1（27A9275）/ 6.4；Swift language 6，SPM tools 6.0 | 纯包及模拟器宿主已编译；本机 iOS 26.5 runtime，使用本地 ad hoc 签名 |
 | SwiftFormat / SwiftLint | 0.64.0 / 0.65.1 | 前者负责排版，后者只启用不冲突的正确性规则 |
@@ -62,6 +63,8 @@ Compose compiler 随 Kotlin 插件使用同版本；Compose UI 通过独立 BOM 
 生成文件来源登记在 scripts/quality/generated-files.json；登记本身不代表免审，源码文件中的 generated 注释也不能豁免行数。
 
 Gradle SHA-256 校验元数据已针对当前已解析配置生成，首次信任来自固定版本的本地缓存与官方仓库依赖；不宣称验证了所有未来构建变体。新增依赖需要人工审阅来源和摘要变化，不能用自动更新元数据绕过校验失败。
+
+Markdown 的双端固定依赖、许可证、SwiftPM / Xcode 两份锁及受限解析见[消息展示](message-rendering.md)。Swift CI 使用 `--force-resolved-versions`；Xcode 依赖图已用锁定 pins 单独解析成功，该动作没有编译或生成模拟器应用。后续授权的应用构建仍需保留锁定版本约束并验证平台行为。
 
 ## CI 工具与本机差异
 

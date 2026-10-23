@@ -1,0 +1,654 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "styles-and-breaks",
+      "source": "中文 **粗体** *斜体* ~~删除~~ `a < b`\n下一行  \n末行🙂",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "中文 "
+            },
+            {
+              "text": "粗体",
+              "bold": true
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "斜体",
+              "italic": true
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "删除",
+              "strike": true
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "a < b",
+              "code": true
+            },
+            {
+              "text": "\n下一行\n末行🙂"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "headings",
+      "source": "# 标题\n\n### 三级 **强调**\n\n###### 六级",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "标题"
+            }
+          ],
+          "heading": 1
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "三级 "
+            },
+            {
+              "text": "强调",
+              "bold": true
+            }
+          ],
+          "heading": 3
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "六级"
+            }
+          ],
+          "heading": 6
+        }
+      ]
+    },
+    {
+      "id": "lists-and-tasks",
+      "source": "3. 第三项\n4. 第四项\n\n- 父项\n  - 子项\n- [x] 完成\n- [ ] 待办",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "第三项"
+            }
+          ],
+          "indent": 1,
+          "marker": "3."
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "第四项"
+            }
+          ],
+          "indent": 1,
+          "marker": "4."
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "父项"
+            }
+          ],
+          "indent": 1,
+          "marker": "•"
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "子项"
+            }
+          ],
+          "indent": 2,
+          "marker": "•"
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "完成"
+            }
+          ],
+          "indent": 1,
+          "marker": "☑"
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "待办"
+            }
+          ],
+          "indent": 1,
+          "marker": "☐"
+        }
+      ]
+    },
+    {
+      "id": "empty-list-parent",
+      "source": "-\n  - 子项",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [],
+          "indent": 1,
+          "marker": "•"
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "子项"
+            }
+          ],
+          "indent": 2,
+          "marker": "•"
+        }
+      ]
+    },
+    {
+      "id": "quotes-and-rule",
+      "source": "> 引用\n>\n> > 深层\n\n---",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "引用"
+            }
+          ],
+          "quote": 1
+        },
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "深层"
+            }
+          ],
+          "quote": 2
+        },
+        {
+          "type": "rule"
+        }
+      ]
+    },
+    {
+      "id": "fenced-code",
+      "source": "```kotlin title=\"示例\"\nval text = \"中文🙂\"\n\nprintln(text)\n```",
+      "blocks": [
+        {
+          "type": "code",
+          "text": "val text = \"中文🙂\"\n\nprintln(text)\n",
+          "language": "kotlin"
+        }
+      ]
+    },
+    {
+      "id": "unfinished-fence",
+      "source": "```unknown\n**不会加粗**\n[[source:s1]]",
+      "blocks": [
+        {
+          "type": "code",
+          "text": "**不会加粗**\n[[source:s1]]\n",
+          "language": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "indented-code",
+      "source": "    first\n    second\n",
+      "blocks": [
+        {
+          "type": "code",
+          "text": "first\nsecond\n",
+          "language": ""
+        }
+      ]
+    },
+    {
+      "id": "table",
+      "source": "| 名称 | 数值 | 备注 |\n| :--- | :---: | ---: |\n| **甲** | 2 | a\\|b |\n| 乙 | `3` | [查看](https://example.com/x) |",
+      "blocks": [
+        {
+          "type": "table",
+          "alignments": [
+            "left",
+            "center",
+            "right"
+          ],
+          "rows": [
+            [
+              [
+                {
+                  "text": "名称"
+                }
+              ],
+              [
+                {
+                  "text": "数值"
+                }
+              ],
+              [
+                {
+                  "text": "备注"
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "text": "甲",
+                  "bold": true
+                }
+              ],
+              [
+                {
+                  "text": "2"
+                }
+              ],
+              [
+                {
+                  "text": "a|b"
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "text": "乙"
+                }
+              ],
+              [
+                {
+                  "text": "3",
+                  "code": true
+                }
+              ],
+              [
+                {
+                  "text": "查看",
+                  "link": "https://example.com/x"
+                }
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "links",
+      "source": "[链接 **强调**](https://EXAMPLE.com:443/a?q=1#x) 与 <http://example.com>。 https://example.com/plain",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "链接 ",
+              "link": "https://example.com/a?q=1#x"
+            },
+            {
+              "text": "强调",
+              "bold": true,
+              "link": "https://example.com/a?q=1#x"
+            },
+            {
+              "text": " 与 "
+            },
+            {
+              "text": "http://example.com",
+              "link": "http://example.com/"
+            },
+            {
+              "text": "。 https://example.com/plain"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unsafe-links",
+      "source": "[脚本](javascript:alert%281%29) [相对](/api/private) [账号](https://u:p@example.com) [邮件](mailto:a@example.com)",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "脚本 相对 账号 邮件"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "html-inline",
+      "source": "文字 <script>alert(1)</script> 和 <b>加粗?</b>",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "文字 <script>alert(1)</script> 和 <b>加粗?</b>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "html-block",
+      "source": "<div onclick=\"evil()\">\n<script>evil()</script>\n</div>\n",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "<div onclick=\"evil()\">\n<script>evil()</script>\n</div>\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "image-alt",
+      "source": "![示意 **图片**](https://example.com/private.png)",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "[图片：示意 "
+            },
+            {
+              "text": "图片",
+              "bold": true
+            },
+            {
+              "text": "]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "image-link-alt",
+      "source": "![外链 [标签](https://example.com)](https://example.com/image)",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "[图片：外链 标签]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reference-links",
+      "source": "[文档][ref]\n\n[ref]: https://example.com/docs \"说明\"",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "文档",
+              "link": "https://example.com/docs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "escaped-and-entities",
+      "source": "\\*原样\\* &amp; &lt;中文&gt; 🙂 é",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "*原样* & <中文> 🙂 é"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nested-emphasis",
+      "source": "***同时*** 与 **外层 *内层* 尾部**",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "同时",
+              "bold": true,
+              "italic": true
+            },
+            {
+              "text": " 与 "
+            },
+            {
+              "text": "外层 ",
+              "bold": true
+            },
+            {
+              "text": "内层",
+              "bold": true,
+              "italic": true
+            },
+            {
+              "text": " 尾部",
+              "bold": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "citation-text",
+      "source": "答案 [[source:s1]] 与 `[[source:s2]]`",
+      "blocks": [
+        {
+          "type": "text",
+          "runs": [
+            {
+              "text": "答案 [[source:s1]] 与 "
+            },
+            {
+              "text": "[[source:s2]]",
+              "code": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empty",
+      "source": "",
+      "blocks": []
+    },
+    {
+      "id": "table-empty-and-short-row",
+      "source": "|a|b|c|\n|---|---|---|\n|x||z|\n|y|",
+      "blocks": [
+        {
+          "type": "table",
+          "alignments": [
+            "left",
+            "left",
+            "left"
+          ],
+          "rows": [
+            [
+              [
+                {
+                  "text": "a"
+                }
+              ],
+              [
+                {
+                  "text": "b"
+                }
+              ],
+              [
+                {
+                  "text": "c"
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "text": "x"
+                }
+              ],
+              [],
+              [
+                {
+                  "text": "z"
+                }
+              ]
+            ],
+            [
+              [
+                {
+                  "text": "y"
+                }
+              ],
+              [],
+              []
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "input": "https://example.com",
+      "safe": "https://example.com/"
+    },
+    {
+      "input": "HTTP://EXAMPLE.COM:80/a?q=1#top",
+      "safe": "http://example.com/a?q=1#top"
+    },
+    {
+      "input": "https://example.com:8443/a",
+      "safe": "https://example.com:8443/a"
+    },
+    {
+      "input": "https://example.com/中文🙂",
+      "safe": "https://example.com/%E4%B8%AD%E6%96%87%F0%9F%99%82"
+    },
+    {
+      "input": "https://例子.测试/",
+      "safe": "https://xn--fsqu00a.xn--0zwm56d/"
+    },
+    {
+      "input": "https://[::1]:8080/a",
+      "safe": "https://[::1]:8080/a"
+    },
+    {
+      "input": "javascript:alert(1)",
+      "safe": null
+    },
+    {
+      "input": "data:text/html,x",
+      "safe": null
+    },
+    {
+      "input": "file:///private/file",
+      "safe": null
+    },
+    {
+      "input": "mailto:a@example.com",
+      "safe": null
+    },
+    {
+      "input": "//example.com",
+      "safe": null
+    },
+    {
+      "input": "/api/private",
+      "safe": null
+    },
+    {
+      "input": " https://example.com",
+      "safe": null
+    },
+    {
+      "input": "https://example.com/a b",
+      "safe": null
+    },
+    {
+      "input": "https://u:p@example.com",
+      "safe": null
+    },
+    {
+      "input": "https://%75@example.com",
+      "safe": null
+    },
+    {
+      "input": "https://example.com\\@evil.com",
+      "safe": null
+    },
+    {
+      "input": "https://exam\nple.com",
+      "safe": null
+    },
+    {
+      "input": "https://example.com:0",
+      "safe": null
+    },
+    {
+      "input": "https://example.com:65536",
+      "safe": null
+    },
+    {
+      "input": "https://",
+      "safe": null
+    },
+    {
+      "input": "https://exa%20mple.com",
+      "safe": null
+    },
+    {
+      "input": "https://example.com/%00",
+      "safe": null
+    },
+    {
+      "input": "https://example.com/%0a",
+      "safe": null
+    },
+    {
+      "input": "https://example.com/​hidden",
+      "safe": null
+    },
+    {
+      "input": "https://example.com/ ",
+      "safe": null
+    }
+  ]
+}

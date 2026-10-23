@@ -7,10 +7,10 @@
 在仓库根目录运行：
 
 ```bash
-swift test --package-path ios/Packages/MindCore --filter SSEContractTests
+swift test --package-path ios/Packages/MindCore --force-resolved-versions --filter SSEContractTests
 ```
 
-此命令编译 Swift 包与主机测试，不运行 SwiftUI 应用、不生成 IPA。样例直接从 contracts/fixtures 读取，需要完整仓库；没有外部 Swift 包依赖，因此当前不伪造 Package.resolved。
+此命令编译 Swift 包与主机测试，不运行 SwiftUI 应用、不生成 IPA。样例直接从 contracts/fixtures 读取，需要完整仓库。Markdown 引入固定 Swift Markdown / swift-cmark 0.9.0，SwiftPM 与 Xcode 的 Package.resolved 均已纳入 Git；升级时同步审阅版本、revision 与许可证，CI 不自动改锁。
 
 ## 应用工程
 
@@ -29,4 +29,4 @@ swift test --package-path ios/Packages/MindCore --filter SSEContractTests
 
 Debug 默认连接 `http://127.0.0.1:8765/`，Release 无本地默认地址。MindCore/Authentication 的 AuthAPI 使用同一个 HTTPTransport；契约、会话、原生表单与剩余设备边界见 [账号实施](../docs/auth-implementation.md)。
 
-MindCore/Chat 提供会话摘要 / 分页 API 和 ChatLibraryModel，复用 HTTPTransport 与 SessionStore。SwiftUI 已接线列表、历史和退出清理，XcodeGen 已登记页面；本批应用未重新编译 / 运行，主机测试不验证 UI。进度、定向入口及 Markdown / 发送待办见[会话读取核心](../docs/chat-history-implementation.md)。
+MindCore/Chat 提供会话摘要 / 分页 API、ChatLibraryModel 与 Markdown 核心；SwiftUI 已接线列表、历史、消息组件和退出清理，XcodeGen 已登记页面。本批应用未重新编译 / 运行，主机测试不验证 UI。入口见[会话读取核心](../docs/chat-history-implementation.md)和[消息展示](../docs/message-rendering.md)，发送继续实施。

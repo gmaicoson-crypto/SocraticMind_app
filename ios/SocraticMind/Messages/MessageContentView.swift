@@ -1,0 +1,91 @@
+import MindCore
+import SwiftUI
+
+struct MessageContentView: View {
+    let message: StoredChatMessage
+    let renderer: MarkdownRenderer
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(message.role == "user" ? "你" : "SocraticMind").font(.caption).foregroundStyle(.tint)
+                Spacer()
+                MessageCopyButton(text: message.content, label: "复制原文")
+            }
+            MarkdownBodyView(source: message.content, renderer: renderer)
+            if !message.attachments.isEmpty {
+                Text("包含 \(message.attachments.count) 个附件").font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+private struct RenderedMarkdown {
+    let source: String
+    let document: MarkdownDocument?
+}
+
+private struct MarkdownBodyView: View {
+    let source: String
+    let renderer: MarkdownRenderer
+    @State private var rendered: RenderedMarkdown?
+
+    var body: some View {
+        Group {
+            if let rendered, rendered.source == source {
+                if let document = rendered.document {
+                    MarkdownDocumentView(document: document).id(source)
+                } else {
+                    Text("暂时无法显示消息，仍可复制原文。").foregroundStyle(.secondary)
+                }
+            } else {
+                ProgressView("正在排版…")
+            }
+        }
+        .task(id: source) {
+            do {
+                let document = try await renderer.render(source)
+                try Task.checkCancellation()
+                rendered = RenderedMarkdown(source: source, document: document)
+            } catch is CancellationError {
+                // A disappearing/reused row cannot update a new message or account.
+            } catch {
+                rendered = RenderedMarkdown(source: source, document: nil)
+            }
+        }
+    }
+}
+
+private struct MarkdownDocumentView: View {
+    let document: MarkdownDocument
+    @State private var visibleBlocks = 24
+    @State private var linkError = false
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if document.plainFallback {
+                Text("此消息按原文分段显示。").font(.caption).foregroundStyle(.secondary)
+            }
+            ForEach(Array(document.blocks.prefix(visibleBlocks).enumerated()), id: \.offset) { _, block in
+                MarkdownBlockView(block: block)
+            }
+            if visibleBlocks < document.blocks.count {
+                Button("显示更多内容（剩余 \(document.blocks.count - visibleBlocks) 段）") { visibleBlocks += 24 }
+                    .buttonStyle(.borderless)
+            }
+            if linkError {
+                Text("无法打开这个链接。").font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .environment(\.openURL, OpenURLAction { url in
+            guard let safe = MarkdownLink.safe(url.absoluteString), let target = URL(string: safe) else {
+                linkError = true
+                return .discarded
+            }
+            openURL(target) { accepted in linkError = !accepted }
+            return .handled
+        })
+    }
+}

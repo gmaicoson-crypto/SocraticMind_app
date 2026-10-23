@@ -13,7 +13,7 @@
 | backend/routers/chat_history.py | 参数、鉴权依赖、分页输入验证 | 通过 chat.router 接入；原路径保留 |
 | Android core:chat | DTO、游标检查、ChatHistoryApi 与 ChatLibraryController | 复用 core:network / core:auth，仍为纯 JVM |
 | Swift MindCore/Chat | Codable / Sendable 数据、ChatHistoryAPI 与 ChatLibraryModel | 复用 HTTPTransport / SessionStore；Combine 状态，无 SwiftUI / UIKit |
-| Android chatui / iOS Chat | 列表、历史原文、刷新 / 加载 / 重试与退出入口 | 两种页共用分页控件；页面不接触 Token 或字节流 |
+| Android chatui / iOS Chat | 列表、历史消息、刷新 / 加载 / 重试与退出入口 | 两种页共用分页控件；正文交给[消息组件](message-rendering.md)，页面不接触 Token 或字节流 |
 
 API 适配器不保存 Token。功能状态通过已有 SessionStore.authenticated 调用，发送前检查账号 ID / revision，完成时再次检查账号和请求序号。退出先同步清空列表、选择和消息并取消请求；账号观察更新再绑定新的状态。页面还比较当前账号与状态归属，避免两个观察流在不同帧交付时显示旧账号数据。没有第二份凭证存储；草稿尚未实现。
 
@@ -27,7 +27,7 @@ API 适配器不保存 Token。功能状态通过已有 SessionStore.authenticat
 - 加载更多按稳定 ID 去重，保留已加载的更新版本；刷新替换窗口。切换会话即清空旧历史，关闭会话或功能容器取消任务。测试用不响应取消的网络替身验证迟到成功和错误不会重新写入状态。
 - UI 使用 Compose LazyColumn / SwiftUI List 与稳定消息 ID，默认每次只请求 30 项，不自动读完整历史。消息在核心保留服务端倒序，展示时转为时间正序；首次进入定位到最近消息，加载更早页的滚动锚点仍需设备验证。[Compose 列表文档](https://developer.android.com/develop/ui/compose/lists)
 - 已加载页保留在当前账号的内存中，更多页面只随用户操作请求。还没有磁盘缓存、分页淘汰或重进程恢复选中会话；大历史的内存、布局和响应上限须继续测量。共享页逻辑减少双份重试实现，代价是需要维护取消和账号边界用例。
-- 正文暂按原文显示，附件只显示数量；没有把这些状态当作 Markdown、受保护附件预览、结构化学习消息或发送已实现。原账号流程的设备结果也不能覆盖本批页面改动。
+- 正文已接入[Markdown 核心与原生消息组件](message-rendering.md)，附件仍只显示数量。受保护附件、结构化学习消息和发送尚待实现；原账号流程的设备结果也不能覆盖本批页面改动。
 
 ## 定向验证
 

@@ -7,16 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0DDFAC9AD1AF7F04071639E9 /* MarkdownBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BD8136F99BE32A17332E89 /* MarkdownBlockView.swift */; };
 		11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072095AA102764FA32FE2A9C /* AuthScreen.swift */; };
 		1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB4AB36687E098F09045608 /* AuthFields.swift */; };
 		1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */; };
 		1EDDD242011246266AB5C4BF /* AuthUITestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F189D44C9164E612C194209 /* AuthUITestFixture.swift */; };
 		2855770B90E837BC2E36EB68 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DFA684F16FC815A3CAA454 /* AppRootView.swift */; };
+		2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E844435E044814A28ED5D442 /* MarkdownInlineView.swift */; };
+		393D26A5169372F78A7EC93F /* MessageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808D06957854C2FE245352E /* MessageContentView.swift */; };
 		56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */; };
 		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
 		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
 		C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4648BB5C680AAE1441E028BF /* AuthTextInput.swift */; };
 		E39ABE4A8138E47D7C469462 /* AuthFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */; };
+		E5213532C63BE3DEA427FA76 /* MessageCopyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */; };
 		E68A9A2A5BA6651F1369D0FA /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DDBEDD8CAC3E583E97292B /* AppModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,7 +37,10 @@
 /* Begin PBXFileReference section */
 		072095AA102764FA32FE2A9C /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
 		0F189D44C9164E612C194209 /* AuthUITestFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUITestFixture.swift; sourceTree = "<group>"; };
+		21BD8136F99BE32A17332E89 /* MarkdownBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockView.swift; sourceTree = "<group>"; };
+		2808D06957854C2FE245352E /* MessageContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageContentView.swift; sourceTree = "<group>"; };
 		2C45889AB397FDA45D84D37D /* MindCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MindCore; path = Packages/MindCore; sourceTree = SOURCE_ROOT; };
+		3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCopyButton.swift; sourceTree = "<group>"; };
 		4648BB5C680AAE1441E028BF /* AuthTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextInput.swift; sourceTree = "<group>"; };
 		69DFA684F16FC815A3CAA454 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPageControls.swift; sourceTree = "<group>"; };
@@ -44,6 +51,7 @@
 		CA2FBA22AE30161F8C7E7733 /* SocraticMind.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SocraticMind.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB4AB36687E098F09045608 /* AuthFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFields.swift; sourceTree = "<group>"; };
 		E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocraticMindApp.swift; sourceTree = "<group>"; };
+		E844435E044814A28ED5D442 /* MarkdownInlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownInlineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +66,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C23DFBA04C2D966FCFDD1CF /* Messages */ = {
+			isa = PBXGroup;
+			children = (
+				21BD8136F99BE32A17332E89 /* MarkdownBlockView.swift */,
+				E844435E044814A28ED5D442 /* MarkdownInlineView.swift */,
+				2808D06957854C2FE245352E /* MessageContentView.swift */,
+				3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */,
+			);
+			path = Messages;
+			sourceTree = "<group>";
+		};
 		164449EA9A263028866B4700 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -129,6 +148,7 @@
 				96640CF4405DA51087373CF5 /* Account */,
 				25910EC35AA2FA841EBD535A /* App */,
 				D313D2081763C8A0C7440170 /* Chat */,
+				0C23DFBA04C2D966FCFDD1CF /* Messages */,
 			);
 			path = SocraticMind;
 			sourceTree = "<group>";
@@ -226,6 +246,10 @@
 				C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */,
 				1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */,
 				56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */,
+				0DDFAC9AD1AF7F04071639E9 /* MarkdownBlockView.swift in Sources */,
+				2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */,
+				393D26A5169372F78A7EC93F /* MessageContentView.swift in Sources */,
+				E5213532C63BE3DEA427FA76 /* MessageCopyButton.swift in Sources */,
 				8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
