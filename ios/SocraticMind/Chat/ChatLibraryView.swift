@@ -7,6 +7,7 @@ struct ChatLibraryView: View {
     @ObservedObject var turn: ChatTurnModel
     @ObservedObject var actions: ChatActionsModel
     let suggestions: ChatSuggestionsModel
+    let models: ChatModelSelectionModel
     @ObservedObject var avatars: ChatAvatarModel
     let avatarImages: AvatarImageLoader<CGImage>?
     let account: SessionState
@@ -96,6 +97,7 @@ struct ChatLibraryView: View {
                 if actions.state.dialog == nil, let selected = model.state.selected,
                    selected.target == turn.state.target, let owner = model.state.account
                 {
+                    ChatModelSelector(model: models, turn: turn.state, account: owner)
                     ChatSuggestionsBar(model: suggestions, account: owner, target: selected.target, style: user.aiStyle)
                 }
                 ChatComposerView(model: turn, style: user.aiStyle,

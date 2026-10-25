@@ -47,6 +47,60 @@ class ModelSelectionImpactTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_plan(scope("backend/services/unknown_model_selection.py"))
 
+    def test_model_fixture_checks_both_catalogs_sends_and_suggestions(self):
+        result = load_plan(scope("scripts/contracts/model_selection_fixture.py"))
+        for name in ["ChatModelApiContractTest", "ChatModelControllerTest", "ChatModelSendTest"]:
+            self.assertIn(f"com.gmaicoson.socraticmind.chat.{name}", result["checks"]["android"])
+        for name in [
+            "ChatModelAPIContractTests",
+            "ChatModelSelectionModelTests",
+            "ChatModelSendTests",
+        ]:
+            self.assertIn(name, result["checks"]["ios"])
+        self.assertFalse(result["checks"]["python"])
+        self.assertFalse(result["checks"]["mysql"])
+
+    def test_catalog_validation_changes_include_request_validation_consumers(self):
+        result = load_plan(
+            scope(
+                "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatModelCatalog.kt"
+            )
+        )
+        self.assertIn("turn-api-android", result["groups"])
+        self.assertIn("suggestions-api-android", result["groups"])
+        self.assertIn("model-send-android", result["groups"])
+        self.assertFalse(result["checks"]["ios"])
+        self.assertFalse(result["checks"]["python"])
+
+    def test_turn_and_suggestion_changes_keep_model_selection_race_coverage(self):
+        for path in [
+            "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnModel.swift",
+            "ios/Packages/MindCore/Sources/MindCore/Chat/ChatSuggestionsState.swift",
+        ]:
+            with self.subTest(path=path):
+                result = load_plan(scope(path))
+                self.assertIn("ChatModelSendTests", result["checks"]["ios"])
+                self.assertFalse(result["checks"]["android"])
+
+    def test_selector_hosts_select_core_checks_and_explicit_device_followup(self):
+        for path, platform, test in [
+            (
+                "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatModelSelector.kt",
+                "android",
+                "com.gmaicoson.socraticmind.chat.ChatModelControllerTest",
+            ),
+            (
+                "ios/SocraticMind/Chat/ChatModelSelector.swift",
+                "ios",
+                "ChatModelSelectionModelTests",
+            ),
+        ]:
+            with self.subTest(path=path):
+                result = load_plan(scope(path))
+                self.assertIn(test, result["checks"][platform])
+                self.assertTrue(result["manual"])
+                self.assertFalse(result["checks"]["mysql"])
+
 
 if __name__ == "__main__":
     unittest.main()

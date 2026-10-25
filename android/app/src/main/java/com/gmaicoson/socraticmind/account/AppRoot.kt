@@ -82,14 +82,16 @@ fun AppRoot(model: AppViewModel) {
                             val actions = model.actions
                             val suggestions = model.suggestions
                             val avatars = model.avatars
+                            val models = model.models
                             if (history != null && turn != null && actions != null && suggestions != null &&
-                                avatars != null
+                                avatars != null && models != null
                             ) {
                                 ChatLibraryScreen(
                                     history,
                                     turn,
                                     actions,
                                     suggestions,
+                                    models,
                                     avatars,
                                     avatarImages?.takeIf { it.account.revision == current.revision },
                                     current,

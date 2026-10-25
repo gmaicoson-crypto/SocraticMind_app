@@ -6,6 +6,7 @@ import com.gmaicoson.socraticmind.auth.SessionStore
 import com.gmaicoson.socraticmind.chat.ChatActionsApi
 import com.gmaicoson.socraticmind.chat.ChatAvatarApi
 import com.gmaicoson.socraticmind.chat.ChatHistoryApi
+import com.gmaicoson.socraticmind.chat.ChatModelApi
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsApi
 import com.gmaicoson.socraticmind.chat.ChatTurnApi
 import com.gmaicoson.socraticmind.chat.FileChatAvatarStore
@@ -34,6 +35,7 @@ class SocraticMindApplication : Application() {
                 ChatSuggestionsApi(transport),
                 ChatAvatarApi(transport),
                 FileChatAvatarStore(noBackupFilesDir, endpoint.credentialScope),
+                ChatModelApi(transport),
             )
         }
     }
@@ -49,4 +51,5 @@ class AppGraph(
     val suggestions: ChatSuggestionsApi,
     val avatars: ChatAvatarApi,
     val avatarStore: FileChatAvatarStore,
+    val models: ChatModelApi,
 )

@@ -8,6 +8,12 @@ public struct ChatSuggestionContext: Equatable, Sendable {
     public let hasConversation: Bool
     public let model: String?
 
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.account == rhs.account && lhs.target == rhs.target && lhs.version == rhs.version &&
+            lhs.hasConversation == rhs.hasConversation && lhs.model.map { Data($0.utf8) } == rhs.model
+            .map { Data($0.utf8) }
+    }
+
     public static func from(_ history: ChatLibraryState, _ turn: ChatTurnState,
                             model: String? = nil) -> ChatSuggestionContext?
     {

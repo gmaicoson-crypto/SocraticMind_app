@@ -46,6 +46,7 @@ import com.gmaicoson.socraticmind.chat.ChatAvatarController
 import com.gmaicoson.socraticmind.chat.ChatAvatarResource
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
 import com.gmaicoson.socraticmind.chat.ChatMode
+import com.gmaicoson.socraticmind.chat.ChatModelController
 import com.gmaicoson.socraticmind.chat.ChatRegeneration
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTurnController
@@ -61,6 +62,7 @@ fun ChatLibraryScreen(
     turn: ChatTurnController,
     actions: ChatActionsController,
     suggestions: ChatSuggestionsController,
+    models: ChatModelController,
     avatars: ChatAvatarController,
     avatarImages: AvatarImageLoader<Bitmap>?,
     account: SessionState.SignedIn,
@@ -199,6 +201,7 @@ fun ChatLibraryScreen(
             if (actionState.dialog == null) actionState.notice?.let { Text(it, Modifier.padding(12.dp)) }
             if (actionState.selectionSessionId == null) {
                 if (actionState.dialog == null && selected != null && selected.target == turnState.target) {
+                    ChatModelSelector(models, turnState, checkNotNull(state.account))
                     ChatSuggestionsBar(suggestions, checkNotNull(state.account), selected.target, account.user.aiStyle)
                 }
                 ChatComposer(

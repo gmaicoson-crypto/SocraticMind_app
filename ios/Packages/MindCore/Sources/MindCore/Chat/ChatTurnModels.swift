@@ -68,12 +68,20 @@ public struct ChatTurnRequest: Sendable {
     public let input: String
     public let style: String
     public let context: ChatRequestContext
+    public let model: String?
 
-    public init(pending: PendingChatTurn, input: String, style: String, context: ChatRequestContext = .plain) throws {
+    public init(
+        pending: PendingChatTurn,
+        input: String,
+        style: String,
+        context: ChatRequestContext = .plain,
+        model: String? = nil
+    ) throws {
         try context.validate(input: input, target: pending.target)
+        try validateModelID(model)
         guard !style.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, style.unicodeScalars.count <= 20
         else { throw ChatTurnFailure.invalidRequest }
-        self.pending = pending; self.input = input; self.style = style; self.context = context
+        self.pending = pending; self.input = input; self.style = style; self.context = context; self.model = model
     }
 
     public func encoded() throws -> Data {
@@ -82,6 +90,9 @@ public struct ChatTurnRequest: Sendable {
             "node_key": pending.target.nodeKey, "topic_id": pending.target.topicID,
             "mode": pending.target.mode.rawValue, "kind": context.kind.rawValue, "user_input": input, "ai_style": style,
         ]
+        if let model {
+            value["model"] = model
+        }
         if let id = pending.regenerateMessageID {
             value["regenerate_message_id"] = id
         }

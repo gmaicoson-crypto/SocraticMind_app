@@ -41,6 +41,8 @@ public struct ChatTurnState: Sendable {
     public internal(set) var notice: String?
     public internal(set) var receipt: ChatTurnReceipt?
     public internal(set) var changingHistory = false
+    public internal(set) var model: String?
+    public internal(set) var modelAvailable = true
 
     public var editable: Bool {
         account != nil && phase == .ready && pending == nil && !changingHistory
@@ -51,7 +53,8 @@ public struct ChatTurnState: Sendable {
     }
 
     public var canSend: Bool {
-        editable && receipt == nil && target != nil && !draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        editable && modelAvailable && receipt == nil && target != nil && !draft
+            .trimmingCharacters(in: .whitespacesAndNewlines)
             .isEmpty && characterCount <= 5000
     }
 
@@ -60,7 +63,7 @@ public struct ChatTurnState: Sendable {
     }
 
     public var canRegenerate: Bool {
-        editable && receipt == nil && target != nil
+        editable && modelAvailable && receipt == nil && target != nil
     }
 
     public var canVerify: Bool {

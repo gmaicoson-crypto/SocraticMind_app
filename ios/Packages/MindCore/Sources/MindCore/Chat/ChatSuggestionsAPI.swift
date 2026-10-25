@@ -39,11 +39,10 @@ public struct ChatSuggestionsAPI: ChatSuggestionsGateway {
     public func suggestions(token: String, target: ChatTarget, exclude: [String], model: String?) async throws
         -> ChatSuggestions
     {
+        try validateModelID(model)
         guard exclude.count <= 24,
               exclude.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                      && $0.unicodeScalars.count <= 5000 }),
-              model == nil || (!(model ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                  && (model ?? "").unicodeScalars.count <= 100)
+                      && $0.unicodeScalars.count <= 5000 })
         else { throw ChatTurnFailure.invalidRequest }
         var query = ["mode": target.mode.rawValue, "session_id": target.sessionID]
         if target.mode == .socratic, target.topicID > 0 {

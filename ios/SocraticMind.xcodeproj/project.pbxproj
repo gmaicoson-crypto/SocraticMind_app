@@ -13,6 +13,7 @@
 		1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB4AB36687E098F09045608 /* AuthFields.swift */; };
 		1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */; };
 		1EDDD242011246266AB5C4BF /* AuthUITestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F189D44C9164E612C194209 /* AuthUITestFixture.swift */; };
+		218F8388775ACBA3047D9588 /* ChatModelSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 594FC5745BC58B69DE0EFC26 /* ChatModelSelector.swift */; };
 		2855770B90E837BC2E36EB68 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DFA684F16FC815A3CAA454 /* AppRootView.swift */; };
 		2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E844435E044814A28ED5D442 /* MarkdownInlineView.swift */; };
 		38DB55034EE78B94993C6718 /* AvatarPhotoTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2532621FCF47A8CEE6098CB /* AvatarPhotoTransfer.swift */; };
@@ -51,6 +52,7 @@
 		2C45889AB397FDA45D84D37D /* MindCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MindCore; path = Packages/MindCore; sourceTree = SOURCE_ROOT; };
 		3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCopyButton.swift; sourceTree = "<group>"; };
 		4648BB5C680AAE1441E028BF /* AuthTextInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTextInput.swift; sourceTree = "<group>"; };
+		594FC5745BC58B69DE0EFC26 /* ChatModelSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModelSelector.swift; sourceTree = "<group>"; };
 		5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatComposerView.swift; sourceTree = "<group>"; };
 		626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSuggestionsBar.swift; sourceTree = "<group>"; };
 		69DFA684F16FC815A3CAA454 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				FEA3DAA7E55A2D7AC384F470 /* ChatActionsControls.swift */,
 				5B6FD4AEA08BCA81BD00A82C /* ChatComposerView.swift */,
 				7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */,
+				594FC5745BC58B69DE0EFC26 /* ChatModelSelector.swift */,
 				626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */,
 				7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */,
 				B0A4EDCBFDD1E89414A126F5 /* MessageHistoryView.swift */,
@@ -283,6 +286,7 @@
 				882687C0581C875A202E9A33 /* ChatAvatarPickerSheet.swift in Sources */,
 				D6D8D428875A919AF0ED79A1 /* ChatComposerView.swift in Sources */,
 				1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */,
+				218F8388775ACBA3047D9588 /* ChatModelSelector.swift in Sources */,
 				8959D81C0451B2AF0D509C27 /* ChatSuggestionsBar.swift in Sources */,
 				56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */,
 				0DDFAC9AD1AF7F04071639E9 /* MarkdownBlockView.swift in Sources */,

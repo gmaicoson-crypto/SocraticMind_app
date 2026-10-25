@@ -25,13 +25,14 @@ struct AppRootView: View {
             SessionPanel(title: "正在退出", message: "正在清理本机登录信息…", loading: true)
         case let .signedIn(user, revision):
             if let history = model.history, let turn = model.turn, let actions = model.actions,
-               let suggestions = model.suggestions, let avatars = model.avatars
+               let suggestions = model.suggestions, let avatars = model.avatars, let models = model.models
             {
                 ChatLibraryView(
                     model: history,
                     turn: turn,
                     actions: actions,
                     suggestions: suggestions,
+                    models: models,
                     avatars: avatars,
                     avatarImages: model.avatarImages,
                     account: .signedIn(user: user, revision: revision),

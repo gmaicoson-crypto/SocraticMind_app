@@ -14,6 +14,12 @@ public final class ChatTurnModel: ObservableObject {
     private var ticket: UInt64 = 0
     private var closed = false
     private var historyMutation: ChatMutationLease?
+    private var rejectedModelRequest: ChatTurnRequest?
+
+    func setModelSelection(account: HistoryAccount, model: String?, available: Bool) {
+        guard !closed, state.account == account, (try? validateModelID(model)) != nil else { return }
+        state.model = model; state.modelAvailable = available
+    }
 
     func reserveHistoryMutation(_ account: HistoryAccount) -> ChatMutationLease? {
         guard !closed, state.account == account, state.editable, state.receipt == nil else { return nil }
@@ -53,7 +59,7 @@ public final class ChatTurnModel: ObservableObject {
     }
 
     public func clear() {
-        historyMutation = nil
+        historyMutation = nil; rejectedModelRequest = nil
         ticket += 1
         task?.cancel(); task = nil
         buffer = ChatTurnBuffer()
@@ -82,13 +88,13 @@ public final class ChatTurnModel: ObservableObject {
 
     /// Compare-and-send keeps stale taps from replacing a newer draft or target.
     func sendSuggestion(account: HistoryAccount, target: ChatTarget, text: String,
-                        style: String, expectedDraft: String) -> Bool
+                        style: String, expectedDraft: String, model: String? = nil) -> Bool
     {
         guard !closed, state.canRegenerate, state.account == account, state.target == target,
-              state.draft == expectedDraft,
-              (try? ChatTurnRequest(pending: PendingChatTurn(ownerID: account.userID, target: target,
-                                                             requestID: "suggestion-check"),
-                                    input: text, style: style)) != nil else { return false }
+              state.draft == expectedDraft, state.model.map { Data($0.utf8) } == model.map { Data($0.utf8) },
+            (try? ChatTurnRequest(pending: PendingChatTurn(ownerID: account.userID, target: target,
+                                                           requestID: "suggestion-check"),
+                                  input: text, style: style)) != nil else { return false }
         state.draft = text; start(style: style, regeneration: nil)
         let started = state.pending != nil
         if !started {
@@ -118,9 +124,11 @@ public final class ChatTurnModel: ObservableObject {
             request = try ChatTurnRequest(
                 pending: PendingChatTurn(ownerID: account.userID, target: target, requestID: requestID(),
                                          regenerateMessageID: regeneration?.answerID),
-                input: regeneration?.input ?? state.draft, style: style, context: regeneration?.context ?? .plain
+                input: regeneration?.input ?? state.draft, style: style, context: regeneration?.context ?? .plain,
+                model: state.model
             )
         } catch { state.notice = "输入或会话配置无效，请检查后重试。"; return }
+        rejectedModelRequest = nil
         state.phase = .preparing; state.pending = request.pending; state.receipt = nil
         launch { operation in
             do { try await self.journal.save(request.pending) }
@@ -146,13 +154,20 @@ public final class ChatTurnModel: ObservableObject {
                 }
             } catch {
                 try await self.requireCurrent(operation)
-                if regeneration != nil, let failure = error as? HTTPFailure, ChatRegeneration.rejected(failure) {
-                    // Persist a stop tombstone before clearing the rejected stale request's recovery record.
+                let failure = error as? HTTPFailure
+                let modelRejected = failure?.status == 422 && failure?.code == "LLM_MODEL_UNAVAILABLE"
+                if modelRejected || (regeneration != nil && failure.map(ChatRegeneration.rejected) == true) {
+                    if modelRejected {
+                        self.rejectedModelRequest = request
+                    }
+                    // Persist a stop tombstone before clearing a preflight-rejected request's recovery record.
                     let remote = try await self.authenticated(operation) {
                         try await gateway.cancel(token: $0, pending: request.pending)
                     }
                     try await self.finish(operation, pending: request.pending, remote: remote)
-                    self.state.notice = "原问题或引用、附件已变化，请刷新历史后重试。"
+                    if !modelRejected {
+                        self.state.notice = "原问题或引用、附件已变化，请刷新历史后重试。"
+                    }
                     return
                 }
             }
@@ -248,6 +263,12 @@ public final class ChatTurnModel: ObservableObject {
             messages = []
         }
         try await requireCurrent(operation)
+        let rejected = rejectedModelRequest?.pending == pending && remote?.status == .interrupted && remote?.ids == nil
+        if rejected, pending.regenerateMessageID == nil,
+           let request = rejectedModelRequest
+        {
+            state.draft = request.input
+        }
         do { try await journal.clear(pending) }
         catch {
             try await requireCurrent(operation)
@@ -256,7 +277,9 @@ public final class ChatTurnModel: ObservableObject {
             return
         }
         try await requireCurrent(operation)
-        state.notice = if pending.regenerateMessageID != nil, remote?.status == .interrupted {
+        state.notice = if rejected {
+            "所选模型不可用，请刷新模型目录或重新选择后发送；输入与原回答已保留。"
+        } else if pending.regenerateMessageID != nil, remote?.status == .interrupted {
             "重新生成已停止，原回答仍保留。"
         } else if pending.regenerateMessageID != nil, remote?.status == .failed {
             "重新生成失败，原回答仍保留。"
@@ -269,6 +292,7 @@ public final class ChatTurnModel: ObservableObject {
             default: "本次回复失败；可查看已有内容后重新输入。"
             }
         }
+        rejectedModelRequest = nil
         state.phase = .ready; state.pending = nil; state.submitted = ""; state.partial = ""; state.ids = nil
         state.receipt = ChatTurnReceipt(pending: pending, status: remote?.status, messages: messages)
         buffer = ChatTurnBuffer()

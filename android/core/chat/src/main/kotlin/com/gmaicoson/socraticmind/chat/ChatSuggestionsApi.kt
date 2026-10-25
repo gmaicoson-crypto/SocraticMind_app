@@ -55,7 +55,7 @@ class ChatSuggestionsApi(
     ): ChatSuggestions {
         require(exclude.size <= 24)
         require(exclude.all { it.isNotBlank() && it.codePointCount(0, it.length) <= 5000 })
-        require(model == null || (model.isNotBlank() && model.codePointCount(0, model.length) <= 100))
+        requireModelId(model)
         val query = mutableMapOf("mode" to target.mode.wireValue, "session_id" to target.sessionId)
         if (target.mode == ChatMode.SOCRATIC && target.topicId > 0) {
             require(target.nodeKey.codePointCount(0, target.nodeKey.length) <= 100)

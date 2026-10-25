@@ -142,3 +142,9 @@ Android 12 类 99 项、Swift 12 suite 103 项和工具 69 项通过；Kotlin 6�
 2026-10-25：model-provider 显式登记目录路由、运行时模型解析、用户模型加载、共享样例与提供方测试；模型变化扩展发送、建议和 OpenAPI 消费者。新 ChatRequest schema 继续关联 chat-provider。模型映射回归单独放到 test_model_selection_impact.py，既有影响图文件不增行。
 
 后端 123 项、Android 23 类 197 项、Swift 23 suite 184 项、工具 72 项及隔离 MySQL 历史投影 1 项通过；OpenAPI 58 路径一致，Python 4 个变化文件固定格式 / lint 通过。路由历史上限随职责拆分从 1216 降至 1169，未提高豁免。原生目录与选择尚未实现，本次消费者测试只证明兼容性；边界见[模型选择实施](model-selection-implementation.md)。
+
+## 基础模型选择的双端验证
+
+2026-10-25：model-api、model-state、model-send 按平台登记目录类型 / 网络、选择 / 宿主接线及发送 / 建议联动，model-fixtures 关联双方消费者。ChatTurnRequest 和建议请求共用 ID 校验；共享 HTTP fixture 变化扩展相关传输与消费者，仍只执行命名集合。模型配置存在不代表真实调用可用，用户选择稍后配置服务。
+
+Android 27 类 200 项、Swift 27 suite 201 项、工具 81 项通过；15 个 Kotlin、15 个 Swift、6 个 Python 变化文件固定格式 / lint、结构与行数检查通过。XcodeGen 2.46.0 只登记新增选择器。旧影响图按职责拆为 394 行通用文件和 455 行聊天领域文件，原 41 个方法没有删除 / 重复，新模型影响测试仍独立。初轮测试和消费者预期问题及修复证据保留在 `.tools/model-selection-native-*`，行数预警结论见[实施状态](execution-status.md)。没有后端行为改动，不重复提供方 / MySQL 测试；宿主与设备验证、真实模型 / 超时 / 限额 / 用量仍待完成。

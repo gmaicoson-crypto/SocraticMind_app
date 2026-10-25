@@ -12,6 +12,7 @@ import com.gmaicoson.socraticmind.avatarui.AvatarImageCodec
 import com.gmaicoson.socraticmind.chat.ChatActionsController
 import com.gmaicoson.socraticmind.chat.ChatAvatarController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
+import com.gmaicoson.socraticmind.chat.ChatModelController
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTarget
 import com.gmaicoson.socraticmind.chat.ChatTurnController
@@ -33,6 +34,7 @@ class AppViewModel(
     val form = graph?.let { AuthFormController(it.session, it.auth) }
     val history = graph?.let { ChatLibraryController(it.session, it.history, viewModelScope, it.actions) }
     val turn = graph?.let { ChatTurnController(it.session, it.turn, it.journal, viewModelScope) }
+    val models = graph?.let { ChatModelController(it.session, it.models, checkNotNull(turn), viewModelScope) }
     val avatars =
         graph?.let {
             ChatAvatarController(
@@ -88,6 +90,7 @@ class AppViewModel(
                     }
                     history?.bindAccount(state)
                     turn?.bindAccount(state)
+                    models?.bindAccount(state)
                     avatars?.bindAccount(state)
                     actions?.bindAccount(state)
                     val next = (state as? SessionState.SignedIn)?.revision
@@ -167,6 +170,7 @@ class AppViewModel(
         formJob?.cancel()
         form?.reset()
         suggestions?.clear()
+        models?.clear()
         avatars?.clear()
         mutableAvatarImages.value?.close()
         mutableAvatarImages.value = null
@@ -178,6 +182,7 @@ class AppViewModel(
 
     override fun onCleared() {
         suggestions?.close()
+        models?.close()
         avatars?.close()
         mutableAvatarImages.value?.close()
         actions?.close()

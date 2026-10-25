@@ -28,7 +28,6 @@ class ChatSuggestionsController(
     val state = mutableState.asStateFlow()
     private val cache = ChatSuggestionsCache()
     private var owner: HistoryAccount? = null
-    private var model: String? = null
     private var active = false
     private var closed = false
     private var attempted = false
@@ -47,7 +46,8 @@ class ChatSuggestionsController(
 
     fun setModel(value: String?) =
         synchronized(lock) {
-            model = value
+            turn.state.value.account
+                ?.let { turn.setModelSelection(it, value, true) }
             synchronizeLocked()
         }
 
@@ -108,7 +108,7 @@ class ChatSuggestionsController(
         draft: String,
     ) {
         val context = state.value.context ?: return
-        if (turn.sendSuggestion(context.account, context.target, text, style, draft)) {
+        if (turn.sendSuggestion(context.account, context.target, text, style, draft, context.model)) {
             cancelLocked()
             mutableState.value = state.value.copy(enabled = false, choice = null)
         }
@@ -128,8 +128,10 @@ class ChatSuggestionsController(
             mutableState.value = ChatSuggestionsState()
             attempted = false
         }
-        val context = if (account != null) ChatSuggestionContext.from(h, t, model) else null
-        val enabled = active && context != null && t.editable && t.receipt == null && h.messages.loading == null
+        val context = if (account != null) ChatSuggestionContext.from(h, t, t.model) else null
+        val enabled =
+            active && context != null && t.modelAvailable && t.editable && t.receipt == null &&
+                h.messages.loading == null
         if (context != state.value.context) {
             cancelLocked()
             attempted = false

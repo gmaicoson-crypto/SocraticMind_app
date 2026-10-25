@@ -46,12 +46,14 @@ data class ChatTurnState(
     val notice: String? = null,
     val receipt: ChatTurnReceipt? = null,
     val changingHistory: Boolean = false,
+    val model: String? = null,
+    val modelAvailable: Boolean = true,
 ) {
     val editable: Boolean get() = account != null && phase == ChatTurnPhase.READY && pending == null && !changingHistory
     val canSend: Boolean get() =
-        editable && receipt == null && target != null && draft.isNotBlank() &&
+        editable && modelAvailable && receipt == null && target != null && draft.isNotBlank() &&
             characterCount <= 5000
-    val canRegenerate: Boolean get() = editable && receipt == null && target != null
+    val canRegenerate: Boolean get() = editable && modelAvailable && receipt == null && target != null
     val characterCount: Int get() = draft.codePointCount(0, draft.length)
     val canStop: Boolean
         get() =

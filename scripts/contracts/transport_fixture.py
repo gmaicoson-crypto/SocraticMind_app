@@ -17,6 +17,7 @@ from chat_history_fixture import response as history_response
 from chat_suggestions_fixture import response as suggestions_response
 from chat_turn_fixture import frames as turn_frames
 from chat_turn_fixture import response as turn_response
+from model_selection_fixture import response as model_response
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +56,11 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path.startswith("/api/auth/"):
             self.respond(*auth_response("GET", url.path, self.headers))
+        elif url.path == "/api/llm/models" or (
+            url.path == "/api/chat/suggestions"
+            and self.headers.get("Authorization", "").startswith("Bearer models-")
+        ):
+            self.respond(*model_response("GET", url.path, parse_qs(url.query), self.headers))
         elif url.path == "/api/chat/suggestions":
             self.respond(*suggestions_response(parse_qs(url.query), self.headers))
         elif url.path == "/api/chat/session-titles":
@@ -122,7 +128,12 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(*auth_response("POST", self.path, self.headers, body))
             return
         if self.path in {"/api/chat/stream", "/api/chat/cancel"}:
-            status, payload = turn_response("POST", self.path, {}, self.headers, body)
+            handler = (
+                model_response
+                if self.headers.get("Authorization", "").startswith("Bearer models-")
+                else turn_response
+            )
+            status, payload = handler("POST", self.path, {}, self.headers, body)
             if self.path == "/api/chat/stream" and status == 200:
                 wire = turn_frames(payload.get("regeneration", False))
                 self.send_response(200)

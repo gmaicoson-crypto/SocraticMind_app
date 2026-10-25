@@ -308,7 +308,8 @@
           "unittest:scripts.quality.tests.test_changed_files",
           "unittest:scripts.ci.tests.test_impact",
           "unittest:scripts.ci.tests.test_avatar_image_impact",
-          "unittest:scripts.ci.tests.test_model_selection_impact"
+          "unittest:scripts.ci.tests.test_model_selection_impact",
+          "unittest:scripts.ci.tests.test_chat_impact"
         ]
       },
       "manual": []
@@ -828,7 +829,8 @@
       "depends_on": [
         "turn-provider",
         "turn-fixtures",
-        "history-android"
+        "history-android",
+        "model-api-android"
       ],
       "checks": {
         "android": [
@@ -847,7 +849,8 @@
       "depends_on": [
         "turn-provider",
         "turn-fixtures",
-        "history-ios"
+        "history-ios",
+        "model-api-ios"
       ],
       "checks": {
         "ios": [
@@ -1521,6 +1524,125 @@
         "python": [
           "pytest:tests/contracts/test_model_selection_contract.py",
           "pytest:tests/p0/test_user_llm_api.py"
+        ]
+      },
+      "manual": []
+    },
+    "model-fixtures": {
+      "paths": [
+        "scripts/contracts/model_selection_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "model-api-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatModelCatalog.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatModelApiContractTest.kt"
+      ],
+      "depends_on": [
+        "model-provider",
+        "model-fixtures",
+        "http-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatModelApiContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "model-state-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatModelController.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatModelControllerTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatModelSelector.kt"
+      ],
+      "depends_on": [
+        "model-api-android",
+        "turn-state-android",
+        "session-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatModelControllerTest"
+        ]
+      },
+      "manual": [
+        "模型选择器已接入；模型目录不是健康检查。宿主编译、键盘/滚动/无障碍与设备生命周期待独立验证，真实模型服务由用户稍后配置。"
+      ]
+    },
+    "model-send-android": {
+      "paths": [
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatModelSendTest.kt"
+      ],
+      "depends_on": [
+        "model-state-android",
+        "suggestions-state-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatModelSendTest"
+        ]
+      },
+      "manual": []
+    },
+    "model-api-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatModelCatalog.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatModelAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "model-provider",
+        "model-fixtures",
+        "http-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatModelAPIContractTests"
+        ]
+      },
+      "manual": []
+    },
+    "model-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatModelSelectionModel.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatModelSelectionModelTests.swift",
+        "ios/SocraticMind/App/AppModel.swift",
+        "ios/SocraticMind/App/AppRootView.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/SocraticMind/Chat/ChatModelSelector.swift"
+      ],
+      "depends_on": [
+        "model-api-ios",
+        "turn-state-ios",
+        "session-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatModelSelectionModelTests"
+        ]
+      },
+      "manual": [
+        "模型选择器已接入；模型目录不是健康检查。宿主编译、键盘/滚动/无障碍与设备生命周期待独立验证，真实模型服务由用户稍后配置。"
+      ]
+    },
+    "model-send-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatModelSendTests.swift"
+      ],
+      "depends_on": [
+        "model-state-ios",
+        "suggestions-state-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatModelSendTests"
         ]
       },
       "manual": []

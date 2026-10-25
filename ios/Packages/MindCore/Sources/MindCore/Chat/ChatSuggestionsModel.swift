@@ -11,7 +11,6 @@ public final class ChatSuggestionsModel: ObservableObject {
     private let turn: ChatTurnModel
     private var cache = ChatSuggestionsCache()
     private var owner: HistoryAccount?
-    private var model: String?
     private var active = false
     private var closed = false
     private var attempted = false
@@ -42,7 +41,10 @@ public final class ChatSuggestionsModel: ObservableObject {
     }
 
     public func setModel(_ value: String?) {
-        model = value; synchronize()
+        if let account = turn.state.account {
+            turn.setModelSelection(account: account, model: value, available: true)
+        }
+        synchronize()
     }
 
     public func clear() {
@@ -96,7 +98,7 @@ public final class ChatSuggestionsModel: ObservableObject {
     private func send(_ text: String, style: String, draft: String) {
         guard let context = state.context else { return }
         if turn.sendSuggestion(account: context.account, target: context.target, text: text,
-                               style: style, expectedDraft: draft)
+                               style: style, expectedDraft: draft, model: context.model)
         {
             cancelRead(); state.enabled = false; state.choice = nil
         }
@@ -109,8 +111,9 @@ public final class ChatSuggestionsModel: ObservableObject {
         if account != owner {
             cancelRead(); cache.clear(); owner = account; state = ChatSuggestionsState(); attempted = false
         }
-        let context = account == nil ? nil : ChatSuggestionContext.from(h, t, model: model)
-        let enabled = active && context != nil && t.editable && t.receipt == nil && h.messages.loading == nil
+        let context = account == nil ? nil : ChatSuggestionContext.from(h, t, model: t.model)
+        let enabled = active && context != nil && t.modelAvailable && t.editable && t.receipt == nil && h.messages
+            .loading == nil
         if context != state.context {
             cancelRead(); attempted = false; state = ChatSuggestionsState()
             state.context = context; state.items = context.map { ChatSuggestionDefaults.items($0) } ?? []

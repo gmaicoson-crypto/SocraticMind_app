@@ -14,6 +14,7 @@ final class AppModel: ObservableObject {
     let actions: ChatActionsModel?
     let suggestions: ChatSuggestionsModel?
     let avatars: ChatAvatarModel?
+    let models: ChatModelSelectionModel?
     let configurationError: String?
     private let store: SessionStore?
     private let avatarAPI: ChatAvatarAPI?
@@ -53,6 +54,11 @@ final class AppModel: ObservableObject {
                 journal: journal
             )
             history = library; turn = coordinator
+            models = ChatModelSelectionModel(
+                session: session,
+                gateway: ChatModelAPI(transport: transport),
+                turn: coordinator
+            )
             let avatarModel = ChatAvatarModel(session: session, gateway: avatarAPI,
                                               store: avatarStore, library: library, turn: coordinator)
             avatars = avatarModel
@@ -77,6 +83,7 @@ final class AppModel: ObservableObject {
             actions = nil
             suggestions = nil
             avatars = nil
+            models = nil
             configurationError = "服务地址未正确配置，请检查当前开发配置。"
         }
         // @Published emits before storing state; acknowledge on the next main-actor turn.
@@ -110,6 +117,7 @@ final class AppModel: ObservableObject {
                 }
                 history?.bindAccount(state)
                 turn?.bindAccount(state)
+                models?.bindAccount(state)
                 avatars?.bindAccount(state)
                 actions?.bindAccount(state)
                 session = state
@@ -135,6 +143,7 @@ final class AppModel: ObservableObject {
         formTask?.cancel()
         form?.reset()
         suggestions?.clear()
+        models?.clear()
         avatars?.clear()
         clearAvatarImages()
         actions?.clear()

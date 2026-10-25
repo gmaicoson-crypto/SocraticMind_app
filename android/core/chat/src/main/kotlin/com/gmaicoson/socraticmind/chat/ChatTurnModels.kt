@@ -40,9 +40,11 @@ data class ChatTurnRequest(
     val input: String,
     val style: String,
     val context: ChatRequestContext = ChatRequestContext(),
+    val model: String? = null,
 ) {
     init {
         context.validate(input, pending.target)
+        requireModelId(model)
         require(style.isNotBlank() && style.codePointCount(0, style.length) <= 20)
     }
 
@@ -56,6 +58,7 @@ data class ChatTurnRequest(
             put("kind", context.kind.wireValue)
             put("user_input", input)
             put("ai_style", style)
+            model?.let { put("model", it) }
             pending.regenerateMessageId?.let { put("regenerate_message_id", it) }
             context.quoteText?.let { put("quote_text", it) }
             context.quoteSourceId?.let { put("quote_source_id", it) }

@@ -33,6 +33,17 @@ class ChatTurnController(
     private var ticket = 0L
     private var closed = false
     private var historyMutation: ChatMutationLease? = null
+    private var rejectedModelRequest: ChatTurnRequest? = null
+
+    internal fun setModelSelection(
+        account: HistoryAccount,
+        model: String?,
+        available: Boolean,
+    ) = synchronized(lock) {
+        if (current() && state.value.account == account && runCatching { requireModelId(model) }.isSuccess) {
+            mutableState.value = state.value.copy(model = model, modelAvailable = available)
+        }
+    }
 
     internal fun reserveHistoryMutation(account: HistoryAccount): ChatMutationLease? =
         synchronized(lock) {
@@ -109,11 +120,12 @@ class ChatTurnController(
         text: String,
         style: String,
         expectedDraft: String,
+        model: String? = null,
     ): Boolean =
         synchronized(lock) {
             val value = state.value
             if (!current() || !value.canRegenerate || value.account != account || value.target != target ||
-                value.draft != expectedDraft
+                value.draft != expectedDraft || value.model != model
             ) {
                 return@synchronized false
             }
@@ -170,11 +182,13 @@ class ChatTurnController(
                         regeneration?.input ?: value.draft,
                         style,
                         regeneration?.context ?: ChatRequestContext(),
+                        value.model,
                     )
                 }.getOrElse {
                     mutableState.value = value.copy(notice = "输入或会话配置无效，请检查后重试。")
                     return
                 }
+            rejectedModelRequest = null
             mutableState.value = value.copy(phase = ChatTurnPhase.PREPARING, pending = request.pending, receipt = null)
             launchOperation { operation ->
                 try {
@@ -212,11 +226,22 @@ class ChatTurnController(
                     }
                 } catch (error: Exception) {
                     requireCurrent(operation)
-                    if (regeneration != null && error is HttpFailure && ChatRegeneration.rejected(error)) {
-                        // A rejected stale question has no turn; persist a stop tombstone before clearing recovery.
+                    val modelRejected =
+                        error is HttpFailure && error.status == 422 && error.code == "LLM_MODEL_UNAVAILABLE"
+                    if (modelRejected ||
+                        (regeneration != null && error is HttpFailure && ChatRegeneration.rejected(error))
+                    ) {
+                        if (modelRejected) {
+                            synchronized(lock) {
+                                requireCurrent(operation)
+                                rejectedModelRequest =
+                                    request
+                            }
+                        }
+                        // A preflight rejection has no turn; persist a stop tombstone before clearing recovery.
                         val remote = authenticated(operation) { gateway.cancel(it, request.pending) }
                         finish(operation, request.pending, remote)
-                        update(operation) { it.copy(notice = "原问题或引用、附件已变化，请刷新历史后重试。") }
+                        if (!modelRejected) update(operation) { it.copy(notice = "原问题或引用、附件已变化，请刷新历史后重试。") }
                         return@launchOperation
                     }
                     // A transport error, timeout or DONE is not a confirmed terminal result.
@@ -309,6 +334,15 @@ class ChatTurnController(
                 authenticated(operation) { gateway.messages(it, pending, ids) }
             }
         requireCurrent(operation)
+        val rejected =
+            rejectedModelRequest?.takeIf {
+                it.pending == pending && remote?.status == ChatTurnStatus.INTERRUPTED && remote.ids == null
+            }
+        if (rejected != null &&
+            pending.regenerateMessageId == null
+        ) {
+            update(operation) { it.copy(draft = rejected.input) }
+        }
         try {
             journal.clear(pending)
         } catch (error: Exception) {
@@ -323,6 +357,10 @@ class ChatTurnController(
         }
         val notice =
             when {
+                rejected != null -> {
+                    "所选模型不可用，请刷新模型目录或重新选择后发送；输入与原回答已保留。"
+                }
+
                 pending.regenerateMessageId != null && remote?.status == ChatTurnStatus.INTERRUPTED -> {
                     "重新生成已停止，原回答仍保留。"
                 }
@@ -348,6 +386,7 @@ class ChatTurnController(
                 }
             }
         update(operation) {
+            rejectedModelRequest = null
             it.copy(
                 phase = ChatTurnPhase.READY,
                 pending = null,
@@ -414,6 +453,7 @@ class ChatTurnController(
 
     private fun clearLocked() {
         historyMutation = null
+        rejectedModelRequest = null
         ++ticket
         job?.cancel()
         job = null
