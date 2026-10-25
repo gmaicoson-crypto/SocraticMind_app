@@ -1,0 +1,447 @@
+{
+  "cases": [
+    {
+      "name": "quoted",
+      "original_request": {
+        "request_id": "context-quoted-original",
+        "session_id": "context-quoted-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "  引用中的结论与资料如何对应？🙂\n",
+        "ai_style": "标准",
+        "quote_text": "  引用片段🙂  ",
+        "quote_source_id": 91
+      },
+      "messages": [
+        {
+          "id": 101,
+          "session_id": "context-quoted-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "user",
+          "content": "  引用中的结论与资料如何对应？🙂\n",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "attachment_snapshot": [],
+            "quote": "  引用片段🙂  ",
+            "quote_source_id": 91
+          },
+          "created_at": null,
+          "attachments": []
+        },
+        {
+          "id": 102,
+          "session_id": "context-quoted-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "ai",
+          "content": "原回答。",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "user_message_id": 101
+          },
+          "created_at": null,
+          "attachments": []
+        }
+      ],
+      "request": {
+        "request_id": "context-quoted-retry",
+        "session_id": "context-quoted-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "  引用中的结论与资料如何对应？🙂\n",
+        "ai_style": "标准",
+        "quote_text": "  引用片段🙂  ",
+        "quote_source_id": 91,
+        "regenerate_message_id": 102
+      }
+    },
+    {
+      "name": "attachments",
+      "original_request": {
+        "request_id": "context-attachments-original",
+        "session_id": "context-attachments-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "",
+        "ai_style": "标准",
+        "attachment_ids": [
+          "00000000-0000-4000-8000-000000000001",
+          "00000000-0000-4000-8000-000000000002"
+        ]
+      },
+      "messages": [
+        {
+          "id": 101,
+          "session_id": "context-attachments-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "user",
+          "content": "",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "attachment_snapshot": [
+              {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "revision": 1,
+                "accepted_coverage": null
+              },
+              {
+                "id": "00000000-0000-4000-8000-000000000002",
+                "revision": 1,
+                "accepted_coverage": null
+              }
+            ]
+          },
+          "created_at": null,
+          "attachments": [
+            {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "revision": 1,
+              "accepted_coverage": null,
+              "name": "合成资料.pdf",
+              "status": "ready"
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "revision": 1,
+              "accepted_coverage": null,
+              "name": "合成资料.pdf",
+              "status": "ready"
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "session_id": "context-attachments-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "ai",
+          "content": "原回答。",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "user_message_id": 101
+          },
+          "created_at": null,
+          "attachments": []
+        }
+      ],
+      "request": {
+        "request_id": "context-attachments-retry",
+        "session_id": "context-attachments-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "",
+        "ai_style": "标准",
+        "attachment_ids": [
+          "00000000-0000-4000-8000-000000000001",
+          "00000000-0000-4000-8000-000000000002"
+        ],
+        "regenerate_message_id": 102
+      }
+    },
+    {
+      "name": "combined",
+      "original_request": {
+        "request_id": "context-combined-original",
+        "session_id": "context-combined-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "  引用中的结论与资料如何对应？🙂\n",
+        "ai_style": "标准",
+        "quote_text": "  引用片段🙂  ",
+        "quote_source_id": 91,
+        "attachment_ids": [
+          "00000000-0000-4000-8000-000000000001",
+          "00000000-0000-4000-8000-000000000002"
+        ]
+      },
+      "messages": [
+        {
+          "id": 101,
+          "session_id": "context-combined-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "user",
+          "content": "  引用中的结论与资料如何对应？🙂\n",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "attachment_snapshot": [
+              {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "revision": 1,
+                "accepted_coverage": null
+              },
+              {
+                "id": "00000000-0000-4000-8000-000000000002",
+                "revision": 1,
+                "accepted_coverage": null
+              }
+            ],
+            "quote": "  引用片段🙂  ",
+            "quote_source_id": 91
+          },
+          "created_at": null,
+          "attachments": [
+            {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "revision": 1,
+              "accepted_coverage": null,
+              "name": "合成资料.pdf",
+              "status": "ready"
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "revision": 1,
+              "accepted_coverage": null,
+              "name": "合成资料.pdf",
+              "status": "ready"
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "session_id": "context-combined-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "ai",
+          "content": "原回答。",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "user_message_id": 101
+          },
+          "created_at": null,
+          "attachments": []
+        }
+      ],
+      "request": {
+        "request_id": "context-combined-retry",
+        "session_id": "context-combined-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "  引用中的结论与资料如何对应？🙂\n",
+        "ai_style": "标准",
+        "quote_text": "  引用片段🙂  ",
+        "quote_source_id": 91,
+        "attachment_ids": [
+          "00000000-0000-4000-8000-000000000001",
+          "00000000-0000-4000-8000-000000000002"
+        ],
+        "regenerate_message_id": 102
+      }
+    },
+    {
+      "name": "plain-quote",
+      "original_request": {
+        "request_id": "context-plain-quote-original",
+        "session_id": "context-plain-quote-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "  引用中的结论与资料如何对应？🙂\n",
+        "ai_style": "标准",
+        "quote_text": "  引用片段🙂  "
+      },
+      "messages": [
+        {
+          "id": 101,
+          "session_id": "context-plain-quote-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "user",
+          "content": "  引用中的结论与资料如何对应？🙂\n",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "attachment_snapshot": [],
+            "quote": "  引用片段🙂  "
+          },
+          "created_at": null,
+          "attachments": []
+        },
+        {
+          "id": 102,
+          "session_id": "context-plain-quote-会话",
+          "mode": "normal",
+          "node_key": "__normal__",
+          "topic_id": null,
+          "role": "ai",
+          "content": "原回答。",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "qa",
+            "user_message_id": 101
+          },
+          "created_at": null,
+          "attachments": []
+        }
+      ],
+      "request": {
+        "request_id": "context-plain-quote-retry",
+        "session_id": "context-plain-quote-会话",
+        "mode": "normal",
+        "node_key": "__normal__",
+        "topic_id": 0,
+        "kind": "qa",
+        "user_input": "  引用中的结论与资料如何对应？🙂\n",
+        "ai_style": "标准",
+        "quote_text": "  引用片段🙂  ",
+        "regenerate_message_id": 102
+      }
+    },
+    {
+      "name": "topic-overview",
+      "original_request": {
+        "request_id": "context-topic-overview-original",
+        "session_id": "context-topic-overview-会话",
+        "mode": "socratic",
+        "node_key": "递归",
+        "topic_id": 7,
+        "kind": "topic_overview",
+        "user_input": "",
+        "ai_style": "标准"
+      },
+      "messages": [
+        {
+          "id": 101,
+          "session_id": "context-topic-overview-会话",
+          "mode": "socratic",
+          "node_key": "递归",
+          "topic_id": 7,
+          "role": "user",
+          "content": "",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "topic_overview",
+            "attachment_snapshot": []
+          },
+          "created_at": null,
+          "attachments": []
+        },
+        {
+          "id": 102,
+          "session_id": "context-topic-overview-会话",
+          "mode": "socratic",
+          "node_key": "递归",
+          "topic_id": 7,
+          "role": "ai",
+          "content": "原回答。",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "topic_overview",
+            "user_message_id": 101
+          },
+          "created_at": null,
+          "attachments": []
+        }
+      ],
+      "request": {
+        "request_id": "context-topic-overview-retry",
+        "session_id": "context-topic-overview-会话",
+        "mode": "socratic",
+        "node_key": "递归",
+        "topic_id": 7,
+        "kind": "topic_overview",
+        "user_input": "",
+        "ai_style": "标准",
+        "regenerate_message_id": 102
+      }
+    },
+    {
+      "name": "node-overview",
+      "original_request": {
+        "request_id": "context-node-overview-original",
+        "session_id": "context-node-overview-会话",
+        "mode": "socratic",
+        "node_key": "node-recursion",
+        "topic_id": 7,
+        "kind": "node_overview",
+        "user_input": "",
+        "ai_style": "标准"
+      },
+      "messages": [
+        {
+          "id": 101,
+          "session_id": "context-node-overview-会话",
+          "mode": "socratic",
+          "node_key": "node-recursion",
+          "topic_id": 7,
+          "role": "user",
+          "content": "",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "node_overview",
+            "attachment_snapshot": []
+          },
+          "created_at": null,
+          "attachments": []
+        },
+        {
+          "id": 102,
+          "session_id": "context-node-overview-会话",
+          "mode": "socratic",
+          "node_key": "node-recursion",
+          "topic_id": 7,
+          "role": "ai",
+          "content": "原回答。",
+          "message_type": "chat",
+          "metadata": {
+            "status": "complete",
+            "kind": "node_overview",
+            "user_message_id": 101
+          },
+          "created_at": null,
+          "attachments": []
+        }
+      ],
+      "request": {
+        "request_id": "context-node-overview-retry",
+        "session_id": "context-node-overview-会话",
+        "mode": "socratic",
+        "node_key": "node-recursion",
+        "topic_id": 7,
+        "kind": "node_overview",
+        "user_input": "",
+        "ai_style": "标准",
+        "regenerate_message_id": 102
+      }
+    }
+  ]
+}

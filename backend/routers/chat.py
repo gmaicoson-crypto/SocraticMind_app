@@ -201,7 +201,7 @@ def chat_stream_endpoint(
             .one_or_none()
         )
         if quote_source is None or not req.quote_text:
-            raise HTTPException(status_code=400, detail="引用消息无效")
+            raise ApiError(status_code=400, code="CHAT_QUOTE_INVALID", message="引用消息无效")
 
     started = begin_chat_turn(
         db,

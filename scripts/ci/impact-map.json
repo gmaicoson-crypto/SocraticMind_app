@@ -781,7 +781,10 @@
     "turn-provider": {
       "paths": [
         "backend/tests/contracts/test_chat_turn_contract.py",
-        "contracts/fixtures/chat-turns.json"
+        "contracts/fixtures/chat-turns.json",
+        "backend/services/chat_regeneration.py",
+        "backend/tests/contracts/test_chat_regeneration_context.py",
+        "contracts/fixtures/chat-regeneration-contexts.json"
       ],
       "depends_on": [
         "chat-provider",
@@ -796,7 +799,9 @@
           "pytest:tests/p0/test_chat_lifecycle.py::test_lease_refresh_preserves_partial_answer_then_cancel_prevents_completion",
           "pytest:tests/p0/test_chat_lifecycle.py::test_stop_intent_blocks_model_start_and_completion_before_cancel_transition",
           "pytest:tests/p0/test_chat_lifecycle.py::test_failed_regeneration_preserves_answer_success_replaces_and_invalidates",
-          "pytest:tests/p0/test_chat_lifecycle.py::test_regenerate_only_latest_question_and_reject_changes"
+          "pytest:tests/p0/test_chat_lifecycle.py::test_regenerate_only_latest_question_and_reject_changes",
+          "pytest:tests/contracts/test_chat_regeneration_context.py",
+          "pytest:tests/p0/test_attachment_chat.py::test_regeneration_keeps_original_resources_and_failed_answer"
         ]
       },
       "manual": []

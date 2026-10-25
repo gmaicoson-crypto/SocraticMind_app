@@ -21,6 +21,24 @@ def scope(*files, initial=False):
 
 
 class ImpactTests(unittest.TestCase):
+    def test_regeneration_context_inputs_select_existing_wire_consumers(self):
+        for path in [
+            "backend/services/chat_regeneration.py",
+            "backend/tests/contracts/test_chat_regeneration_context.py",
+            "contracts/fixtures/chat-regeneration-contexts.json",
+        ]:
+            result = load_plan(scope(path))
+            self.assertIn("ChatTurnAPIContractTests", result["checks"]["ios"])
+            self.assertIn(
+                "com.gmaicoson.socraticmind.chat.ChatTurnApiContractTest",
+                result["checks"]["android"],
+            )
+            self.assertIn(
+                "pytest:tests/contracts/test_chat_regeneration_context.py",
+                result["checks"]["python"],
+            )
+            self.assertFalse(result["checks"]["mysql"])
+
     def test_suggestion_contract_and_state_keep_exact_consumers(self):
         result = load_plan(scope("contracts/fixtures/chat-suggestions.json"))
         self.assertEqual(

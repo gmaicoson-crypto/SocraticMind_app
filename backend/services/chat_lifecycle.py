@@ -16,6 +16,7 @@ from models import ChatCancellation, ChatMessage, ChatSession, ChatTurn
 from services.web_evidence import cited_source_ids
 from services.web_search import empty_web_snapshot
 from services.attachments.service import validate_for_message, bind_to_message
+from services.chat_regeneration import regeneration_question
 
 GENERATION_LEASE_SECONDS = 360
 TERMINAL_STATUSES = {"complete", "failed", "interrupted"}
@@ -341,79 +342,20 @@ def begin_chat_turn(
         if is_chat_cancelled(db, user_id=user_id, request_id=request_id):
             raise _error("CHAT_REQUEST_CANCELLED", "该请求已停止，请使用新的请求重新发送")
 
-        old_turn = None
         if regenerate_message_id is not None:
-            old_turn = (
-                db.query(ChatTurn)
-                .filter_by(
-                    user_id=user_id,
-                    chat_session_id=session.id,
-                    ai_message_id=regenerate_message_id,
-                )
-                .one_or_none()
+            user_message = regeneration_question(
+                db,
+                user_id=user_id,
+                session=session,
+                answer_id=regenerate_message_id,
+                node_key=node_key,
+                user_input=user_input,
+                kind=kind,
+                quote_text=quote_text,
+                quote_source_id=quote_source_id,
+                attachment_snapshot=attachment_snapshot,
+                terminal_statuses=TERMINAL_STATUSES,
             )
-            old_ai = (
-                db.query(ChatMessage)
-                .filter_by(
-                    id=regenerate_message_id,
-                    user_id=user_id,
-                    session_id=session_id,
-                    role="ai",
-                    message_type="chat",
-                )
-                .one_or_none()
-            )
-            if (
-                old_ai is None
-                or (old_ai.metadata_json or {}).get("status", "complete") not in TERMINAL_STATUSES
-            ):
-                raise _error("CHAT_REGENERATE_INVALID", "该回答无法重新生成", 400)
-            if old_turn is not None and old_turn.status not in TERMINAL_STATUSES:
-                raise _error("CHAT_REGENERATE_INVALID", "该回答无法重新生成", 400)
-            if old_turn is not None:
-                user_message = (
-                    db.get(ChatMessage, old_turn.user_message_id)
-                    if old_turn.user_message_id
-                    else None
-                )
-                if old_turn.kind != kind or old_turn.node_key != node_key[:100]:
-                    raise _error(
-                        "CHAT_REGENERATE_INVALID", "重新生成需要使用原问题的节点和类型", 400
-                    )
-            else:
-                user_message = (
-                    db.query(ChatMessage)
-                    .filter(
-                        ChatMessage.user_id == user_id,
-                        ChatMessage.session_id == session_id,
-                        ChatMessage.role == "user",
-                        ChatMessage.message_type == "chat",
-                        ChatMessage.id < old_ai.id,
-                    )
-                    .order_by(ChatMessage.id.desc())
-                    .first()
-                )
-            if user_message is None or user_message.content != user_input:
-                raise _error("CHAT_REGENERATE_INVALID", "重新生成需要对应原问题", 400)
-            if attachment_snapshot != (user_message.metadata_json or {}).get(
-                "attachment_snapshot", []
-            ):
-                raise _error("CHAT_REGENERATE_INVALID", "原问题附件已改变或不可用", 400)
-            if (
-                db.query(ChatMessage.id)
-                .filter(
-                    ChatMessage.user_id == user_id,
-                    ChatMessage.session_id == session_id,
-                    ChatMessage.role == "user",
-                    ChatMessage.message_type == "chat",
-                    ChatMessage.id > user_message.id,
-                )
-                .first()
-                is not None
-            ):
-                raise _error(
-                    "CHAT_REGENERATE_NOT_LATEST", "仅支持重新生成当前会话最后一轮回答", 400
-                )
         else:
             attachments = (
                 validate_for_message(
