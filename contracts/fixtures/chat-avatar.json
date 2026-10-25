@@ -1,0 +1,34 @@
+{
+  "owner_id": 7,
+  "session_id": "头像 /?&#+🙂",
+  "upload_url": "/static/avatars/ai_7_89cb4f2735526449d837072e_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png",
+  "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGMwaDjwHwAExAJwNooHGQAAAABJRU5ErkJggg==",
+  "presets": {
+    "normal": [
+      "/avatars/AI/normal/AI_normal.webp",
+      "/avatars/AI/normal/AI_normal_2.webp",
+      "/avatars/AI/normal/AI_normal_3.webp",
+      "/avatars/AI/normal/AI_normal_4.webp",
+      "/avatars/AI/normal/AI_normal_5.webp",
+      "/avatars/AI/normal/AI_normal_6.webp"
+    ],
+    "socratic": [
+      "/avatars/AI/study/AI-female-1.webp",
+      "/avatars/AI/study/AI-female-2.webp",
+      "/avatars/AI/study/AI-female-3.webp",
+      "/avatars/AI/study/AI-male-1.webp",
+      "/avatars/AI/study/AI-male-2.webp",
+      "/avatars/AI/study/AI-male-3.webp"
+    ]
+  },
+  "invalid_paths": [
+    "https://example.test/a.png",
+    "//example.test/a.png",
+    "/static/avatars/../a.png",
+    "/static/avatars/%2e%2e/a.png",
+    "/static/avatars/ai_7_89cb4f2735526449d837072e_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.svg",
+    "/static/avatars/ai_7_89cb4f2735526449d837072e_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png?x=1",
+    "/avatars/AI/normal/unknown.webp",
+    "/static/avatars/ai_7_89cb4f2735526449d837072e_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.png\n"
+  ]
+}

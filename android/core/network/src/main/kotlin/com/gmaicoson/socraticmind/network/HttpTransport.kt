@@ -58,13 +58,52 @@ class HttpTransport(
         form: Map<String, String>? = null,
         query: Map<String, String> = emptyMap(),
         repeatedQuery: Map<String, List<String>> = emptyMap(),
+        multipart: MultipartUpload? = null,
     ): JsonElement =
-        suspendCancellableCoroutine { continuation ->
-            val requestClient = if (method == "GET") finiteClient else finiteMutationClient
-            val call =
-                requestClient.newCall(
-                    buildRequest(method, path, bearer, json, form, query, "application/json", repeatedQuery),
+        execute(
+            buildRequest(method, path, bearer, json, form, query, "application/json", repeatedQuery, multipart),
+            maximumResponseBytes,
+        ) { response, bytes ->
+            if (bytes.isNotEmpty() &&
+                response.body.contentType()?.let { "${it.type}/${it.subtype}" } != "application/json"
+            ) {
+                throw TransportFailure("Expected a JSON response")
+            }
+            if (bytes.isEmpty()) {
+                JsonNull
+            } else {
+                Json.parseToJsonElement(
+                    bytes.decodeToString(throwOnInvalidSequence = true),
                 )
+            }
+        }
+
+    /** Public same-endpoint resources only; no bearer token, cookies or redirect following. */
+    suspend fun resource(
+        path: String,
+        mimeTypes: Set<String>,
+        maximumBytes: Int,
+    ): ByteArray {
+        require(maximumBytes in 1..(5 * 1024 * 1024))
+        require(mimeTypes.isNotEmpty() && mimeTypes.all { it.matches(Regex("[a-z0-9.+_-]+/[a-z0-9.+_-]+")) })
+        return execute(
+            buildRequest("GET", path, null, null, null, emptyMap(), mimeTypes.sorted().joinToString(", ")),
+            maximumBytes,
+        ) { response, bytes ->
+            val mime = response.body.contentType()?.let { "${it.type}/${it.subtype}" }
+            if (bytes.isEmpty() || mime !in mimeTypes) throw TransportFailure("Unexpected resource type")
+            bytes
+        }
+    }
+
+    private suspend fun <T> execute(
+        request: Request,
+        maximumBytes: Int,
+        decode: (Response, ByteArray) -> T,
+    ): T =
+        suspendCancellableCoroutine { continuation ->
+            val requestClient = if (request.method == "GET") finiteClient else finiteMutationClient
+            val call = requestClient.newCall(request)
             continuation.invokeOnCancellation { call.cancel() }
             call.enqueue(
                 object : Callback {
@@ -81,20 +120,9 @@ class HttpTransport(
                     ) {
                         try {
                             response.use {
-                                val bytes = readBounded(it)
+                                val bytes = readBounded(it, maximumBytes)
                                 if (!it.isSuccessful) throw HttpFailure.from(it.code, bytes)
-                                val mime = it.body.contentType()?.let { type -> "${type.type}/${type.subtype}" }
-                                if (bytes.isNotEmpty() && mime != "application/json") {
-                                    throw TransportFailure("Expected a JSON response")
-                                }
-                                val value =
-                                    if (bytes.isEmpty()) {
-                                        JsonNull
-                                    } else {
-                                        Json.parseToJsonElement(
-                                            bytes.decodeToString(throwOnInvalidSequence = true),
-                                        )
-                                    }
+                                val value = decode(it, bytes)
                                 if (continuation.isActive) continuation.resumeWith(Result.success(value))
                             }
                         } catch (error: Exception) {
@@ -173,12 +201,14 @@ class HttpTransport(
         query: Map<String, String>,
         accept: String,
         repeatedQuery: Map<String, List<String>> = emptyMap(),
+        multipart: MultipartUpload? = null,
     ): Request {
         require(method in setOf("GET", "POST", "PUT", "PATCH", "DELETE"))
-        require(json == null || form == null)
-        require(method != "GET" || (json == null && form == null))
+        require(listOf(json, form, multipart).count { it != null } <= 1)
+        require(method != "GET" || (json == null && form == null && multipart == null))
         val body =
             when {
+                multipart != null -> multipart.body
                 form != null -> FormBody.Builder().apply { form.forEach { (key, value) -> add(key, value) } }.build()
                 json != null -> json.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
                 method in setOf("POST", "PUT", "PATCH") -> ByteArray(0).toRequestBody()
@@ -197,14 +227,18 @@ class HttpTransport(
             }.build()
     }
 
-    private fun readBounded(response: Response): ByteArray {
+    private fun readBounded(
+        response: Response,
+        maximumBytes: Int = maximumResponseBytes,
+    ): ByteArray {
+        if (response.body.contentLength() > maximumBytes) throw TransportFailure("Response size limit exceeded")
         val output = ByteArrayOutputStream()
         val buffer = ByteArray(4096)
         val source = response.body.byteStream()
         while (true) {
             val count = source.read(buffer)
             if (count < 0) return output.toByteArray()
-            if (count > maximumResponseBytes - output.size()) throw TransportFailure("Response size limit exceeded")
+            if (count > maximumBytes - output.size()) throw TransportFailure("Response size limit exceeded")
             output.write(buffer, 0, count)
         }
     }

@@ -8,17 +8,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.io.File
-import java.io.FileOutputStream
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-import java.security.MessageDigest
 
 /** App-private, excluded-from-backup directory supplied by the host. One app-scoped instance per endpoint. */
 class FileChatTurnJournal(
     directory: File,
     endpointScope: String,
 ) : ChatTurnJournal {
-    private val directory = File(directory, "chat-turns-${scopeHash(endpointScope)}")
+    private val storage = AccountFileStorage(directory, endpointScope, "chat-turns", MAX_BYTES)
     private val mutex = Mutex()
 
     override suspend fun read(ownerId: Long): PendingChatTurn? =
@@ -30,26 +26,8 @@ class FileChatTurnJournal(
                 val existing = readFile(pending.ownerId)
                 require(existing == null || existing == pending) { "Unconfirmed chat turn exists" }
                 if (existing == pending) return@withLock
-                check(directory.isDirectory || directory.mkdirs()) { "Cannot create recovery directory" }
-                val destination = file(pending.ownerId)
-                val temporary = File(directory, "${pending.ownerId}.tmp")
-                val bytes = encode(pending).toByteArray(Charsets.UTF_8)
-                require(bytes.size <= MAX_BYTES)
-                try {
-                    FileOutputStream(temporary).use { output ->
-                        output.write(bytes)
-                        output.fd.sync()
-                    }
-                    Files.move(
-                        temporary.toPath(),
-                        destination.toPath(),
-                        StandardCopyOption.ATOMIC_MOVE,
-                        StandardCopyOption.REPLACE_EXISTING,
-                    )
-                    check(readFile(pending.ownerId) == pending) { "Recovery write could not be verified" }
-                } finally {
-                    Files.deleteIfExists(temporary.toPath())
-                }
+                storage.write(pending.ownerId, encode(pending).toByteArray(Charsets.UTF_8))
+                check(readFile(pending.ownerId) == pending) { "Recovery write could not be verified" }
             }
         }
 
@@ -58,35 +36,17 @@ class FileChatTurnJournal(
             mutex.withLock {
                 val existing = readFile(pending.ownerId)
                 require(existing == null || existing == pending) { "Recovery record changed" }
-                Files.deleteIfExists(file(pending.ownerId).toPath())
+                storage.remove(pending.ownerId)
                 check(readFile(pending.ownerId) == null)
             }
         }
 
-    private fun file(ownerId: Long): File {
-        require(ownerId > 0)
-        return File(directory, "$ownerId.json")
-    }
-
     private fun readFile(ownerId: Long): PendingChatTurn? {
-        val path = file(ownerId)
-        if (!path.exists()) return null
-        val bytes = ByteArray(MAX_BYTES + 1)
-        val count =
-            path.inputStream().use { input ->
-                var offset = 0
-                while (offset < bytes.size) {
-                    val read = input.read(bytes, offset, bytes.size - offset)
-                    if (read < 0) break
-                    offset += read
-                }
-                offset
-            }
-        require(count in 1..MAX_BYTES) { "Invalid recovery record size" }
+        val bytes = storage.read(ownerId) ?: return null
         val value =
             Json
                 .parseToJsonElement(
-                    bytes.decodeToString(0, count, throwOnInvalidSequence = true),
+                    bytes.decodeToString(throwOnInvalidSequence = true),
                 ).historyObject()
         require(value.historyLong("schema") in 1L..2L)
         val target = value.getValue("target").historyObject()
@@ -125,14 +85,6 @@ class FileChatTurnJournal(
                 },
             )
         }.toString()
-
-    private fun scopeHash(value: String): String {
-        require(value.isNotBlank())
-        return MessageDigest
-            .getInstance("SHA-256")
-            .digest(value.toByteArray(Charsets.UTF_8))
-            .joinToString("") { "%02x".format(it) }
-    }
 
     private companion object {
         const val MAX_BYTES = 4096

@@ -2,7 +2,7 @@ import Foundation
 
 public enum TransportFailure: Error, Equatable {
     case invalidEndpoint, invalidPath, invalidRequest, invalidResponse
-    case expectedJSON, expectedSSE, responseTooLarge, incompleteStream
+    case expectedJSON, expectedSSE, responseTooLarge, incompleteStream, unexpectedResourceType
 }
 
 public struct HTTPFailure: Error, Sendable {

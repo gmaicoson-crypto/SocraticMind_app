@@ -37,19 +37,40 @@ public final class HTTPTransport: Sendable {
         json: Data? = nil,
         form: [String: String]? = nil,
         query: [String: String] = [:],
-        repeatedQuery: [String: [String]] = [:]
+        repeatedQuery: [String: [String]] = [:],
+        multipart: MultipartUpload? = nil
     ) async throws -> Data {
         let request = try makeRequest(method: method, path: path, bearer: bearer, json: json, form: form,
-                                      query: query, accept: "application/json", repeatedQuery: repeatedQuery)
+                                      query: query, accept: "application/json", repeatedQuery: repeatedQuery,
+                                      multipart: multipart)
+        let (data, response) = try await receive(request, maximumBytes: maximumResponseBytes)
+        guard data.isEmpty || response.mimeType == "application/json" else { throw TransportFailure.expectedJSON }
+        return data
+    }
+
+    /// Same-endpoint public resources; never attach credentials or follow redirects.
+    public func resource(path: String, mimeTypes: Set<String>, maximumBytes: Int) async throws -> Data {
+        guard (1 ... 5 * 1024 * 1024).contains(maximumBytes), !mimeTypes.isEmpty,
+              mimeTypes.allSatisfy({ $0.range(of: "^[a-z0-9.+_-]+/[a-z0-9.+_-]+$", options: .regularExpression)
+                      == $0.startIndex ..< $0.endIndex }) else { throw TransportFailure.invalidRequest }
+        let request = try makeRequest(method: "GET", path: path, bearer: nil, json: nil, form: nil,
+                                      query: [:], accept: mimeTypes.sorted().joined(separator: ", "))
+        let (data, response) = try await receive(request, maximumBytes: maximumBytes)
+        guard !data.isEmpty, let mime = response.mimeType, mimeTypes.contains(mime)
+        else { throw TransportFailure.unexpectedResourceType }
+        return data
+    }
+
+    private func receive(_ request: URLRequest, maximumBytes: Int) async throws -> (Data, HTTPURLResponse) {
         let (bytes, response) = try await session.bytes(for: request)
         defer { bytes.task.cancel() }
         guard let response = response as? HTTPURLResponse else { throw TransportFailure.invalidResponse }
-        let data = try await readBounded(bytes)
+        guard response.expectedContentLength <= maximumBytes else { throw TransportFailure.responseTooLarge }
+        let data = try await readBounded(bytes, maximumBytes: maximumBytes)
         guard (200 ... 299).contains(response.statusCode) else {
             throw HTTPFailure.decode(status: response.statusCode, data: data)
         }
-        guard data.isEmpty || response.mimeType == "application/json" else { throw TransportFailure.expectedJSON }
-        return data
+        return (data, response)
     }
 
     public func stream(
@@ -91,11 +112,12 @@ public final class HTTPTransport: Sendable {
         throw TransportFailure.incompleteStream
     }
 
-    private func readBounded(_ bytes: URLSession.AsyncBytes) async throws -> Data {
+    private func readBounded(_ bytes: URLSession.AsyncBytes, maximumBytes: Int? = nil) async throws -> Data {
+        let limit = maximumBytes ?? maximumResponseBytes
         var data = Data()
         for try await byte in bytes {
             try Task.checkCancellation()
-            guard data.count < maximumResponseBytes else { throw TransportFailure.responseTooLarge }
+            guard data.count < limit else { throw TransportFailure.responseTooLarge }
             data.append(byte)
         }
         return data
@@ -103,10 +125,12 @@ public final class HTTPTransport: Sendable {
 
     private func makeRequest(
         method: String, path: String, bearer: String?, json: Data?, form: [String: String]?,
-        query: [String: String], accept: String, repeatedQuery: [String: [String]] = [:]
+        query: [String: String], accept: String, repeatedQuery: [String: [String]] = [:],
+        multipart: MultipartUpload? = nil
     ) throws -> URLRequest {
-        guard ["GET", "POST", "PUT", "PATCH", "DELETE"].contains(method), json == nil || form == nil,
-              method != "GET" || (json == nil && form == nil)
+        guard ["GET", "POST", "PUT", "PATCH", "DELETE"].contains(method),
+              [json != nil, form != nil, multipart != nil].filter(\.self).count <= 1,
+              method != "GET" || (json == nil && form == nil && multipart == nil)
         else { throw TransportFailure.invalidRequest }
         var request = try URLRequest(url: endpoint.url(path: path, query: query, repeatedQuery: repeatedQuery))
         request.httpMethod = method
@@ -118,7 +142,10 @@ public final class HTTPTransport: Sendable {
             }
             request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
         }
-        if let json {
+        if let multipart {
+            request.httpBody = multipart.body
+            request.setValue(multipart.contentType, forHTTPHeaderField: "Content-Type")
+        } else if let json {
             request.httpBody = json
             request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         } else if let form {

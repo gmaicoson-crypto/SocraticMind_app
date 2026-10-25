@@ -11,6 +11,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from auth_fixture import response as auth_response
 from chat_actions_fixture import response as actions_response
+from chat_avatar_fixture import mutation as avatar_mutation
+from chat_avatar_fixture import resource as avatar_resource
 from chat_history_fixture import response as history_response
 from chat_suggestions_fixture import response as suggestions_response
 from chat_turn_fixture import frames as turn_frames
@@ -48,6 +50,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        if avatar_resource(self, RUNS, LOCK):
+            return
         url = urlsplit(self.path)
         if url.path.startswith("/api/auth/"):
             self.respond(*auth_response("GET", url.path, self.headers))
@@ -94,9 +98,13 @@ class Handler(BaseHTTPRequestHandler):
         self.chat_action("PUT")
 
     def do_DELETE(self):
+        if avatar_mutation(self, "DELETE", RUNS, LOCK):
+            return
         self.chat_action("DELETE")
 
     def do_POST(self):
+        if avatar_mutation(self, "POST", RUNS, LOCK):
+            return
         if self.path == "/fresh-mutation" and getattr(self, "drop_next_mutation", False):
             self.close_connection = True
             return

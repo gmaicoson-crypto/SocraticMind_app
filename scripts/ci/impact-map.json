@@ -99,7 +99,8 @@
         "import-baseline",
         "history-provider",
         "actions-provider",
-        "suggestions-provider"
+        "suggestions-provider",
+        "avatar-provider"
       ],
       "checks": {
         "python": [
@@ -186,7 +187,8 @@
         "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/HttpTransport.kt",
         "android/core/network/src/test/kotlin/com/gmaicoson/socraticmind/network/HttpTransportTest.kt",
         "android/core/network/src/test/kotlin/com/gmaicoson/socraticmind/network/LoopbackFixture.kt",
-        "android/core/network/src/testFixtures/kotlin/com/gmaicoson/socraticmind/network/LoopbackFixture.kt"
+        "android/core/network/src/testFixtures/kotlin/com/gmaicoson/socraticmind/network/LoopbackFixture.kt",
+        "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/MultipartUpload.kt"
       ],
       "depends_on": [
         "sse-android",
@@ -205,7 +207,8 @@
         "ios/Packages/MindCore/Sources/MindCore/Networking/HTTPFailure.swift",
         "ios/Packages/MindCore/Sources/MindCore/Networking/HTTPTransport.swift",
         "ios/Packages/MindCore/Tests/MindCoreTests/HTTPTransportTests.swift",
-        "ios/Packages/MindCore/Tests/MindCoreTests/LoopbackFixture.swift"
+        "ios/Packages/MindCore/Tests/MindCoreTests/LoopbackFixture.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Networking/MultipartUpload.swift"
       ],
       "depends_on": [
         "sse-ios",
@@ -862,7 +865,8 @@
       "depends_on": [
         "turn-api-android",
         "history-state-android",
-        "session-android"
+        "session-android",
+        "account-files-android"
       ],
       "checks": {
         "android": [
@@ -896,7 +900,8 @@
       "depends_on": [
         "turn-api-ios",
         "history-state-ios",
-        "session-ios"
+        "session-ios",
+        "account-files-ios"
       ],
       "checks": {
         "ios": [
@@ -1168,6 +1173,176 @@
       "manual": [
         "建议列表、换一批与草稿确认已接线；点击、滚动、后台取消、账号切换与真实生命周期待明确获准构建后验证。"
       ]
+    },
+    "avatar-provider": {
+      "paths": [
+        "backend/routers/chat.py",
+        "backend/core/avatar_uploads.py",
+        "backend/core/avatars.py",
+        "backend/tests/contracts/test_chat_avatar_contract.py",
+        "backend/tests/p0/test_chat_avatars.py",
+        "contracts/fixtures/chat-avatar.json"
+      ],
+      "depends_on": [
+        "avatars",
+        "chat-provider"
+      ],
+      "checks": {
+        "python": [
+          "pytest:tests/contracts/test_chat_avatar_contract.py",
+          "pytest:tests/p0/test_chat_avatars.py",
+          "pytest:tests/p0/test_avatar_presets.py::test_preset_paths_match_public_assets"
+        ]
+      },
+      "manual": [
+        "头像提供方使用合成图片与隔离目录；本批不验证原生图片解码、选择器或真实文件保护。"
+      ]
+    },
+    "avatar-fixtures": {
+      "paths": [
+        "scripts/contracts/chat_avatar_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "account-files-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/AccountFileStorage.kt"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": [
+        "原子文件 IO 在主机临时目录验证；App 私有目录、最低系统、备份排除及设备文件保护另行验收。"
+      ]
+    },
+    "avatar-models-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarModels.kt"
+      ],
+      "depends_on": [
+        "history-android"
+      ],
+      "checks": {},
+      "manual": []
+    },
+    "avatar-api-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarApi.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarApiContractTest.kt"
+      ],
+      "depends_on": [
+        "avatar-provider",
+        "avatar-fixtures",
+        "http-android",
+        "avatar-models-android",
+        "avatar-fixtures-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatAvatarApiContractTest"
+        ]
+      },
+      "manual": [
+        "头像上传、读取及清除仅接入核心适配；选择界面、状态与宿主注入尚未实现。"
+      ]
+    },
+    "avatar-store-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/FileChatAvatarStore.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/FileChatAvatarStoreTest.kt"
+      ],
+      "depends_on": [
+        "account-files-android",
+        "avatar-models-android",
+        "avatar-provider",
+        "avatar-fixtures-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.FileChatAvatarStoreTest"
+        ]
+      },
+      "manual": [
+        "头像选择记录在主机临时目录验证；宿主注入、设备文件保护、退出清理策略和页面仍需后续实施与验收。"
+      ]
+    },
+    "account-files-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/AccountFileStorage.swift"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": [
+        "原子文件 IO 在主机临时目录验证；App 私有目录、最低系统、备份排除及设备文件保护另行验收。"
+      ]
+    },
+    "avatar-models-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatAvatarModels.swift"
+      ],
+      "depends_on": [
+        "history-ios"
+      ],
+      "checks": {},
+      "manual": []
+    },
+    "avatar-api-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatAvatarAPI.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatAvatarAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "avatar-provider",
+        "avatar-fixtures",
+        "http-ios",
+        "avatar-models-ios",
+        "avatar-fixtures-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatAvatarAPIContractTests"
+        ]
+      },
+      "manual": [
+        "头像上传、读取及清除仅接入核心适配；选择界面、状态与宿主注入尚未实现。"
+      ]
+    },
+    "avatar-store-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/FileChatAvatarStore.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/FileChatAvatarStoreTests.swift"
+      ],
+      "depends_on": [
+        "account-files-ios",
+        "avatar-models-ios",
+        "avatar-provider",
+        "avatar-fixtures-ios"
+      ],
+      "checks": {
+        "ios": [
+          "FileChatAvatarStoreTests"
+        ]
+      },
+      "manual": [
+        "头像选择记录在主机临时目录验证；宿主注入、设备文件保护、退出清理策略和页面仍需后续实施与验收。"
+      ]
+    },
+    "avatar-fixtures-android": {
+      "paths": [
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarFixtures.kt"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "avatar-fixtures-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatAvatarFixtures.swift"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
     }
   },
   "metadata": [
