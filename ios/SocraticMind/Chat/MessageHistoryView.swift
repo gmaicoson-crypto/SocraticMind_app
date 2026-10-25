@@ -9,6 +9,7 @@ struct MessageHistoryView: View {
     let regenerate: () -> Void
     let actions: ChatActionsState
     let toggleMessage: (Int64) -> Void
+    let avatar: AvatarPresentation
     let refresh: () -> Void
     let more: () -> Void
 
@@ -30,7 +31,7 @@ struct MessageHistoryView: View {
                         .accessibilityValue(actions.selectedIDs.contains(message.id) ? "已选择" : "未选择")
                         .accessibilityIdentifier("chat_select_\(message.id)")
                     }
-                    MessageContentView(message: message, renderer: renderer).listRowSeparator(.hidden)
+                    MessageContentView(message: message, renderer: renderer, avatar: avatar).listRowSeparator(.hidden)
                     if message.id == regenerationID, actions.selectionSessionID == nil {
                         Button("重新生成回答", action: regenerate).disabled(!turn.canRegenerate)
                             .buttonStyle(.borderless)
@@ -43,8 +44,14 @@ struct MessageHistoryView: View {
                     } else if !turn.submitted.isEmpty {
                         MessageContentView(role: "user", content: turn.submitted, renderer: renderer)
                     }
-                    MessageContentView(role: "ai", content: turn.partial, renderer: renderer, provisional: true)
-                        .id("pending-turn")
+                    MessageContentView(
+                        role: "ai",
+                        content: turn.partial,
+                        renderer: renderer,
+                        provisional: true,
+                        avatar: avatar
+                    )
+                    .id("pending-turn")
                 }
             }
             .listStyle(.plain)

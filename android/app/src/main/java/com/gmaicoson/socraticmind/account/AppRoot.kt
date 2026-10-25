@@ -32,6 +32,7 @@ import com.gmaicoson.socraticmind.chatui.ChatLibraryScreen
 fun AppRoot(model: AppViewModel) {
     val session by model.session.collectAsStateWithLifecycle()
     val error by model.error.collectAsStateWithLifecycle()
+    val avatarImages by model.avatarImages.collectAsStateWithLifecycle()
     val colors =
         if (isSystemInDarkTheme()) {
             darkColorScheme(
@@ -80,12 +81,17 @@ fun AppRoot(model: AppViewModel) {
                             val turn = model.turn
                             val actions = model.actions
                             val suggestions = model.suggestions
-                            if (history != null && turn != null && actions != null && suggestions != null) {
+                            val avatars = model.avatars
+                            if (history != null && turn != null && actions != null && suggestions != null &&
+                                avatars != null
+                            ) {
                                 ChatLibraryScreen(
                                     history,
                                     turn,
                                     actions,
                                     suggestions,
+                                    avatars,
+                                    avatarImages?.takeIf { it.account.revision == current.revision },
                                     current,
                                     model::logout,
                                     model::newConversation,

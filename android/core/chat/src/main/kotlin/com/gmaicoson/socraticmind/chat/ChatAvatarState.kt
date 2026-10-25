@@ -26,9 +26,14 @@ data class ChatAvatarState(
     val pendingSave: ChatAvatarSave? = null,
     val notice: String? = null,
 ) {
-    fun resource(target: ChatTarget): ChatAvatarResource {
-        val pending = pendingSave?.takeIf { it.target.sessionId == target.sessionId }
-        val choice = if (pending != null) pending.value else choices[target.sessionId]
-        return choice ?: ChatAvatarResource.default(target.mode)
+    fun resource(target: ChatTarget): ChatAvatarResource = resource(target.sessionId, target.mode)
+
+    fun resource(
+        sessionId: String,
+        mode: ChatMode,
+    ): ChatAvatarResource {
+        val pending = pendingSave?.takeIf { it.target.sessionId == sessionId }
+        val choice = if (pending != null) pending.value else choices[sessionId]
+        return choice ?: ChatAvatarResource.default(mode)
     }
 }

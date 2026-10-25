@@ -1,4 +1,5 @@
 import Combine
+import CoreGraphics
 import MindCore
 import SwiftUI
 
@@ -6,6 +7,7 @@ import SwiftUI
 final class AppModel: ObservableObject {
     @Published private(set) var session: SessionState = .uninitialized
     @Published private(set) var error: String?
+    @Published private(set) var avatarImages: AvatarImageLoader<CGImage>?
     let form: AuthFormModel?
     let history: ChatLibraryModel?
     let turn: ChatTurnModel?
@@ -14,6 +16,7 @@ final class AppModel: ObservableObject {
     let avatars: ChatAvatarModel?
     let configurationError: String?
     private let store: SessionStore?
+    private let avatarAPI: ChatAvatarAPI?
     private var observation: Task<Void, Never>?
     private var formTask: Task<Void, Never>?
     private var sessionTask: Task<Void, Never>?
@@ -37,6 +40,8 @@ final class AppModel: ObservableObject {
                                                         appropriateFor: nil, create: true)
             let journal = try FileChatTurnJournal(directory: directory, endpointScope: endpoint.credentialScope)
             let avatarStore = try FileChatAvatarStore(directory: directory, endpointScope: endpoint.credentialScope)
+            let avatarAPI = ChatAvatarAPI(transport: transport)
+            self.avatarAPI = avatarAPI
             store = session
             form = AuthFormModel(session: session, recovery: api)
             let actionsAPI = ChatActionsAPI(transport: transport)
@@ -48,7 +53,7 @@ final class AppModel: ObservableObject {
                 journal: journal
             )
             history = library; turn = coordinator
-            let avatarModel = ChatAvatarModel(session: session, gateway: ChatAvatarAPI(transport: transport),
+            let avatarModel = ChatAvatarModel(session: session, gateway: avatarAPI,
                                               store: avatarStore, library: library, turn: coordinator)
             avatars = avatarModel
             actions = ChatActionsModel(
@@ -65,6 +70,7 @@ final class AppModel: ObservableObject {
             configurationError = nil
         } catch {
             store = nil
+            avatarAPI = nil
             form = nil
             history = nil
             turn = nil
@@ -89,6 +95,14 @@ final class AppModel: ObservableObject {
                     value
                 } else {
                     nil
+                }
+                let imageAccount = HistoryAccount.from(state)
+                if avatarImages?.account != imageAccount {
+                    clearAvatarImages()
+                    if let imageAccount, let avatarAPI {
+                        avatarImages = AvatarImageLoader(account: imageAccount, gateway: avatarAPI,
+                                                         decode: AvatarImageCodec.thumbnail)
+                    }
                 }
                 if next != revision {
                     suggestions?.clear()
@@ -122,6 +136,7 @@ final class AppModel: ObservableObject {
         form?.reset()
         suggestions?.clear()
         avatars?.clear()
+        clearAvatarImages()
         actions?.clear()
         history?.clear()
         turn?.clear()
@@ -172,6 +187,14 @@ final class AppModel: ObservableObject {
         }
     }
 
+    private func clearAvatarImages() {
+        let previous = avatarImages
+        avatarImages = nil
+        if let previous {
+            Task { await previous.close() }
+        }
+    }
+
     private func runSession(_ action: @escaping @Sendable (SessionStore) async throws -> Void) {
         guard !sessionRunning, let store else { return }
         sessionRunning = true
@@ -190,6 +213,9 @@ final class AppModel: ObservableObject {
     }
 
     deinit {
+        if let avatarImages {
+            Task { await avatarImages.close() }
+        }
         observation?.cancel()
         formTask?.cancel()
         sessionTask?.cancel()

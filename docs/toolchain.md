@@ -116,3 +116,10 @@ ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改�
 扩展集合 Android 142 项、Swift 139 项通过；补齐 Unicode ID 字节隔离后，双端相关各 13 项通过，按类合并为 Android 143、Swift 140 项有效结果。后端 10 项、工具 63 项通过；Kotlin 10、Swift 11、Python 4 个变化文件的固定格式 / lint 通过。报告复用及原始证据见[实施状态](execution-status.md)，文件预警和未接线范围见[会话头像](chat-avatar-implementation.md)。
 
 随后接入 avatar-state-*：修改状态只选择本平台状态测试；接口 / 存储 / 会话操作变化扩展对应状态消费者，宿主接线保留账号、历史、发送、建议与删除的相关验证。状态批次有效结果为 Android 107、Swift 120、工具 64 项，新增状态测试 Android 15、Swift 16 项。清理旧读取的修正仅复跑相关 Swift suite；Android 失败的相关集合修复测试等待后复验通过。头像页面和图片解码尚未接入，主机测试不替代原生构建或设备验收。
+
+
+## 头像图片与选择界面的增量验证
+
+2026-10-25：avatar-images-* 与 avatar-ui-* 显式登记图片策略、加载器、解码器及原生组件；头像接口 / 状态变化扩展同平台图片消费者，宿主页继续关联账号、历史、发送和 Markdown 的已登记集合。Swift 图片测试读取已迁入的 WebP 预设，资源变化也选择其解码消费者。影响图头像测试独立到 test_avatar_image_impact.py，减少原文件职责与行数；未放宽未知核心路径检查。
+
+受影响集合有效结果为 Android 14 类 126 项、Swift 14 suite 129 项、工具 72 项；最后只补验改变了断言的 Kotlin 加载器 7 项及 Swift 图片处理 7 项，统计按类覆盖，不重复计数。变化 Kotlin 14、Swift 15、Python 2 个文件通过固定格式 / lint，两个行数预警已有职责审查。没有新工具、依赖或锁变更；XcodeGen 只登记源文件，宿主编译 / 系统照片选择和设备图片解码仍待授权验证。执行与缓存边界见[实施状态](execution-status.md)。

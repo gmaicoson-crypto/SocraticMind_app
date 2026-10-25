@@ -1,3 +1,4 @@
+import CoreGraphics
 import MindCore
 import SwiftUI
 
@@ -6,6 +7,8 @@ struct ChatLibraryView: View {
     @ObservedObject var turn: ChatTurnModel
     @ObservedObject var actions: ChatActionsModel
     let suggestions: ChatSuggestionsModel
+    @ObservedObject var avatars: ChatAvatarModel
+    let avatarImages: AvatarImageLoader<CGImage>?
     let account: SessionState
     let logout: () -> Void
     let newConversation: () -> Void
@@ -30,13 +33,16 @@ struct ChatLibraryView: View {
                 Text(notice).padding(.horizontal, 20)
             }
             if model.state.account != HistoryAccount.from(account) || turn.state.account != model.state
-                .account || actions.state.account != model.state.account
+                .account || actions.state.account != model.state.account || avatars.state.account != model.state.account
             {
                 ProgressView("正在读取会话…").frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let selected = model.state.selected {
                 header(title: selected.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "对话",
                        loading: model.state.messages.loading, back: turn.state.editable ? back : nil,
                        refresh: model.refreshSelectedConversation)
+                ChatAvatarControls(model: avatars, images: avatarImages, target: selected.target,
+                                   enabled: turn.state.editable && actions.state.dialog == nil && actions.state
+                                       .selectionSessionID == nil)
                 if actions.state.selectionSessionID == selected.sessionID {
                     ChatSelectionControls(
                         state: actions.state,
@@ -62,6 +68,11 @@ struct ChatLibraryView: View {
                         regenerate: regenerate,
                         actions: actions.state,
                         toggleMessage: actions.toggleMessage,
+                        avatar: AvatarPresentation(
+                            images: avatarImages,
+                            resource: avatars.state.resource(for: selected.target),
+                            fallback: .fallback(for: selected.target.mode)
+                        ),
                         refresh: model.refreshSelectedConversation,
                         more: model.loadMoreMessages
                     )
@@ -71,6 +82,7 @@ struct ChatLibraryView: View {
                 header(title: "会话", loading: model.state.conversations.loading, refresh: model.refreshConversations)
                 Button("新建对话", action: newConversation).disabled(!turn.state.editable)
                 conversations
+                ChatAvatarControls(model: avatars, images: avatarImages, target: nil, enabled: turn.state.editable)
             }
             if actions.state.dialog == nil, actions.state.account == HistoryAccount.from(account),
                let notice = actions.state.notice
@@ -100,6 +112,16 @@ struct ChatLibraryView: View {
             }
         )) {
             ChatActionSheet(model: actions)
+        }
+        .sheet(item: Binding(
+            get: { avatars.state.account == HistoryAccount.from(account) ? avatars.state.picker : nil },
+            set: {
+                if $0 == nil {
+                    avatars.dismiss()
+                }
+            }
+        )) { picker in
+            ChatAvatarPickerSheet(model: avatars, turn: turn, picker: picker, images: avatarImages)
         }
         .confirmationDialog("放弃未发送的内容？", isPresented: $discardDraft, titleVisibility: .visible) {
             Button("放弃草稿", role: .destructive, action: closeConversation)
@@ -136,12 +158,25 @@ struct ChatLibraryView: View {
             ForEach(model.state.conversations.items, id: \.sessionID) { summary in
                 VStack(alignment: .leading) {
                     Button { selectConversation(summary.sessionID) } label: {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(summary.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "未命名对话")
-                                .font(.headline).foregroundStyle(.primary).lineLimit(2)
-                            Text(summary.preview.nilIfEmpty ?? "暂无文字预览").font(.subheadline)
-                                .foregroundStyle(.secondary).lineLimit(2)
-                        }.padding(.vertical, 6)
+                        HStack(spacing: 12) {
+                            AvatarImageView(source: AvatarPresentation(images: avatarImages,
+                                                                       resource: avatars.state.resource(
+                                                                           sessionID: summary.sessionID,
+                                                                           mode: ChatMode(rawValue: summary.mode) ??
+                                                                               .normal
+                                                                       ),
+                                                                       fallback: .fallback(
+                                                                           for: ChatMode(rawValue: summary
+                                                                               .mode) ?? .normal
+                                                                       )))
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(summary.title?.trimmingCharacters(in: .whitespacesAndNewlines)
+                                    .nilIfEmpty ?? "未命名对话")
+                                    .font(.headline).foregroundStyle(.primary).lineLimit(2)
+                                Text(summary.preview.nilIfEmpty ?? "暂无文字预览").font(.subheadline)
+                                    .foregroundStyle(.secondary).lineLimit(2)
+                            }.padding(.vertical, 6)
+                        }
                     }
                     .buttonStyle(.plain)
                     .disabled(!turn.state.editable)

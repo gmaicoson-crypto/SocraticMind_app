@@ -7,20 +7,28 @@ struct MessageContentView: View {
     let attachmentCount: Int
     let renderer: MarkdownRenderer
     let provisional: Bool
+    let avatar: AvatarPresentation?
 
-    init(message: StoredChatMessage, renderer: MarkdownRenderer) {
+    init(message: StoredChatMessage, renderer: MarkdownRenderer, avatar: AvatarPresentation? = nil) {
         role = message.role; content = message.content; attachmentCount = message.attachments.count
         self.renderer = renderer; provisional = false
+        self.avatar = avatar
     }
 
-    init(role: String, content: String, renderer: MarkdownRenderer, provisional: Bool = false) {
+    init(role: String, content: String, renderer: MarkdownRenderer, provisional: Bool = false,
+         avatar: AvatarPresentation? = nil)
+    {
         self.role = role; self.content = content; attachmentCount = 0
         self.renderer = renderer; self.provisional = provisional
+        self.avatar = avatar
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
+                if role != "user", let avatar {
+                    AvatarImageView(source: avatar, size: 32)
+                }
                 Text(role == "user" ? "你" : "SocraticMind").font(.caption).foregroundStyle(.tint)
                 Spacer()
                 MessageCopyButton(text: content, label: provisional ? "复制当前文字" : "复制原文")

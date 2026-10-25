@@ -15,8 +15,12 @@
 		1EDDD242011246266AB5C4BF /* AuthUITestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F189D44C9164E612C194209 /* AuthUITestFixture.swift */; };
 		2855770B90E837BC2E36EB68 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69DFA684F16FC815A3CAA454 /* AppRootView.swift */; };
 		2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E844435E044814A28ED5D442 /* MarkdownInlineView.swift */; };
+		38DB55034EE78B94993C6718 /* AvatarPhotoTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2532621FCF47A8CEE6098CB /* AvatarPhotoTransfer.swift */; };
 		393D26A5169372F78A7EC93F /* MessageContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808D06957854C2FE245352E /* MessageContentView.swift */; };
+		407E9DCBC9D9629E503DAD1E /* ChatAvatarControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8374CA308DDF43E8A2F812 /* ChatAvatarControls.swift */; };
 		56DB845FA326204F2C5A42C9 /* HistoryPageControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */; };
+		5B1CE16D72ADDA1615B5389C /* AvatarImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6388CBDB247E5EA468BB8B /* AvatarImageView.swift */; };
+		882687C0581C875A202E9A33 /* ChatAvatarPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36CB9D6D35B53049977A359 /* ChatAvatarPickerSheet.swift */; };
 		8959D81C0451B2AF0D509C27 /* ChatSuggestionsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */; };
 		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
 		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
@@ -41,6 +45,7 @@
 /* Begin PBXFileReference section */
 		072095AA102764FA32FE2A9C /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
 		0F189D44C9164E612C194209 /* AuthUITestFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUITestFixture.swift; sourceTree = "<group>"; };
+		1A6388CBDB247E5EA468BB8B /* AvatarImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarImageView.swift; sourceTree = "<group>"; };
 		21BD8136F99BE32A17332E89 /* MarkdownBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBlockView.swift; sourceTree = "<group>"; };
 		2808D06957854C2FE245352E /* MessageContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageContentView.swift; sourceTree = "<group>"; };
 		2C45889AB397FDA45D84D37D /* MindCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MindCore; path = Packages/MindCore; sourceTree = SOURCE_ROOT; };
@@ -52,7 +57,10 @@
 		7C7107C5B4A3102C623FCF1C /* HistoryPageControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPageControls.swift; sourceTree = "<group>"; };
 		7FA7CDC48E2476C65F9351E7 /* ChatLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLibraryView.swift; sourceTree = "<group>"; };
 		84D8A5BEFDB494A6081DDD0F /* AuthFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowTests.swift; sourceTree = "<group>"; };
+		A36CB9D6D35B53049977A359 /* ChatAvatarPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAvatarPickerSheet.swift; sourceTree = "<group>"; };
+		AF8374CA308DDF43E8A2F812 /* ChatAvatarControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAvatarControls.swift; sourceTree = "<group>"; };
 		B0A4EDCBFDD1E89414A126F5 /* MessageHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageHistoryView.swift; sourceTree = "<group>"; };
+		C2532621FCF47A8CEE6098CB /* AvatarPhotoTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarPhotoTransfer.swift; sourceTree = "<group>"; };
 		C2DFEB354734BE9B1218B7B9 /* SocraticMindUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SocraticMindUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6DDBEDD8CAC3E583E97292B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		CA2FBA22AE30161F8C7E7733 /* SocraticMind.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SocraticMind.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -145,6 +153,17 @@
 			path = Chat;
 			sourceTree = "<group>";
 		};
+		D4252255984AD6A6F54306E1 /* Avatars */ = {
+			isa = PBXGroup;
+			children = (
+				1A6388CBDB247E5EA468BB8B /* AvatarImageView.swift */,
+				C2532621FCF47A8CEE6098CB /* AvatarPhotoTransfer.swift */,
+				AF8374CA308DDF43E8A2F812 /* ChatAvatarControls.swift */,
+				A36CB9D6D35B53049977A359 /* ChatAvatarPickerSheet.swift */,
+			);
+			path = Avatars;
+			sourceTree = "<group>";
+		};
 		E230DB14413FC185FE443BDC /* UITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,6 +178,7 @@
 			children = (
 				96640CF4405DA51087373CF5 /* Account */,
 				25910EC35AA2FA841EBD535A /* App */,
+				D4252255984AD6A6F54306E1 /* Avatars */,
 				D313D2081763C8A0C7440170 /* Chat */,
 				0C23DFBA04C2D966FCFDD1CF /* Messages */,
 			);
@@ -256,7 +276,11 @@
 				1ADEEFD8E59B008AAD1BDC39 /* AuthFields.swift in Sources */,
 				11470CC46CA1E75048CE3413 /* AuthScreen.swift in Sources */,
 				C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */,
+				5B1CE16D72ADDA1615B5389C /* AvatarImageView.swift in Sources */,
+				38DB55034EE78B94993C6718 /* AvatarPhotoTransfer.swift in Sources */,
 				03F1E45EECCD6CAF5C2674A7 /* ChatActionsControls.swift in Sources */,
+				407E9DCBC9D9629E503DAD1E /* ChatAvatarControls.swift in Sources */,
+				882687C0581C875A202E9A33 /* ChatAvatarPickerSheet.swift in Sources */,
 				D6D8D428875A919AF0ED79A1 /* ChatComposerView.swift in Sources */,
 				1DBCB7515A0C883BD31CCB4E /* ChatLibraryView.swift in Sources */,
 				8959D81C0451B2AF0D509C27 /* ChatSuggestionsBar.swift in Sources */,

@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.gmaicoson.socraticmind.avatarui.AvatarPresentation
 import com.gmaicoson.socraticmind.chat.ChatActionsState
 import com.gmaicoson.socraticmind.chat.ChatTurnState
 import com.gmaicoson.socraticmind.chat.HistoryPageState
@@ -33,6 +34,7 @@ internal fun MessageHistory(
     regenerate: () -> Unit,
     actions: ChatActionsState,
     toggleMessage: (Long) -> Unit,
+    avatar: AvatarPresentation,
     modifier: Modifier,
 ) {
     val scroll = rememberLazyListState()
@@ -63,7 +65,7 @@ internal fun MessageHistory(
                     Text("选择这条消息")
                 }
             }
-            MessageContent(message, renderer)
+            MessageContent(message, renderer, avatar)
             if (message.id == regenerationId && actions.selectionSessionId == null) {
                 TextButton(
                     onClick = regenerate,
@@ -81,7 +83,7 @@ internal fun MessageHistory(
                 } else if (turn.submitted.isNotEmpty()) {
                     MessageContent("user", turn.submitted, renderer)
                 }
-                MessageContent("ai", turn.partial, renderer, provisional = true)
+                MessageContent("ai", turn.partial, renderer, provisional = true, avatar = avatar)
             }
         }
     }

@@ -304,7 +304,8 @@
         "python": [
           "unittest:scripts.quality.tests.test_file_rules",
           "unittest:scripts.quality.tests.test_changed_files",
-          "unittest:scripts.ci.tests.test_impact"
+          "unittest:scripts.ci.tests.test_impact",
+          "unittest:scripts.ci.tests.test_avatar_image_impact"
         ]
       },
       "manual": []
@@ -1244,7 +1245,7 @@
         ]
       },
       "manual": [
-        "头像 API 已接入选择状态与宿主；图片选择器和页面尚未接入，资源检查不代表图片解码或设备验收通过。"
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
       ]
     },
     "avatar-store-android": {
@@ -1305,7 +1306,7 @@
         ]
       },
       "manual": [
-        "头像 API 已接入选择状态与宿主；图片选择器和页面尚未接入，资源检查不代表图片解码或设备验收通过。"
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
       ]
     },
     "avatar-store-ios": {
@@ -1365,7 +1366,7 @@
         ]
       },
       "manual": [
-        "会话头像状态与宿主已接线；选择器、缩略图和原生页面尚待实现。主机测试不覆盖系统图片解码、设备存储和进程终止。"
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
       ]
     },
     "avatar-state-ios": {
@@ -1388,7 +1389,103 @@
         ]
       },
       "manual": [
-        "会话头像状态与宿主已接线；选择器、缩略图和原生页面尚待实现。主机测试不覆盖系统图片解码、设备存储和进程终止。"
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
+      ]
+    },
+    "avatar-images-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/images/AvatarImagePolicy.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/images/AvatarImageLoader.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/AvatarImagePolicyTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/AvatarImageLoaderTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/avatarui/AvatarImage.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/avatarui/AvatarImageCodec.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppRoot.kt"
+      ],
+      "depends_on": [
+        "avatar-api-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.AvatarImageLoaderTest",
+          "com.gmaicoson.socraticmind.chat.AvatarImagePolicyTest"
+        ]
+      },
+      "manual": [
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
+      ]
+    },
+    "avatar-images-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Images/AvatarImagePolicy.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Images/AvatarImageLoader.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Images/AvatarImageCodec.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/AvatarImageLoaderTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/AvatarImageCodecTests.swift",
+        "ios/SocraticMind/Avatars/AvatarImageView.swift",
+        "ios/SocraticMind/Avatars/AvatarPhotoTransfer.swift",
+        "ios/SocraticMind/App/AppModel.swift",
+        "ios/SocraticMind/App/AppRootView.swift"
+      ],
+      "depends_on": [
+        "avatar-api-ios",
+        "avatars"
+      ],
+      "checks": {
+        "ios": [
+          "AvatarImageLoaderTests",
+          "AvatarImageCodecTests"
+        ]
+      },
+      "manual": [
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
+      ]
+    },
+    "avatar-ui-android": {
+      "paths": [
+        "android/app/src/main/java/com/gmaicoson/socraticmind/avatarui/ChatAvatarControls.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/avatarui/ChatAvatarPickerDialog.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/ChatLibraryScreen.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MessageContent.kt"
+      ],
+      "depends_on": [
+        "avatar-state-android",
+        "avatar-images-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.AvatarImageLoaderTest",
+          "com.gmaicoson.socraticmind.chat.AvatarImagePolicyTest",
+          "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest"
+        ]
+      },
+      "manual": [
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
+      ]
+    },
+    "avatar-ui-ios": {
+      "paths": [
+        "ios/SocraticMind/Avatars/ChatAvatarControls.swift",
+        "ios/SocraticMind/Avatars/ChatAvatarPickerSheet.swift",
+        "ios/SocraticMind/Chat/ChatLibraryView.swift",
+        "ios/SocraticMind/Chat/MessageHistoryView.swift",
+        "ios/SocraticMind/Messages/MessageContentView.swift"
+      ],
+      "depends_on": [
+        "avatar-state-ios",
+        "avatar-images-ios"
+      ],
+      "checks": {
+        "ios": [
+          "AvatarImageLoaderTests",
+          "AvatarImageCodecTests",
+          "ChatAvatarModelTests"
+        ]
+      },
+      "manual": [
+        "头像选择器、圆形缩略图与保存恢复已接入原生页面；核心测试不覆盖宿主编译、系统照片提供方、设备解码与滚动性能，待独立构建授权后定向验证。"
       ]
     }
   },

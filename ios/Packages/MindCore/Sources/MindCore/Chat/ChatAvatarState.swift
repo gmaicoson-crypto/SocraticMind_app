@@ -27,9 +27,13 @@ public struct ChatAvatarState: Sendable {
     }
 
     public func resource(for target: ChatTarget) -> ChatAvatarResource {
-        if let pendingSave, pendingSave.target.sessionID.utf8.elementsEqual(target.sessionID.utf8) {
-            return pendingSave.value ?? .fallback(for: target.mode)
+        resource(sessionID: target.sessionID, mode: target.mode)
+    }
+
+    public func resource(sessionID: String, mode: ChatMode) -> ChatAvatarResource {
+        if let pendingSave, pendingSave.target.sessionID.utf8.elementsEqual(sessionID.utf8) {
+            return pendingSave.value ?? .fallback(for: mode)
         }
-        return choices?[target.sessionID] ?? .fallback(for: target.mode)
+        return choices?[sessionID] ?? .fallback(for: mode)
     }
 }

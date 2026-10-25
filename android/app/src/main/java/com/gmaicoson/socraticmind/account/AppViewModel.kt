@@ -1,5 +1,6 @@
 package com.gmaicoson.socraticmind.account
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -7,12 +8,15 @@ import com.gmaicoson.socraticmind.AppGraph
 import com.gmaicoson.socraticmind.auth.AuthFormController
 import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.auth.accountErrorMessage
+import com.gmaicoson.socraticmind.avatarui.AvatarImageCodec
 import com.gmaicoson.socraticmind.chat.ChatActionsController
 import com.gmaicoson.socraticmind.chat.ChatAvatarController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTarget
 import com.gmaicoson.socraticmind.chat.ChatTurnController
+import com.gmaicoson.socraticmind.chat.HistoryAccount
+import com.gmaicoson.socraticmind.chat.images.AvatarImageLoader
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,6 +67,8 @@ class AppViewModel(
             )
         }
     private val mutableError = MutableStateFlow<String?>(null)
+    private val mutableAvatarImages = MutableStateFlow<AvatarImageLoader<Bitmap>?>(null)
+    val avatarImages = mutableAvatarImages.asStateFlow()
     val error = mutableError.asStateFlow()
     private var formJob: Job? = null
     private var sessionJob: Job? = null
@@ -72,6 +78,14 @@ class AppViewModel(
             viewModelScope.launch {
                 var accountRevision: Long? = null
                 session.collect { state ->
+                    val imageAccount = HistoryAccount.from(state)
+                    if (mutableAvatarImages.value?.account != imageAccount) {
+                        mutableAvatarImages.value?.close()
+                        mutableAvatarImages.value =
+                            imageAccount?.let { owner ->
+                                AvatarImageLoader(owner, it.avatars, AvatarImageCodec::thumbnail, viewModelScope)
+                            }
+                    }
                     history?.bindAccount(state)
                     turn?.bindAccount(state)
                     avatars?.bindAccount(state)
@@ -154,6 +168,8 @@ class AppViewModel(
         form?.reset()
         suggestions?.clear()
         avatars?.clear()
+        mutableAvatarImages.value?.close()
+        mutableAvatarImages.value = null
         actions?.clear()
         history?.clear()
         turn?.clear()
@@ -163,6 +179,7 @@ class AppViewModel(
     override fun onCleared() {
         suggestions?.close()
         avatars?.close()
+        mutableAvatarImages.value?.close()
         actions?.close()
         history?.close()
         turn?.close()

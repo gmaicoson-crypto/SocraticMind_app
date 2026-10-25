@@ -16,10 +16,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.gmaicoson.socraticmind.avatarui.AvatarImage
+import com.gmaicoson.socraticmind.avatarui.AvatarPresentation
 import com.gmaicoson.socraticmind.chat.StoredChatMessage
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownDocument
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownLink
@@ -30,7 +33,8 @@ import kotlinx.coroutines.CancellationException
 fun MessageContent(
     message: StoredChatMessage,
     renderer: MarkdownRenderer,
-) = MessageContent(message.role, message.content, renderer, attachments = message.attachments.size)
+    avatar: AvatarPresentation? = null,
+) = MessageContent(message.role, message.content, renderer, attachments = message.attachments.size, avatar = avatar)
 
 @Composable
 fun MessageContent(
@@ -39,12 +43,18 @@ fun MessageContent(
     renderer: MarkdownRenderer,
     provisional: Boolean = false,
     attachments: Int = 0,
+    avatar: AvatarPresentation? = null,
 ) {
     Column(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Row(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            if (role != "user" && avatar != null) AvatarImage(avatar, 32.dp)
             Text(
                 if (role == "user") "你" else "SocraticMind",
                 Modifier.weight(1f).padding(vertical = 12.dp),

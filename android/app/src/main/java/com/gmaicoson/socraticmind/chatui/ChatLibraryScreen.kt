@@ -1,5 +1,6 @@
 package com.gmaicoson.socraticmind.chatui
 
+import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,14 +37,22 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gmaicoson.socraticmind.auth.SessionState
+import com.gmaicoson.socraticmind.avatarui.AvatarImage
+import com.gmaicoson.socraticmind.avatarui.AvatarPresentation
+import com.gmaicoson.socraticmind.avatarui.ChatAvatarControls
+import com.gmaicoson.socraticmind.avatarui.ChatAvatarPickerDialog
 import com.gmaicoson.socraticmind.chat.ChatActionsController
+import com.gmaicoson.socraticmind.chat.ChatAvatarController
+import com.gmaicoson.socraticmind.chat.ChatAvatarResource
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
+import com.gmaicoson.socraticmind.chat.ChatMode
 import com.gmaicoson.socraticmind.chat.ChatRegeneration
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTurnController
 import com.gmaicoson.socraticmind.chat.ConversationSummary
 import com.gmaicoson.socraticmind.chat.HistoryAccount
 import com.gmaicoson.socraticmind.chat.HistoryLoad
+import com.gmaicoson.socraticmind.chat.images.AvatarImageLoader
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownRenderer
 
 @Composable
@@ -52,6 +61,8 @@ fun ChatLibraryScreen(
     turn: ChatTurnController,
     actions: ChatActionsController,
     suggestions: ChatSuggestionsController,
+    avatars: ChatAvatarController,
+    avatarImages: AvatarImageLoader<Bitmap>?,
     account: SessionState.SignedIn,
     logout: () -> Unit,
     newConversation: () -> Unit,
@@ -78,6 +89,7 @@ fun ChatLibraryScreen(
     val state by model.state.collectAsStateWithLifecycle()
     val turnState by turn.state.collectAsStateWithLifecycle()
     val actionState by actions.state.collectAsStateWithLifecycle()
+    val avatarState by avatars.state.collectAsStateWithLifecycle()
     var discardDraft by remember { mutableStateOf(false) }
     val back = {
         if (turnState.editable) {
@@ -101,7 +113,7 @@ fun ChatLibraryScreen(
         HorizontalDivider()
         // Session and feature flows can be delivered in different frames; never render a mismatched account.
         if (state.account != HistoryAccount.from(account) || turnState.account != state.account ||
-            actionState.account != state.account
+            actionState.account != state.account || avatarState.account != state.account
         ) {
             CircularProgressIndicator(Modifier.padding(24.dp))
         } else {
@@ -113,7 +125,17 @@ fun ChatLibraryScreen(
                 TextButton(onClick = newConversation, enabled = turnState.editable) { Text("新建对话") }
                 LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
                     items(state.conversations.items, key = { "conversation:${it.sessionId}" }) { summary ->
-                        ConversationRow(summary, turnState.editable, actions) { selectConversation(summary.sessionId) }
+                        val mode = ChatMode.entries.find { it.wireValue == summary.mode } ?: ChatMode.NORMAL
+                        ConversationRow(
+                            summary,
+                            turnState.editable,
+                            actions,
+                            AvatarPresentation(
+                                avatarImages,
+                                avatarState.resource(summary.sessionId, mode),
+                                ChatAvatarResource.default(mode),
+                            ),
+                        ) { selectConversation(summary.sessionId) }
                     }
                     item(key = "conversation-controls") {
                         HistoryPageControls(
@@ -131,6 +153,13 @@ fun ChatLibraryScreen(
                     state.messages.loading,
                     if (turnState.editable) back else null,
                     model::refreshSelectedConversation,
+                )
+                ChatAvatarControls(
+                    avatars,
+                    avatarState,
+                    avatarImages,
+                    selected.target,
+                    turnState.editable && actionState.dialog == null && actionState.selectionSessionId == null,
                 )
                 if (actionState.selectionSessionId == selected.sessionId) {
                     ChatSelectionControls(actionState, turnState.editable && !actionState.busy, actions)
@@ -156,11 +185,17 @@ fun ChatLibraryScreen(
                             { turn.regenerate(model.state.value, account.user.aiStyle) },
                             actionState,
                             actions::toggleMessage,
+                            AvatarPresentation(
+                                avatarImages,
+                                avatarState.resource(selected.target),
+                                ChatAvatarResource.default(selected.target.mode),
+                            ),
                             Modifier.weight(1f),
                         )
                     }
                 }
             }
+            if (selected == null) ChatAvatarControls(avatars, avatarState, avatarImages, null, turnState.editable)
             if (actionState.dialog == null) actionState.notice?.let { Text(it, Modifier.padding(12.dp)) }
             if (actionState.selectionSessionId == null) {
                 if (actionState.dialog == null && selected != null && selected.target == turnState.target) {
@@ -176,6 +211,9 @@ fun ChatLibraryScreen(
         }
     }
     if (actionState.account == HistoryAccount.from(account)) ChatActionDialog(actionState, actions)
+    avatarState.picker?.takeIf { it.account == HistoryAccount.from(account) }?.let { picker ->
+        key(picker.id) { ChatAvatarPickerDialog(avatars, avatarState, picker, avatarImages, turnState.editable) }
+    }
     if (discardDraft) {
         AlertDialog(
             onDismissRequest = { discardDraft = false },
@@ -217,18 +255,22 @@ private fun ConversationRow(
     summary: ConversationSummary,
     enabled: Boolean,
     actions: ChatActionsController,
+    avatar: AvatarPresentation,
     select: () -> Unit,
 ) {
     Column(
         Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = select).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Text(
-            summary.title?.takeIf { it.isNotBlank() } ?: "未命名对话",
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            AvatarImage(avatar)
+            Text(
+                summary.title?.takeIf { it.isNotBlank() } ?: "未命名对话",
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         Text(
             summary.preview.ifBlank { "暂无文字预览" },
             style = MaterialTheme.typography.bodyMedium,
