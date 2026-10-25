@@ -101,7 +101,8 @@
         "actions-provider",
         "suggestions-provider",
         "avatar-provider",
-        "model-provider"
+        "model-provider",
+        "onboarding-provider"
       ],
       "checks": {
         "python": [
@@ -312,7 +313,8 @@
           "unittest:scripts.ci.tests.test_avatar_image_impact",
           "unittest:scripts.ci.tests.test_model_selection_impact",
           "unittest:scripts.ci.tests.test_chat_impact",
-          "unittest:scripts.ci.tests.test_chat_feedback_impact"
+          "unittest:scripts.ci.tests.test_chat_feedback_impact",
+          "unittest:scripts.ci.tests.test_onboarding_impact"
         ]
       },
       "manual": []
@@ -1798,6 +1800,82 @@
       "manual": [
         "回答错误与用量已接入消息组件；宿主编译、展开控件、无障碍和设备恢复行为待明确获准构建后定向验证。"
       ]
+    },
+    "onboarding-provider": {
+      "paths": [
+        "backend/routers/agent.py",
+        "backend/schemas/agent.py",
+        "backend/services/agent/orchestrator.py",
+        "backend/services/agent/run_store.py",
+        "backend/services/agent/onboarding_creation.py",
+        "backend/services/agent/state_machine.py",
+        "backend/services/assessments.py",
+        "backend/tests/p0/test_onboarding_recovery.py",
+        "backend/tests/contracts/test_onboarding_contract.py",
+        "contracts/fixtures/onboarding-runs.json",
+        "backend/tests/p0/test_agent_permissions.py"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_onboarding_recovery.py",
+          "pytest:tests/contracts/test_onboarding_contract.py",
+          "pytest:tests/p0/test_agent_api.py",
+          "pytest:tests/p0/test_agent_orchestrator.py",
+          "pytest:tests/p0/test_agent_permissions.py",
+          "pytest:tests/p0/test_agent_state_machine.py",
+          "pytest:tests/p0/test_assessment_service.py",
+          "pytest:tests/p0/test_cross_domain_fixtures.py",
+          "pytest:tests/p0/test_chat_context.py",
+          "pytest:tests/p0/test_chat_context_edges.py",
+          "pytest:tests/p0/test_planning.py",
+          "pytest:tests/p0/test_plans_queries.py",
+          "pytest:tests/contracts/test_openapi_contract.py"
+        ],
+        "android": [
+          "com.gmaicoson.socraticmind.network.SseContractTest",
+          "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest"
+        ],
+        "ios": [
+          "SSEContractTests",
+          "ChatHistoryAPIContractTests"
+        ]
+      },
+      "manual": [
+        "新增恢复字段需保持旧聊天结构化消息兼容；本批仅提供方与现有消费者定向测试，新主题原生流程和真实模型仍待验证。"
+      ]
+    },
+    "onboarding-mysql": {
+      "paths": [
+        "backend/tests/integration/test_mysql_onboarding_recovery.py"
+      ],
+      "depends_on": [
+        "onboarding-provider",
+        "mysql"
+      ],
+      "checks": {
+        "mysql": [
+          "pytest:tests/integration/test_mysql_onboarding_recovery.py::test_mysql_concurrent_onboarding_create_and_confirm",
+          "pytest:tests/integration/test_mysql_onboarding_recovery.py::test_mysql_confirmation_uses_current_version_despite_old_read_snapshot",
+          "pytest:tests/integration/test_mysql_onboarding_recovery.py::test_mysql_cancel_fences_late_onboarding_model_result",
+          "pytest:tests/integration/test_mysql_onboarding_recovery.py::test_mysql_cancel_after_creation_commit_preserves_terminal_version"
+        ]
+      },
+      "manual": [
+        "并发创建、确认与取消需通过隔离 MySQL harness 验证，不可用 SQLite 结果代替。"
+      ]
+    },
+    "chat-context-edges-regression": {
+      "paths": [
+        "backend/tests/p0/test_chat_context_edges.py"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_chat_context_edges.py"
+        ]
+      },
+      "manual": []
     }
   },
   "metadata": [

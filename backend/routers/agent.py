@@ -1,7 +1,8 @@
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
+from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -15,7 +16,9 @@ from schemas.agent import (
     AgentRunResponse,
     ConfirmRunRequest,
     OnboardingRequest,
+    OnboardingInput,
     RunUpdateRequest,
+    RunVersionRequest,
     TopicPlanRequest,
 )
 from schemas.mastery import StartAssessmentRequest
@@ -102,6 +105,14 @@ def create_assessment(
 
 def serialize_run(run: AgentRun) -> AgentRunResponse:
     state = run.state_json or {}
+    form = None
+    if run.run_type == "onboarding":
+        try:
+            form = OnboardingInput.model_validate(state.get("params"))
+        except ValidationError:
+            # Older updates allowed null required fields. Optional input projection
+            # must not block reading/cancelling those runs or fabricate a valid form.
+            pass
     step = None
     if run.status in {"diagnosing", "assessing"} and state.get("step_id"):
         questions = state.get("questions", [])
@@ -128,6 +139,8 @@ def serialize_run(run: AgentRun) -> AgentRunResponse:
         preview=state.get("preview"),
         result=run.result_json,
         error=error,
+        input=form,
+        processing=bool(state.get("processing")),
     )
 
 
@@ -236,7 +249,8 @@ def patch_run(
             db,
             user_id=current_user.id,
             run_id=run_id,
-            updates=request.model_dump(mode="json", exclude_unset=True),
+            updates=request.model_dump(mode="json", exclude_unset=True, exclude={"version"}),
+            version=request.version,
             generator=generator,
         ),
     )
@@ -256,6 +270,7 @@ def confirm_agent_run(
             user_id=current_user.id,
             run_id=run_id,
             request_id=request.request_id,
+            version=request.version,
         ),
     )
 
@@ -275,6 +290,7 @@ def cancel_agent_run(
 @router.post("/runs/{run_id}/retry", response_model=AgentRunResponse)
 def retry_agent_run(
     run_id: str,
+    request: RunVersionRequest | None = Body(default=None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
     generator: Any = Depends(get_agent_generator),
@@ -288,6 +304,7 @@ def retry_agent_run(
             db,
             user_id=current_user.id,
             run_id=run_id,
+            version=request.version if request else None,
             generator=generator,
         ),
     )

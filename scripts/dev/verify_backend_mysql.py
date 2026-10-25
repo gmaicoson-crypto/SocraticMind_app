@@ -19,6 +19,10 @@ TESTS = {
     "test_mysql_application_lifespan_and_health": TEST_FILE,
     "test_mysql_history_window_and_unicode_projection": "tests/integration/test_mysql_chat_history.py",
     "test_mysql_usage_checkpoint_and_new_turn_fence": "tests/integration/test_mysql_chat_feedback.py",
+    "test_mysql_concurrent_onboarding_create_and_confirm": "tests/integration/test_mysql_onboarding_recovery.py",
+    "test_mysql_confirmation_uses_current_version_despite_old_read_snapshot": "tests/integration/test_mysql_onboarding_recovery.py",
+    "test_mysql_cancel_fences_late_onboarding_model_result": "tests/integration/test_mysql_onboarding_recovery.py",
+    "test_mysql_cancel_after_creation_commit_preserves_terminal_version": "tests/integration/test_mysql_onboarding_recovery.py",
 }
 
 

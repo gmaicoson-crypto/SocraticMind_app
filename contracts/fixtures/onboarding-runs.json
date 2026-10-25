@@ -1,0 +1,626 @@
+{
+  "version": 1,
+  "request": {
+    "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
+    "topic": "线性代数",
+    "goal": "理解向量与线性变换",
+    "domain": "mathematics",
+    "outcome_type": "concept",
+    "familiarity": "beginner",
+    "daily_minutes": 30,
+    "target_date": null,
+    "timezone": "Asia/Shanghai",
+    "use_diagnostic": true
+  },
+  "failed_request": {
+    "run_id": "61519efb-02e4-4903-85c0-abdb28dd4b63",
+    "topic": "线性代数",
+    "goal": "理解向量与线性变换",
+    "domain": "mathematics",
+    "outcome_type": "concept",
+    "familiarity": "beginner",
+    "daily_minutes": 30,
+    "target_date": null,
+    "timezone": "Asia/Shanghai",
+    "use_diagnostic": true
+  },
+  "answers": [
+    "先表示向量",
+    "通过投影应用",
+    "非线性关系需要其他工具"
+  ],
+  "responses": {
+    "processing": {
+      "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
+      "type": "onboarding",
+      "status": "diagnosing",
+      "version": 1,
+      "step": null,
+      "preview": null,
+      "result": null,
+      "error": null,
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 30,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": true
+    },
+    "diagnosing": {
+      "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
+      "type": "onboarding",
+      "status": "diagnosing",
+      "version": 2,
+      "step": {
+        "step_id": "diagnostic-question-1",
+        "prompt": "Prior?",
+        "input_type": "text",
+        "choices": [],
+        "current": 1,
+        "total": 3
+      },
+      "preview": null,
+      "result": null,
+      "error": null,
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 30,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": false
+    },
+    "preview": {
+      "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
+      "type": "onboarding",
+      "status": "awaiting_confirmation",
+      "version": 7,
+      "step": null,
+      "preview": {
+        "topic": "线性代数",
+        "emoji": "📐",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "diagnostic": {
+          "score": 65,
+          "level": "foundation",
+          "domain": "mathematics",
+          "outcome_type": "concept",
+          "strengths": [],
+          "weaknesses": [
+            "proof"
+          ],
+          "graph_guidance": []
+        },
+        "nodes": [
+          {
+            "key": "root",
+            "label": "Root",
+            "sub": "",
+            "parent_keys": [],
+            "estimated_minutes": 20,
+            "x": 300,
+            "y": 120
+          },
+          {
+            "key": "a",
+            "label": "A",
+            "sub": "",
+            "parent_keys": [
+              "root"
+            ],
+            "estimated_minutes": 20,
+            "x": 202,
+            "y": 300
+          },
+          {
+            "key": "b",
+            "label": "B",
+            "sub": "",
+            "parent_keys": [
+              "root"
+            ],
+            "estimated_minutes": 20,
+            "x": 398,
+            "y": 300
+          },
+          {
+            "key": "c",
+            "label": "C",
+            "sub": "",
+            "parent_keys": [
+              "a"
+            ],
+            "estimated_minutes": 20,
+            "x": 104,
+            "y": 480
+          },
+          {
+            "key": "d",
+            "label": "D",
+            "sub": "",
+            "parent_keys": [
+              "a"
+            ],
+            "estimated_minutes": 20,
+            "x": 300,
+            "y": 480
+          },
+          {
+            "key": "e",
+            "label": "E",
+            "sub": "",
+            "parent_keys": [
+              "b"
+            ],
+            "estimated_minutes": 20,
+            "x": 496,
+            "y": 480
+          }
+        ],
+        "plan_items": [
+          {
+            "node_key": "root",
+            "scheduled_date": "2026-10-25",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "a",
+            "scheduled_date": "2026-10-25",
+            "day_order": 2,
+            "estimated_minutes": 10,
+            "status": "pending"
+          },
+          {
+            "node_key": "a",
+            "scheduled_date": "2026-10-26",
+            "day_order": 1,
+            "estimated_minutes": 10,
+            "status": "pending"
+          },
+          {
+            "node_key": "b",
+            "scheduled_date": "2026-10-26",
+            "day_order": 2,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "c",
+            "scheduled_date": "2026-10-27",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "d",
+            "scheduled_date": "2026-10-27",
+            "day_order": 2,
+            "estimated_minutes": 10,
+            "status": "pending"
+          },
+          {
+            "node_key": "d",
+            "scheduled_date": "2026-10-28",
+            "day_order": 1,
+            "estimated_minutes": 10,
+            "status": "pending"
+          },
+          {
+            "node_key": "e",
+            "scheduled_date": "2026-10-28",
+            "day_order": 2,
+            "estimated_minutes": 20,
+            "status": "pending"
+          }
+        ],
+        "total_minutes": 120,
+        "daily_minutes": 30,
+        "start_date": "2026-10-25",
+        "estimated_end_date": "2026-10-28",
+        "target_date": null,
+        "will_miss_target": false,
+        "delay_days": 0,
+        "effective_timezone": "Asia/Shanghai",
+        "risk_notice": null
+      },
+      "result": null,
+      "error": null,
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 30,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": false
+    },
+    "edited": {
+      "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
+      "type": "onboarding",
+      "status": "awaiting_confirmation",
+      "version": 9,
+      "step": null,
+      "preview": {
+        "topic": "线性代数",
+        "emoji": "📐",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "diagnostic": {
+          "score": 65,
+          "level": "foundation",
+          "domain": "mathematics",
+          "outcome_type": "concept",
+          "strengths": [],
+          "weaknesses": [
+            "proof"
+          ],
+          "graph_guidance": []
+        },
+        "nodes": [
+          {
+            "key": "root",
+            "label": "Root",
+            "sub": "",
+            "parent_keys": [],
+            "estimated_minutes": 20,
+            "x": 300,
+            "y": 120
+          },
+          {
+            "key": "a",
+            "label": "A",
+            "sub": "",
+            "parent_keys": [
+              "root"
+            ],
+            "estimated_minutes": 20,
+            "x": 202,
+            "y": 300
+          },
+          {
+            "key": "b",
+            "label": "B",
+            "sub": "",
+            "parent_keys": [
+              "root"
+            ],
+            "estimated_minutes": 20,
+            "x": 398,
+            "y": 300
+          },
+          {
+            "key": "c",
+            "label": "C",
+            "sub": "",
+            "parent_keys": [
+              "a"
+            ],
+            "estimated_minutes": 20,
+            "x": 104,
+            "y": 480
+          },
+          {
+            "key": "d",
+            "label": "D",
+            "sub": "",
+            "parent_keys": [
+              "a"
+            ],
+            "estimated_minutes": 20,
+            "x": 300,
+            "y": 480
+          },
+          {
+            "key": "e",
+            "label": "E",
+            "sub": "",
+            "parent_keys": [
+              "b"
+            ],
+            "estimated_minutes": 20,
+            "x": 496,
+            "y": 480
+          }
+        ],
+        "plan_items": [
+          {
+            "node_key": "root",
+            "scheduled_date": "2026-10-25",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "a",
+            "scheduled_date": "2026-10-26",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "b",
+            "scheduled_date": "2026-10-27",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "c",
+            "scheduled_date": "2026-10-28",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "d",
+            "scheduled_date": "2026-10-29",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "e",
+            "scheduled_date": "2026-10-30",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          }
+        ],
+        "total_minutes": 120,
+        "daily_minutes": 20,
+        "start_date": "2026-10-25",
+        "estimated_end_date": "2026-10-30",
+        "target_date": null,
+        "will_miss_target": false,
+        "delay_days": 0,
+        "effective_timezone": "Asia/Shanghai",
+        "risk_notice": null
+      },
+      "result": null,
+      "error": null,
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 20,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": false
+    },
+    "completed": {
+      "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
+      "type": "onboarding",
+      "status": "completed",
+      "version": 10,
+      "step": null,
+      "preview": {
+        "topic": "线性代数",
+        "emoji": "📐",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "diagnostic": {
+          "score": 65,
+          "level": "foundation",
+          "domain": "mathematics",
+          "outcome_type": "concept",
+          "strengths": [],
+          "weaknesses": [
+            "proof"
+          ],
+          "graph_guidance": []
+        },
+        "nodes": [
+          {
+            "key": "root",
+            "label": "Root",
+            "sub": "",
+            "parent_keys": [],
+            "estimated_minutes": 20,
+            "x": 300,
+            "y": 120
+          },
+          {
+            "key": "a",
+            "label": "A",
+            "sub": "",
+            "parent_keys": [
+              "root"
+            ],
+            "estimated_minutes": 20,
+            "x": 202,
+            "y": 300
+          },
+          {
+            "key": "b",
+            "label": "B",
+            "sub": "",
+            "parent_keys": [
+              "root"
+            ],
+            "estimated_minutes": 20,
+            "x": 398,
+            "y": 300
+          },
+          {
+            "key": "c",
+            "label": "C",
+            "sub": "",
+            "parent_keys": [
+              "a"
+            ],
+            "estimated_minutes": 20,
+            "x": 104,
+            "y": 480
+          },
+          {
+            "key": "d",
+            "label": "D",
+            "sub": "",
+            "parent_keys": [
+              "a"
+            ],
+            "estimated_minutes": 20,
+            "x": 300,
+            "y": 480
+          },
+          {
+            "key": "e",
+            "label": "E",
+            "sub": "",
+            "parent_keys": [
+              "b"
+            ],
+            "estimated_minutes": 20,
+            "x": 496,
+            "y": 480
+          }
+        ],
+        "plan_items": [
+          {
+            "node_key": "root",
+            "scheduled_date": "2026-10-25",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "a",
+            "scheduled_date": "2026-10-26",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "b",
+            "scheduled_date": "2026-10-27",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "c",
+            "scheduled_date": "2026-10-28",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "d",
+            "scheduled_date": "2026-10-29",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          },
+          {
+            "node_key": "e",
+            "scheduled_date": "2026-10-30",
+            "day_order": 1,
+            "estimated_minutes": 20,
+            "status": "pending"
+          }
+        ],
+        "total_minutes": 120,
+        "daily_minutes": 20,
+        "start_date": "2026-10-25",
+        "estimated_end_date": "2026-10-30",
+        "target_date": null,
+        "will_miss_target": false,
+        "delay_days": 0,
+        "effective_timezone": "Asia/Shanghai",
+        "risk_notice": null
+      },
+      "result": {
+        "topic_id": 1,
+        "plan_id": 1
+      },
+      "error": null,
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 20,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": false
+    },
+    "failed": {
+      "run_id": "61519efb-02e4-4903-85c0-abdb28dd4b63",
+      "type": "onboarding",
+      "status": "failed",
+      "version": 2,
+      "step": null,
+      "preview": null,
+      "result": null,
+      "error": {
+        "code": "AI_TIMEOUT",
+        "retryable": true
+      },
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 30,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": false
+    },
+    "cancelled": {
+      "run_id": "61519efb-02e4-4903-85c0-abdb28dd4b63",
+      "type": "onboarding",
+      "status": "cancelled",
+      "version": 3,
+      "step": null,
+      "preview": null,
+      "result": null,
+      "error": {
+        "code": "AI_TIMEOUT",
+        "retryable": true
+      },
+      "input": {
+        "topic": "线性代数",
+        "goal": "理解向量与线性变换",
+        "domain": "mathematics",
+        "outcome_type": "concept",
+        "familiarity": "beginner",
+        "daily_minutes": 30,
+        "target_date": null,
+        "timezone": "Asia/Shanghai",
+        "use_diagnostic": true
+      },
+      "processing": false
+    }
+  }
+}

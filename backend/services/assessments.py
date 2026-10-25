@@ -8,13 +8,8 @@ from core.errors import ApiError
 from models import AgentRun, AssessmentAttempt, Node, StudyPlan, Topic
 from models.enums import AgentRunStatus, AgentRunType, AssessmentStatus, MasterySource
 from schemas.structured_ai import AssessmentQuestions, AssessmentScore
-from services.agent.orchestrator import (
-    Generator,
-    RunSnapshot,
-    _invoke,
-    _load_owned,
-    _snapshot,
-)
+from services.agent.orchestrator import Generator, _invoke
+from services.agent.run_store import RunSnapshot, _load_owned, _snapshot, require_version
 from services.agent.state_machine import transition
 from services.agent.structured_ai import StructuredAIError, high_risk_notice
 from services.mastery import record_mastery
@@ -483,9 +478,11 @@ def retry_assessment(
     *,
     user_id: int,
     run_id: str,
+    version: int | None = None,
     generator: Generator | None = None,
 ) -> AgentRun:
     run = _load_owned(db, user_id, run_id, for_update=True)
+    require_version(db, run, version)
     if (
         run.run_type != AgentRunType.ASSESSMENT.value
         or run.status != AgentRunStatus.FAILED.value
@@ -518,6 +515,8 @@ def retry_assessment(
 
 def cancel_assessment(db: Session, *, user_id: int, run_id: str) -> AgentRun:
     run = _load_owned(db, user_id, run_id, for_update=True)
+    if run.status == AgentRunStatus.CANCELLED.value:
+        return run
     run.status = transition(run.status, AgentRunStatus.CANCELLED).value
     state = deepcopy(run.state_json or {})
     state["processing"] = False

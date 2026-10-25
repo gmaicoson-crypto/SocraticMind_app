@@ -1,6 +1,5 @@
 import json
 from copy import deepcopy
-from dataclasses import dataclass
 from typing import Any, Callable
 
 from sqlalchemy.orm import Session
@@ -18,6 +17,17 @@ from schemas.structured_ai import (
 from services.graph_validation import GraphValidationError, prepare_graph
 from services.planning import build_schedule, today_in_timezone
 
+from .onboarding_creation import reserve_onboarding
+from .run_store import (
+    RunSnapshot,
+    _begin_processing,
+    _conditional_save,
+    _load_owned,
+    _mark_failed,
+    _snapshot,
+    get_run as get_run,
+    require_version,
+)
 from .state_machine import transition
 from .structured_ai import (
     RunContext,
@@ -29,166 +39,6 @@ from .structured_ai import (
 
 
 Generator = Callable[[type, list[dict], RunContext], StructuredResult]
-
-
-@dataclass(frozen=True)
-class RunSnapshot:
-    id: str
-    user_id: int
-    status: str
-    version: int
-    state: dict[str, Any]
-    model: str | None
-    token_usage: int
-    latency_ms: int
-
-
-def _snapshot(run: AgentRun) -> RunSnapshot:
-    return RunSnapshot(
-        id=run.id,
-        user_id=run.user_id,
-        status=run.status,
-        version=run.version,
-        state=deepcopy(run.state_json or {}),
-        model=run.model,
-        token_usage=run.token_usage or 0,
-        latency_ms=run.latency_ms or 0,
-    )
-
-
-def _load_owned(db: Session, user_id: int, run_id: str, *, for_update: bool = False) -> AgentRun:
-    query = (
-        db.query(AgentRun)
-        .populate_existing()
-        .filter(AgentRun.id == run_id, AgentRun.user_id == user_id)
-    )
-    if for_update:
-        query = query.with_for_update()
-    run = query.first()
-    if run is None:
-        raise ApiError(status_code=404, code="RUN_NOT_FOUND", message="流程不存在")
-    return run
-
-
-def get_run(db: Session, *, user_id: int, run_id: str) -> AgentRun:
-    return _load_owned(db, user_id, run_id)
-
-
-def _begin_processing(
-    db: Session,
-    *,
-    user_id: int,
-    run_id: str,
-    target_status: AgentRunStatus,
-    stage: str,
-    state_updates: dict[str, Any] | None = None,
-) -> RunSnapshot:
-    run = _load_owned(db, user_id, run_id, for_update=True)
-    run.status = transition(run.status, target_status).value
-    state = deepcopy(run.state_json or {})
-    state.update(state_updates or {})
-    state["processing"] = True
-    state["processing_stage"] = stage
-    run.state_json = state
-    run.error_code = None
-    run.retryable = None
-    run.version += 1
-    snapshot = _snapshot(run)
-    db.commit()
-    return snapshot
-
-
-def _conditional_save(
-    db: Session,
-    snapshot: RunSnapshot,
-    *,
-    status: AgentRunStatus,
-    state: dict[str, Any],
-    ai_result: StructuredResult | None = None,
-) -> RunSnapshot:
-    transition(snapshot.status, status)
-    next_version = snapshot.version + 1
-    token_usage = snapshot.token_usage + (ai_result.token_usage if ai_result else 0)
-    latency_ms = snapshot.latency_ms + (ai_result.latency_ms if ai_result else 0)
-    updated = (
-        db.query(AgentRun)
-        .filter(
-            AgentRun.id == snapshot.id,
-            AgentRun.user_id == snapshot.user_id,
-            AgentRun.version == snapshot.version,
-        )
-        .update(
-            {
-                AgentRun.status: status.value,
-                AgentRun.state_json: state,
-                AgentRun.version: next_version,
-                AgentRun.token_usage: token_usage,
-                AgentRun.latency_ms: latency_ms,
-                AgentRun.error_code: None,
-                AgentRun.retryable: None,
-            },
-            synchronize_session=False,
-        )
-    )
-    if updated != 1:
-        db.rollback()
-        raise ApiError(
-            status_code=409,
-            code="AGENT_STATE_CONFLICT",
-            message="流程已被其他请求更新，请刷新后重试",
-            retryable=False,
-        )
-    next_snapshot = RunSnapshot(
-        id=snapshot.id,
-        user_id=snapshot.user_id,
-        status=status.value,
-        version=next_version,
-        state=deepcopy(state),
-        model=snapshot.model,
-        token_usage=token_usage,
-        latency_ms=latency_ms,
-    )
-    db.commit()
-    return next_snapshot
-
-
-def _mark_failed(
-    db: Session,
-    snapshot: RunSnapshot,
-    *,
-    code: str,
-    retryable: bool,
-) -> AgentRun:
-    state = deepcopy(snapshot.state)
-    state["processing"] = False
-    next_version = snapshot.version + 1
-    updated = (
-        db.query(AgentRun)
-        .filter(
-            AgentRun.id == snapshot.id,
-            AgentRun.user_id == snapshot.user_id,
-            AgentRun.version == snapshot.version,
-        )
-        .update(
-            {
-                AgentRun.status: AgentRunStatus.FAILED.value,
-                AgentRun.state_json: state,
-                AgentRun.version: next_version,
-                AgentRun.error_code: code,
-                AgentRun.retryable: retryable,
-            },
-            synchronize_session=False,
-        )
-    )
-    if updated != 1:
-        db.rollback()
-        raise ApiError(
-            status_code=409,
-            code="AGENT_STATE_CONFLICT",
-            message="流程已被其他请求更新，请刷新后重试",
-        )
-    db.commit()
-    return _load_owned(db, snapshot.user_id, snapshot.id)
 
 
 def _invoke(
@@ -451,37 +301,11 @@ def start_onboarding(
     generator: Generator | None = None,
     model_id: str | None = None,
 ) -> AgentRun:
-    params = request.model_dump(mode="json")
-    run = AgentRun(
-        user_id=user_id,
-        session_id=request.session_id,
-        run_type=AgentRunType.ONBOARDING.value,
-        status=AgentRunStatus.COLLECTING.value,
-        state_json={"params": params, "processing": False},
-        model=resolve_model_id(model_id or request.model),
-    )
-    db.add(run)
-    db.flush()
-    run_id = run.id
-    db.commit()
-
+    run, snapshot = reserve_onboarding(db, user_id=user_id, request=request, model_id=model_id)
+    if snapshot is None:
+        return run
     if request.use_diagnostic:
-        snapshot = _begin_processing(
-            db,
-            user_id=user_id,
-            run_id=run_id,
-            target_status=AgentRunStatus.DIAGNOSING,
-            stage="diagnostic_questions",
-        )
         return _generate_questions(db, snapshot, generator)
-
-    snapshot = _begin_processing(
-        db,
-        user_id=user_id,
-        run_id=run_id,
-        target_status=AgentRunStatus.DRAFTING,
-        stage="graph_draft",
-    )
     return _generate_preview(db, snapshot, generator)
 
 
@@ -562,9 +386,11 @@ def update_run_parameters(
     user_id: int,
     run_id: str,
     updates: dict[str, Any],
+    version: int | None = None,
     generator: Generator | None = None,
 ) -> AgentRun:
     run = _load_owned(db, user_id, run_id, for_update=True)
+    require_version(db, run, version)
     if run.status not in {
         AgentRunStatus.COLLECTING.value,
         AgentRunStatus.AWAITING_CONFIRMATION.value,
@@ -653,6 +479,8 @@ def submit_answer(
 
 def cancel_run(db: Session, *, user_id: int, run_id: str) -> AgentRun:
     run = _load_owned(db, user_id, run_id, for_update=True)
+    if run.status == AgentRunStatus.CANCELLED.value:
+        return run
     run.status = transition(run.status, AgentRunStatus.CANCELLED).value
     state = deepcopy(run.state_json or {})
     state["processing"] = False
@@ -667,9 +495,11 @@ def retry_run(
     *,
     user_id: int,
     run_id: str,
+    version: int | None = None,
     generator: Generator | None = None,
 ) -> AgentRun:
     run = _load_owned(db, user_id, run_id, for_update=True)
+    require_version(db, run, version)
     if run.status != AgentRunStatus.FAILED.value or not run.retryable:
         db.rollback()
         raise ApiError(
@@ -704,10 +534,12 @@ def confirm_run(
     user_id: int,
     run_id: str,
     request_id: str,
+    version: int | None = None,
 ) -> AgentRun:
     run = _load_owned(db, user_id, run_id, for_update=True)
     if run.status == AgentRunStatus.COMPLETED.value:
         return run
+    require_version(db, run, version)
     if run.status != AgentRunStatus.AWAITING_CONFIRMATION.value:
         db.rollback()
         raise ApiError(

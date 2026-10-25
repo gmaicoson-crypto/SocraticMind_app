@@ -162,3 +162,11 @@ Android 27 类 200 项、Swift 27 suite 201 项、工具 81 项通过；15 个 K
 2026-10-25：feedback-model / feedback-contract / feedback-state 按平台登记归一类型、状态 / 历史 / 取消消费者、终态投影和消息控件。ChatTurnOutcome 关联原 turn-state 集合，错误 / 用量提供方变化扩展两端反馈消费者；纯原生修改不选择 backend / MySQL。
 
 Android 29 类 209 项、Swift 29 suite 210 项、工具 86 项通过。双端各新增九项反馈测试，覆盖共享样例、未知 / 零用量、脱敏展示、旧历史缺码、终态优先和失败重生成。Kotlin 九、Swift 十二、Python 六个变化文件格式 / lint 通过；Android 控制器与 Swift 状态模型分别下降至 433 / 331 行。原始 JSON 数字类型和超大可选用量回归补齐后，公共回环 fixture 的字节响应变化按图扩展相关 HTTP / 账号消费者；后端未改动。原生页面只新增 XcodeGen 登记，宿主编译与设备仍待验；具体范围、初轮警告及最终日志见 `.tools/chat-feedback-native-r2-*` 和[实施状态](execution-status.md)。
+
+## 新主题恢复提供方验证
+
+2026-10-25：onboarding-provider 覆盖 run 存储、创建仲裁、路由、schema、评估及共享恢复样例，扩展旧 SSE / 历史消费者；onboarding-mysql 列出四个多连接测试方法，共五个场景。MySQL harness 的变化同时保留原有五项；修改的聊天边界测试文件单独登记，不由测试目录通配扩成全量。
+
+r2 最终后端 118、工具 85、Swift 主机包 11、隔离 MySQL 十项通过。Android JVM 两类 25 项首轮通过；r2 未修改其代码 / 输入，命名 Gradle 任务为 UP-TO-DATE，原始报告保留。十三个 Python 文件格式 / lint、变化文件规模和 OpenAPI 58 路径通过。历史 orchestrator / assessments 上限下调至 688 / 528，路由 310 行预警已审查。
+
+首轮两项旧测试失败均在未改基线 `c7d5ed8` 复现，修正旧图样例与 ORM 缓存断言并保留无效图保护用例，相关两文件十六项补验通过。r1 审查未通过：提交后快照可能吸收取消版本、历史 null 会让新增投影抛错。r2 修正后补充 after_commit 的真实 MySQL 成功 / 失败回写保护及三种旧字段 HTTP 回归，重新运行明确的受影响集合。初次失败、探针和修复证据不删除，最终结果见 `.tools/onboarding-provider-r2-results.json`。没有应用构建、设备测试或真实模型调用。

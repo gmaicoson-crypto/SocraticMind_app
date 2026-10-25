@@ -1,12 +1,12 @@
 from datetime import date
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import UUID4, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from models.enums import AgentRunStatus, AgentRunType, Familiarity, OutcomeType
 
 
-class OnboardingRequest(BaseModel):
+class OnboardingInput(BaseModel):
     topic: str = Field(min_length=1, max_length=200)
     goal: str = Field(min_length=1, max_length=300)
     domain: str = Field(min_length=1, max_length=100)
@@ -16,8 +16,6 @@ class OnboardingRequest(BaseModel):
     target_date: date | None = None
     timezone: str = Field(default="UTC", min_length=1, max_length=100)
     use_diagnostic: bool = True
-    session_id: str | None = Field(default=None, max_length=100)
-    model: str | None = Field(default=None, min_length=1, max_length=100)
 
     @field_validator("topic", "goal", "domain", "timezone")
     @classmethod
@@ -26,6 +24,12 @@ class OnboardingRequest(BaseModel):
         if not value:
             raise ValueError("must not be blank")
         return value
+
+
+class OnboardingRequest(OnboardingInput):
+    run_id: UUID4 | None = None
+    session_id: str | None = Field(default=None, max_length=100)
+    model: str | None = Field(default=None, min_length=1, max_length=100)
 
 
 class AgentStep(BaseModel):
@@ -48,6 +52,8 @@ class AgentRunResponse(BaseModel):
     preview: dict[str, Any] | None = None
     result: dict[str, Any] | None = None
     error: dict[str, Any] | None = None
+    input: OnboardingInput | None = None
+    processing: bool = False
 
 
 class TopicPlanRequest(BaseModel):
@@ -77,11 +83,15 @@ class AgentAnswerRequest(BaseModel):
     answer: str = Field(min_length=1, max_length=5000)
 
 
-class ConfirmRunRequest(BaseModel):
+class RunVersionRequest(BaseModel):
+    version: int | None = Field(default=None, ge=0, strict=True)
+
+
+class ConfirmRunRequest(RunVersionRequest):
     request_id: str = Field(min_length=1, max_length=100)
 
 
-class RunUpdateRequest(BaseModel):
+class RunUpdateRequest(RunVersionRequest):
     goal: str | None = Field(default=None, min_length=1, max_length=300)
     daily_minutes: int | None = Field(default=None, ge=5, le=240)
     target_date: date | None = None
@@ -99,8 +109,11 @@ class RunUpdateRequest(BaseModel):
 
     @model_validator(mode="after")
     def require_a_change(self):
-        if not self.model_fields_set:
+        if not self.model_fields_set - {"version"}:
             raise ValueError("at least one field is required")
+        for name in ("goal", "daily_minutes", "timezone"):
+            if name in self.model_fields_set and getattr(self, name) is None:
+                raise ValueError(f"{name} cannot be null")
         return self
 
 
@@ -113,7 +126,9 @@ __all__ = [
     "ConfirmRunRequest",
     "Familiarity",
     "OnboardingRequest",
+    "OnboardingInput",
     "OutcomeType",
     "RunUpdateRequest",
+    "RunVersionRequest",
     "TopicPlanRequest",
 ]

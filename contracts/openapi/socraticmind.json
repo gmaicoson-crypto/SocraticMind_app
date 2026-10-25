@@ -43,6 +43,16 @@
             ],
             "title": "Error"
           },
+          "input": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OnboardingInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "preview": {
             "anyOf": [
               {
@@ -54,6 +64,11 @@
               }
             ],
             "title": "Preview"
+          },
+          "processing": {
+            "default": false,
+            "title": "Processing",
+            "type": "boolean"
           },
           "result": {
             "anyOf": [
@@ -621,6 +636,18 @@
             "minLength": 1,
             "title": "Request Id",
             "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
           }
         },
         "required": [
@@ -1422,6 +1449,74 @@
         "title": "NodeResponse",
         "type": "object"
       },
+      "OnboardingInput": {
+        "properties": {
+          "daily_minutes": {
+            "default": 30,
+            "maximum": 240.0,
+            "minimum": 5.0,
+            "title": "Daily Minutes",
+            "type": "integer"
+          },
+          "domain": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Domain",
+            "type": "string"
+          },
+          "familiarity": {
+            "$ref": "#/components/schemas/Familiarity"
+          },
+          "goal": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Goal",
+            "type": "string"
+          },
+          "outcome_type": {
+            "$ref": "#/components/schemas/OutcomeType"
+          },
+          "target_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Date"
+          },
+          "timezone": {
+            "default": "UTC",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Timezone",
+            "type": "string"
+          },
+          "topic": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Topic",
+            "type": "string"
+          },
+          "use_diagnostic": {
+            "default": true,
+            "title": "Use Diagnostic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "topic",
+          "goal",
+          "domain",
+          "outcome_type",
+          "familiarity"
+        ],
+        "title": "OnboardingInput",
+        "type": "object"
+      },
       "OnboardingRequest": {
         "properties": {
           "daily_minutes": {
@@ -1461,6 +1556,18 @@
           },
           "outcome_type": {
             "$ref": "#/components/schemas/OutcomeType"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "format": "uuid4",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
           },
           "session_id": {
             "anyOf": [
@@ -1695,9 +1802,39 @@
               }
             ],
             "title": "Timezone"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
           }
         },
         "title": "RunUpdateRequest",
+        "type": "object"
+      },
+      "RunVersionRequest": {
+        "properties": {
+          "version": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "title": "RunVersionRequest",
         "type": "object"
       },
       "SearchedNodeResponse": {
@@ -2797,6 +2934,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RunVersionRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Request"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {

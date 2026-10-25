@@ -111,7 +111,8 @@ def test_empty_normal_reply_is_failed_and_never_scheduled_for_summary(
     )
     response = client.post("/api/chat/stream", json=request())
     assert db_session.query(ChatTurn).one().status == "failed"
-    assert db_session.query(ChatSession).one().active_request_id is None
+    # Bulk lease updates deliberately avoid ORM synchronization; assert persisted state.
+    assert db_session.query(ChatSession.active_request_id).scalar() is None
     assert any(
         item.get("error", {}).get("code") == "AI_EMPTY_RESPONSE" for item in events(response)
     )
