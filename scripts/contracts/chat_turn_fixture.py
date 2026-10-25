@@ -7,6 +7,11 @@ from pathlib import Path
 DATA = json.loads(
     (Path(__file__).resolve().parents[2] / "contracts/fixtures/chat-turns.json").read_text()
 )
+CONTEXTS = json.loads(
+    (
+        Path(__file__).resolve().parents[2] / "contracts/fixtures/chat-regeneration-contexts.json"
+    ).read_text()
+)["cases"]
 
 
 def response(method: str, path: str, query: dict, headers, body: bytes = b""):
@@ -52,6 +57,8 @@ def response(method: str, path: str, query: dict, headers, body: bytes = b""):
         if path == "/api/chat/stream" and payload == request:
             return 200, {"stream": True}
         if path == "/api/chat/stream" and payload == DATA["regeneration_request"]:
+            return 200, {"stream": True, "regeneration": True}
+        if path == "/api/chat/stream" and any(payload == item["request"] for item in CONTEXTS):
             return 200, {"stream": True, "regeneration": True}
         if path == "/api/chat/cancel" and payload == {
             "request_id": request["request_id"],

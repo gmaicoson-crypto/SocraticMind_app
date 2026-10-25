@@ -2,7 +2,9 @@ package com.gmaicoson.socraticmind.chat
 
 import com.gmaicoson.socraticmind.network.ChatEvent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -37,9 +39,10 @@ data class ChatTurnRequest(
     val pending: PendingChatTurn,
     val input: String,
     val style: String,
+    val context: ChatRequestContext = ChatRequestContext(),
 ) {
     init {
-        require(input.isNotBlank() && input.codePointCount(0, input.length) <= 5000)
+        context.validate(input, pending.target)
         require(style.isNotBlank() && style.codePointCount(0, style.length) <= 20)
     }
 
@@ -50,10 +53,15 @@ data class ChatTurnRequest(
             put("mode", pending.target.mode.wireValue)
             put("node_key", pending.target.nodeKey)
             put("topic_id", pending.target.topicId)
-            put("kind", "qa")
+            put("kind", context.kind.wireValue)
             put("user_input", input)
             put("ai_style", style)
             pending.regenerateMessageId?.let { put("regenerate_message_id", it) }
+            context.quoteText?.let { put("quote_text", it) }
+            context.quoteSourceId?.let { put("quote_source_id", it) }
+            if (context.attachmentIds.isNotEmpty()) {
+                put("attachment_ids", JsonArray(context.attachmentIds.map(::JsonPrimitive)))
+            }
         }
 }
 

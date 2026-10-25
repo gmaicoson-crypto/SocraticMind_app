@@ -818,7 +818,8 @@
       "paths": [
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnModels.kt",
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnApi.kt",
-        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnApiContractTest.kt"
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnApiContractTest.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatRequestContext.kt"
       ],
       "depends_on": [
         "turn-provider",
@@ -836,7 +837,8 @@
       "paths": [
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnModels.swift",
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnAPI.swift",
-        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTurnAPIContractTests.swift"
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTurnAPIContractTests.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatRequestContext.swift"
       ],
       "depends_on": [
         "turn-provider",
@@ -866,7 +868,8 @@
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatRegeneration.kt",
         "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationTest.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt",
-        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt"
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationContextTest.kt"
       ],
       "depends_on": [
         "turn-api-android",
@@ -879,7 +882,8 @@
           "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
           "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
           "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
-          "com.gmaicoson.socraticmind.chat.ChatRegenerationTest"
+          "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
+          "com.gmaicoson.socraticmind.chat.ChatRegenerationContextTest"
         ]
       },
       "manual": [
@@ -901,7 +905,8 @@
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatRegeneration.swift",
         "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationTests.swift",
         "ios/SocraticMind/Chat/MessageHistoryView.swift",
-        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift"
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationContextTests.swift"
       ],
       "depends_on": [
         "turn-api-ios",
@@ -914,7 +919,8 @@
           "ChatTurnModelTests",
           "FileChatTurnJournalTests",
           "ChatLibraryModelTests",
-          "ChatRegenerationTests"
+          "ChatRegenerationTests",
+          "ChatRegenerationContextTests"
         ]
       },
       "manual": [

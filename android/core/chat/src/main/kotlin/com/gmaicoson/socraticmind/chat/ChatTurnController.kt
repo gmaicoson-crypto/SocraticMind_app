@@ -169,6 +169,7 @@ class ChatTurnController(
                         ),
                         regeneration?.input ?: value.draft,
                         style,
+                        regeneration?.context ?: ChatRequestContext(),
                     )
                 }.getOrElse {
                     mutableState.value = value.copy(notice = "输入或会话配置无效，请检查后重试。")
@@ -211,13 +212,11 @@ class ChatTurnController(
                     }
                 } catch (error: Exception) {
                     requireCurrent(operation)
-                    if (regeneration != null && error is HttpFailure && error.status in setOf(400, 409) &&
-                        error.code in setOf("CHAT_REGENERATE_INVALID", "CHAT_REGENERATE_NOT_LATEST")
-                    ) {
+                    if (regeneration != null && error is HttpFailure && ChatRegeneration.rejected(error)) {
                         // A rejected stale question has no turn; persist a stop tombstone before clearing recovery.
                         val remote = authenticated(operation) { gateway.cancel(it, request.pending) }
                         finish(operation, request.pending, remote)
-                        update(operation) { it.copy(notice = "原问题已变化或不再是最后一问，请刷新历史后重试。") }
+                        update(operation) { it.copy(notice = "原问题或引用、附件已变化，请刷新历史后重试。") }
                         return@launchOperation
                     }
                     // A transport error, timeout or DONE is not a confirmed terminal result.

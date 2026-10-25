@@ -118,7 +118,7 @@ public final class ChatTurnModel: ObservableObject {
             request = try ChatTurnRequest(
                 pending: PendingChatTurn(ownerID: account.userID, target: target, requestID: requestID(),
                                          regenerateMessageID: regeneration?.answerID),
-                input: regeneration?.input ?? state.draft, style: style
+                input: regeneration?.input ?? state.draft, style: style, context: regeneration?.context ?? .plain
             )
         } catch { state.notice = "输入或会话配置无效，请检查后重试。"; return }
         state.phase = .preparing; state.pending = request.pending; state.receipt = nil
@@ -146,15 +146,13 @@ public final class ChatTurnModel: ObservableObject {
                 }
             } catch {
                 try await self.requireCurrent(operation)
-                if regeneration != nil, let failure = error as? HTTPFailure, [400, 409].contains(failure.status),
-                   ["CHAT_REGENERATE_INVALID", "CHAT_REGENERATE_NOT_LATEST"].contains(failure.code ?? "")
-                {
+                if regeneration != nil, let failure = error as? HTTPFailure, ChatRegeneration.rejected(failure) {
                     // Persist a stop tombstone before clearing the rejected stale request's recovery record.
                     let remote = try await self.authenticated(operation) {
                         try await gateway.cancel(token: $0, pending: request.pending)
                     }
                     try await self.finish(operation, pending: request.pending, remote: remote)
-                    self.state.notice = "原问题已变化或不再是最后一问，请刷新历史后重试。"
+                    self.state.notice = "原问题或引用、附件已变化，请刷新历史后重试。"
                     return
                 }
             }

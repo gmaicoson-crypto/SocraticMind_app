@@ -59,7 +59,7 @@ class ChatRegenerationTest {
                 listOf(user.copy(id = 103), answer),
                 listOf(user.copy(sessionId = "other"), answer),
                 listOf(user.copy(metadata = JsonObject(mapOf("kind" to JsonPrimitive("node_overview")))), answer),
-                listOf(user.copy(metadata = JsonObject(mapOf("quote" to JsonPrimitive("quote")))), answer),
+                listOf(user.copy(metadata = JsonObject(mapOf("quote" to JsonPrimitive(true)))), answer),
                 listOf(user.copy(attachments = listOf(JsonObject(emptyMap()))), answer),
                 listOf(user, answer.copy(metadata = JsonObject(mapOf("status" to JsonPrimitive("generating"))))),
             )

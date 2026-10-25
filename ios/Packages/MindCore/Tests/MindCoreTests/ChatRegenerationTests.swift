@@ -57,7 +57,7 @@ struct ChatRegenerationTests {
         let invalid: [[StoredChatMessage]] = try [
             [answer], [user], [changed(user, id: 103), answer], [changed(user, session: "other"), answer],
             [changed(user, metadata: ["kind": "node_overview"]), answer],
-            [changed(user, metadata: ["quote": "quote"]), answer],
+            [changed(user, metadata: ["quote": String(repeating: "q", count: 201)]), answer],
             [changed(user, attachments: [[:]]), answer],
             [user, changed(answer, metadata: ["status": "generating"])],
         ]

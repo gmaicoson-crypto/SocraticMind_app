@@ -129,4 +129,10 @@ ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改�
 
 2026-10-25：turn-provider 新增 chat_regeneration 服务、完整上下文契约及共享样例路径。路由与生命周期变化按已登记依赖扩展消费者，新增映射回归确保三类输入均选择真实提供方与双端 wire 测试。没有改变执行器、工具版本、依赖或锁。
 
-后端首轮 104 项、补验新契约 19 项，按文件覆盖为 107 项有效结果；Android 22 类 190 项、Swift 22 suite 177 项、工具 68 项及临时 MySQL 历史投影 1 项通过。OpenAPI 58 路径一致；5 个变化 Python 文件通过固定格式 / lint。历史 lifecycle 上限从 864 下调至 806，新模块 112 行；历史路由与 753 行影响图的职责审查见[上下文实现](chat-regeneration-context.md)。当前只提供后端与兼容性证据，新增原生上下文请求尚待接入。
+后端首轮 104 项、补验新契约 19 项，按文件覆盖为 107 项有效结果；Android 22 类 190 项、Swift 22 suite 177 项、工具 68 项及临时 MySQL 历史投影 1 项通过。OpenAPI 58 路径一致；5 个变化 Python 文件通过固定格式 / lint。历史 lifecycle 上限从 864 下调至 806，新模块 112 行；历史路由与 753 行影响图的职责审查见[上下文实现](chat-regeneration-context.md)。该次仅提供后端与兼容性证据，新增原生上下文请求的接入与验证见下节。
+
+## 完整上下文重生成的双端验证
+
+2026-10-25：ChatRequestContext 精确登记到各自 turn-api 组；新的 ChatRegenerationContextTest(s) 登记到 turn-state，继续受共享提供方 / fixture 反向依赖选择。回环服务精确核对六种重生成请求；状态交接使用已有异步替身，不把旧 fixture 的固定会话状态当作新场景的服务端结果。
+
+Android 12 类 99 项、Swift 12 suite 103 项和工具 69 项通过；Kotlin 6、Swift 6、Python 3 个变化文件固定格式 / lint 通过。消费者扩展有精确列表断言，初轮遗漏新增测试类的预期已修正；工具版本、依赖和锁均未改变。三个行数预警的审查、原始日志与 XML 见[实施状态](execution-status.md)。本批不运行 backend / MySQL 或应用构建；宿主与设备验收仍单独安排。

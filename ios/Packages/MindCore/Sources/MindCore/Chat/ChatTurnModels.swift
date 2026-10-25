@@ -67,23 +67,32 @@ public struct ChatTurnRequest: Sendable {
     public let pending: PendingChatTurn
     public let input: String
     public let style: String
+    public let context: ChatRequestContext
 
-    public init(pending: PendingChatTurn, input: String, style: String) throws {
-        guard !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              input.unicodeScalars.count <= 5000,
-              !style.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, style.unicodeScalars.count <= 20
+    public init(pending: PendingChatTurn, input: String, style: String, context: ChatRequestContext = .plain) throws {
+        try context.validate(input: input, target: pending.target)
+        guard !style.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, style.unicodeScalars.count <= 20
         else { throw ChatTurnFailure.invalidRequest }
-        self.pending = pending; self.input = input; self.style = style
+        self.pending = pending; self.input = input; self.style = style; self.context = context
     }
 
     public func encoded() throws -> Data {
         var value: [String: Any] = [
             "request_id": pending.requestID, "session_id": pending.target.sessionID,
             "node_key": pending.target.nodeKey, "topic_id": pending.target.topicID,
-            "mode": pending.target.mode.rawValue, "kind": "qa", "user_input": input, "ai_style": style,
+            "mode": pending.target.mode.rawValue, "kind": context.kind.rawValue, "user_input": input, "ai_style": style,
         ]
         if let id = pending.regenerateMessageID {
             value["regenerate_message_id"] = id
+        }
+        if let quote = context.quoteText {
+            value["quote_text"] = quote
+        }
+        if let source = context.quoteSourceID {
+            value["quote_source_id"] = source
+        }
+        if !context.attachmentIDs.isEmpty {
+            value["attachment_ids"] = context.attachmentIDs
         }
         return try JSONSerialization.data(withJSONObject: value)
     }

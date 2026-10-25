@@ -146,6 +146,7 @@ class AvatarImageImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatRegenerationContextTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
