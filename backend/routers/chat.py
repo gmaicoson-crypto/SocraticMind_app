@@ -11,7 +11,7 @@ from typing import List, Literal
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session, sessionmaker
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ai.agent import ChatStreamError, chat_stream
 from ai.prompts import build_normal_suggestions_prompt, build_socratic_suggestions_prompt
@@ -36,13 +36,13 @@ from core.context_budget import (
 )
 from routers.chat_history import router as history_router
 from schemas.chat_history import HistoryResponse
+from schemas.chat_request import ChatRequest
 from services.chat_history import history_responses, visible_messages
 from services.chat_context import assemble_chat_context
 from services.web_evidence import apply_web_context, cited_source_ids, invalid_source_ids
 from services.web_search import iter_web_search, web_search_capabilities
 from services.web_search_quota import reserve_web_queries
 from services.chat_stream_runner import cancellable_chat_stream
-from services.attachments.config import LIMITS as ATTACHMENT_LIMITS
 from services.chat_summaries import run_one_summary_job, schedule_chat_summary
 from services.chat_titles import schedule_title
 from services.chat_lifecycle import (
@@ -80,63 +80,16 @@ def _delete_chat_avatar_files(user_id: int, session_id: str, *, except_name: str
     return deleted
 
 
-class ChatRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    request_id: str = Field(min_length=1, max_length=100)
-    regenerate_message_id: int | None = Field(default=None, gt=0)
-    node_key: str = Field(min_length=1, max_length=200)
-    topic_id: int = Field(ge=0)
-    session_id: str = Field(min_length=1, max_length=100)
-    user_input: str = Field(max_length=5000)
-    mode: Literal["socratic", "normal"] = "socratic"
-    ai_style: str = Field(default="标准", min_length=1, max_length=20)
-    kind: Literal["qa", "topic_overview", "node_overview"] = "qa"
-    model: str | None = Field(default=None, min_length=1, max_length=100)
-    quote_text: str | None = Field(default=None, max_length=200)
-    quote_source_id: int | None = Field(default=None, gt=0)
-    attachment_ids: list[str] = Field(
-        default_factory=list, max_length=ATTACHMENT_LIMITS["max_attachments"]
-    )
-
-    @property
-    def web_mode(self) -> Literal["auto", "off"]:
-        """The server owns the policy; clients only select the kind of conversation."""
-        return "auto" if self.kind == "qa" else "off"
-
-    @field_validator("node_key", "session_id", "ai_style", "request_id")
-    @classmethod
-    def strip_required_text(cls, value: str) -> str:
-        value = value.strip()
-        if not value:
-            raise ValueError("must not be blank")
-        return value
-
-    @model_validator(mode="after")
-    def validate_request(self):
-        if (
-            self.kind == "qa"
-            and not self.user_input.strip()
-            and not self.attachment_ids
-            and self.regenerate_message_id is None
-        ):
-            raise ValueError("user_input must not be blank for qa")
-        if len(self.attachment_ids) != len(set(self.attachment_ids)) or any(
-            not item or len(item) > 36 for item in self.attachment_ids
-        ):
-            raise ValueError("attachment_ids must be unique resource identifiers")
-        if self.kind != "qa" and self.attachment_ids:
-            raise ValueError("overview requests cannot contain attachments")
-        if self.kind != "qa" and self.mode != "socratic":
-            raise ValueError("overview requests must use socratic mode")
-        return self
-
-
 def selected_model(model_id: str | None, user_id: int | None = None) -> str:
     try:
         return resolve_model_id(model_id, user_id=user_id)
     except ValueError as error:
-        raise HTTPException(status_code=422, detail=str(error)) from error
+        raise ApiError(
+            status_code=422,
+            code="LLM_MODEL_UNAVAILABLE",
+            message="所选模型不可用，请刷新模型列表后重试。",
+            retryable=False,
+        ) from error
 
 
 @router.get("/capabilities")

@@ -136,3 +136,9 @@ ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改�
 2026-10-25：ChatRequestContext 精确登记到各自 turn-api 组；新的 ChatRegenerationContextTest(s) 登记到 turn-state，继续受共享提供方 / fixture 反向依赖选择。回环服务精确核对六种重生成请求；状态交接使用已有异步替身，不把旧 fixture 的固定会话状态当作新场景的服务端结果。
 
 Android 12 类 99 项、Swift 12 suite 103 项和工具 69 项通过；Kotlin 6、Swift 6、Python 3 个变化文件固定格式 / lint 通过。消费者扩展有精确列表断言，初轮遗漏新增测试类的预期已修正；工具版本、依赖和锁均未改变。三个行数预警的审查、原始日志与 XML 见[实施状态](execution-status.md)。本批不运行 backend / MySQL 或应用构建；宿主与设备验收仍单独安排。
+
+## 基础模型选择的提供方验证
+
+2026-10-25：model-provider 显式登记目录路由、运行时模型解析、用户模型加载、共享样例与提供方测试；模型变化扩展发送、建议和 OpenAPI 消费者。新 ChatRequest schema 继续关联 chat-provider。模型映射回归单独放到 test_model_selection_impact.py，既有影响图文件不增行。
+
+后端 123 项、Android 23 类 197 项、Swift 23 suite 184 项、工具 72 项及隔离 MySQL 历史投影 1 项通过；OpenAPI 58 路径一致，Python 4 个变化文件固定格式 / lint 通过。路由历史上限随职责拆分从 1216 降至 1169，未提高豁免。原生目录与选择尚未实现，本次消费者测试只证明兼容性；边界见[模型选择实施](model-selection-implementation.md)。

@@ -1,0 +1,92 @@
+{
+  "catalog": {
+    "models": [
+      {
+        "id": "env:first",
+        "name": "系统模型一",
+        "source": "environment",
+        "model": "synthetic-model",
+        "image_input": "unknown",
+        "max_images": 9,
+        "max_image_bytes": 10485760,
+        "vision_token_budget": null
+      },
+      {
+        "id": "env:second",
+        "name": "系统默认模型",
+        "source": "environment",
+        "model": "synthetic-model",
+        "image_input": "unknown",
+        "max_images": 9,
+        "max_image_bytes": 10485760,
+        "vision_token_budget": null
+      },
+      {
+        "id": "custom:00000000-0000-4000-8000-000000000001",
+        "name": "我的模型🙂",
+        "source": "custom",
+        "base_url": "https://custom.example.test/v1",
+        "model": "synthetic-model",
+        "image_input": "unknown",
+        "max_images": 9,
+        "max_image_bytes": 10485760,
+        "vision_token_budget": null
+      }
+    ]
+  },
+  "default_id": "env:second",
+  "requests": [
+    {
+      "name": "default",
+      "request": {
+        "request_id": "model-contract-default",
+        "session_id": "model-selection-会话",
+        "node_key": "__normal__",
+        "mode": "normal",
+        "topic_id": 0,
+        "kind": "qa",
+        "ai_style": "标准",
+        "user_input": "  模型选择的合成问题🙂\n"
+      },
+      "resolved_model": "env:second"
+    },
+    {
+      "name": "environment",
+      "request": {
+        "request_id": "model-contract-environment",
+        "session_id": "model-selection-会话",
+        "node_key": "__normal__",
+        "mode": "normal",
+        "topic_id": 0,
+        "kind": "qa",
+        "ai_style": "标准",
+        "user_input": "  模型选择的合成问题🙂\n",
+        "model": "env:first"
+      },
+      "resolved_model": "env:first"
+    },
+    {
+      "name": "custom",
+      "request": {
+        "request_id": "model-contract-custom",
+        "session_id": "model-selection-会话",
+        "node_key": "__normal__",
+        "mode": "normal",
+        "topic_id": 0,
+        "kind": "qa",
+        "ai_style": "标准",
+        "user_input": "  模型选择的合成问题🙂\n",
+        "model": "custom:00000000-0000-4000-8000-000000000001"
+      },
+      "resolved_model": "custom:00000000-0000-4000-8000-000000000001"
+    }
+  ],
+  "unavailable": {
+    "status": 422,
+    "payload": {
+      "code": "LLM_MODEL_UNAVAILABLE",
+      "message": "所选模型不可用，请刷新模型列表后重试。",
+      "retryable": false
+    }
+  }
+}
