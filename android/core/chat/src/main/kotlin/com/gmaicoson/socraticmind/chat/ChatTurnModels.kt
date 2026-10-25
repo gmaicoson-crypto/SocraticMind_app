@@ -96,6 +96,7 @@ data class ChatMessageIds(
 data class RemoteChatTurn(
     val status: ChatTurnStatus,
     val ids: ChatMessageIds?,
+    val feedback: ChatAnswerFeedback? = null,
 )
 
 interface ChatTurnGateway {

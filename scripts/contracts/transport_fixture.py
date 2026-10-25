@@ -41,7 +41,11 @@ class Handler(BaseHTTPRequestHandler):
         pass  # No request bodies, tokens, or platform credentials in test output.
 
     def respond(self, status: int, payload: dict, **headers):
-        body = json.dumps(payload, ensure_ascii=False).encode()
+        body = (
+            payload
+            if isinstance(payload, bytes)
+            else json.dumps(payload, ensure_ascii=False).encode()
+        )
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))

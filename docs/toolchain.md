@@ -155,3 +155,10 @@ Android 27 类 200 项、Swift 27 suite 201 项、工具 81 项通过；15 个 K
 2026-10-25：feedback-provider 显式覆盖安全模型错误、有界用量、消息元数据及取消检查点；feedback-mysql 校验 MySQL 的报告 JSON 与更新轮次保护。共享实现变化扩展相关 SSE / 历史 / turn 消费者及其依赖，纯协议文件不无故选中数据库集合；测试选择仍限定具体文件 / 节点。
 
 后端 212 项、Android JVM 26 类 213 项、Swift macOS 包 26 suite 200 项、工具 78 项通过；OpenAPI 58 路径一致。MySQL 的五项定向集合首轮四项通过，新用例发现旧快照问题后修复并单独通过，生命周期八项随之补验。Python 15 个变化文件格式 / lint、结构和行数检查通过；历史路由 / lifecycle 上限下降为 1146 / 803。失败与最终报告见 `.tools/chat-feedback-provider-*`，真实服务及原生反馈展示另验，未构建或部署应用。
+
+
+## 双端回答反馈验证
+
+2026-10-25：feedback-model / feedback-contract / feedback-state 按平台登记归一类型、状态 / 历史 / 取消消费者、终态投影和消息控件。ChatTurnOutcome 关联原 turn-state 集合，错误 / 用量提供方变化扩展两端反馈消费者；纯原生修改不选择 backend / MySQL。
+
+Android 29 类 209 项、Swift 29 suite 210 项、工具 86 项通过。双端各新增九项反馈测试，覆盖共享样例、未知 / 零用量、脱敏展示、旧历史缺码、终态优先和失败重生成。Kotlin 九、Swift 十二、Python 六个变化文件格式 / lint 通过；Android 控制器与 Swift 状态模型分别下降至 433 / 331 行。原始 JSON 数字类型和超大可选用量回归补齐后，公共回环 fixture 的字节响应变化按图扩展相关 HTTP / 账号消费者；后端未改动。原生页面只新增 XcodeGen 登记，宿主编译与设备仍待验；具体范围、初轮警告及最终日志见 `.tools/chat-feedback-native-r2-*` 和[实施状态](execution-status.md)。

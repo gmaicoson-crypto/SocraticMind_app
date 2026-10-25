@@ -43,7 +43,7 @@ class ImpactTests(unittest.TestCase):
             "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt"
         )
         result = load_plan(scope(value))
-        self.assertEqual(26, len(result["checks"]["android"]))
+        self.assertEqual(28, len(result["checks"]["android"]))
         self.assertFalse(result["checks"]["ios"])
         self.assertFalse(result["checks"]["python"])
         self.assertEqual([value], result["files"]["android"])
@@ -69,6 +69,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.AvatarImagePolicyTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatFeedbackStateTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelSendTest",
@@ -89,6 +90,7 @@ class ImpactTests(unittest.TestCase):
                 "AvatarImageLoaderTests",
                 "ChatActionsModelTests",
                 "ChatAvatarModelTests",
+                "ChatFeedbackStateTests",
                 "ChatLibraryModelTests",
                 "ChatModelSelectionModelTests",
                 "ChatModelSendTests",
@@ -149,7 +151,7 @@ class ImpactTests(unittest.TestCase):
             "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         ]:
             result = load_plan(scope(value))
-            self.assertEqual(28, len(result["checks"]["ios"]))
+            self.assertEqual(30, len(result["checks"]["ios"]))
             self.assertIn("MarkdownContractTests", result["checks"]["ios"])
             self.assertEqual(
                 ["unittest:scripts.ci.tests.test_package_resolution"], result["checks"]["python"]
@@ -187,6 +189,7 @@ class ImpactTests(unittest.TestCase):
                 "AvatarImageLoaderTests",
                 "ChatActionsModelTests",
                 "ChatAvatarModelTests",
+                "ChatFeedbackStateTests",
                 "ChatLibraryModelTests",
                 "ChatModelSelectionModelTests",
                 "ChatModelSendTests",
@@ -219,6 +222,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.AvatarImagePolicyTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatFeedbackStateTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelSendTest",
@@ -246,6 +250,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.AvatarImagePolicyTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatFeedbackStateTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelSendTest",

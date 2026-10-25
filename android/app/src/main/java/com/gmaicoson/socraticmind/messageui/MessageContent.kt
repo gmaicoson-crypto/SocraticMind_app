@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gmaicoson.socraticmind.avatarui.AvatarImage
 import com.gmaicoson.socraticmind.avatarui.AvatarPresentation
+import com.gmaicoson.socraticmind.chat.ChatAnswerFeedback
 import com.gmaicoson.socraticmind.chat.StoredChatMessage
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownDocument
 import com.gmaicoson.socraticmind.chat.markdown.MarkdownLink
@@ -34,7 +35,14 @@ fun MessageContent(
     message: StoredChatMessage,
     renderer: MarkdownRenderer,
     avatar: AvatarPresentation? = null,
-) = MessageContent(message.role, message.content, renderer, attachments = message.attachments.size, avatar = avatar)
+) = MessageContent(
+    message.role,
+    message.content,
+    renderer,
+    attachments = message.attachments.size,
+    avatar = avatar,
+    feedback = ChatAnswerFeedback.from(message),
+)
 
 @Composable
 fun MessageContent(
@@ -44,6 +52,7 @@ fun MessageContent(
     provisional: Boolean = false,
     attachments: Int = 0,
     avatar: AvatarPresentation? = null,
+    feedback: ChatAnswerFeedback? = null,
 ) {
     Column(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -71,6 +80,7 @@ fun MessageContent(
         if (attachments > 0) {
             Text("包含 $attachments 个附件", style = MaterialTheme.typography.labelMedium)
         }
+        feedback?.let { MessageFeedback(it) }
     }
 }
 

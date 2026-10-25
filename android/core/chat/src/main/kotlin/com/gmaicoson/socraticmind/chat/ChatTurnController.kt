@@ -355,36 +355,7 @@ class ChatTurnController(
             }
             return
         }
-        val notice =
-            when {
-                rejected != null -> {
-                    "所选模型不可用，请刷新模型目录或重新选择后发送；输入与原回答已保留。"
-                }
-
-                pending.regenerateMessageId != null && remote?.status == ChatTurnStatus.INTERRUPTED -> {
-                    "重新生成已停止，原回答仍保留。"
-                }
-
-                pending.regenerateMessageId != null && remote?.status == ChatTurnStatus.FAILED -> {
-                    "重新生成失败，原回答仍保留。"
-                }
-
-                remote == null || (ids != null && messages.size != 2) -> {
-                    "消息已更新或删除，请刷新历史查看。"
-                }
-
-                remote.status == ChatTurnStatus.COMPLETE -> {
-                    null
-                }
-
-                remote.status == ChatTurnStatus.INTERRUPTED -> {
-                    "回复已停止；已保存的部分可在历史中查看。"
-                }
-
-                else -> {
-                    "本次回复失败；可查看已有内容后重新输入。"
-                }
-            }
+        val notice = ChatTurnOutcome.notice(pending, remote, messages, rejected != null)
         update(operation) {
             rejectedModelRequest = null
             it.copy(

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "integer-shaped-float",
+      "usage_json": "{\"prompt_tokens\":42.0,\"completion_tokens\":17,\"total_tokens\":59}",
+      "valid_state": true,
+      "expected_total": null
+    },
+    {
+      "name": "integer-shaped-exponent",
+      "usage_json": "{\"prompt_tokens\":4.2e1,\"completion_tokens\":17,\"total_tokens\":59}",
+      "valid_state": true,
+      "expected_total": null
+    },
+    {
+      "name": "unrepresentable-number",
+      "usage_json": "{\"prompt_tokens\":1e400,\"completion_tokens\":17,\"total_tokens\":1e400}",
+      "valid_state": true,
+      "expected_total": null
+    },
+    {
+      "name": "negative-unrepresentable-number",
+      "usage_json": "{\"prompt_tokens\":-1e400,\"completion_tokens\":17,\"total_tokens\":59}",
+      "valid_state": true,
+      "expected_total": null
+    },
+    {
+      "name": "integer-maximum",
+      "usage_json": "{\"prompt_tokens\":9007199254740991,\"completion_tokens\":0,\"total_tokens\":9007199254740991}",
+      "valid_state": true,
+      "expected_total": 9007199254740991
+    },
+    {
+      "name": "reported-zero",
+      "usage_json": "{\"prompt_tokens\":0,\"completion_tokens\":0,\"total_tokens\":0}",
+      "valid_state": true,
+      "expected_total": 0
+    },
+    {
+      "name": "foreign-request",
+      "usage_json": "{\"prompt_tokens\":1e400}",
+      "valid_state": false,
+      "expected_total": null,
+      "override": {"request_id": "foreign"}
+    },
+    {
+      "name": "invalid-status",
+      "usage_json": "{\"prompt_tokens\":1e400}",
+      "valid_state": false,
+      "expected_total": null,
+      "override": {"status": "not-terminal"}
+    },
+    {
+      "name": "invalid-message-id",
+      "usage_json": "{\"prompt_tokens\":1e400}",
+      "valid_state": false,
+      "expected_total": null,
+      "override": {"msg_ids": {"user": 101, "ai": 0}}
+    }
+  ]
+}

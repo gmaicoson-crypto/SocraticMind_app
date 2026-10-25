@@ -23,7 +23,8 @@ class ChatTurnApi(
         val value = transport.request("GET", "api/chat/requests/${pending.requestId}", bearer = token).historyObject()
         require(value.historyString("request_id") == pending.requestId)
         require(value.historyString("session_id") == pending.target.sessionId)
-        return RemoteChatTurn(ChatTurnStatus.decode(value.historyString("status")), decodeIds(value))
+        val status = ChatTurnStatus.decode(value.historyString("status"))
+        return RemoteChatTurn(status, decodeIds(value), ChatAnswerFeedback.decode(value, status))
     }
 
     override suspend fun cancel(
@@ -45,7 +46,7 @@ class ChatTurnApi(
         val status = ChatTurnStatus.decode(value.historyString("status"))
         val ids = if (value.containsKey("msg_ids")) decodeIds(value) else null
         require(status.terminal && (ids != null || status == ChatTurnStatus.INTERRUPTED))
-        return RemoteChatTurn(status, ids)
+        return RemoteChatTurn(status, ids, ChatAnswerFeedback.decode(value, status))
     }
 
     override suspend fun messages(

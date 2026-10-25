@@ -1,6 +1,7 @@
 import Foundation
 
 /// Keep structured learning, sources and attachments for their feature consumers, including unknown additions.
+/// Optional usage is retained only through ChatHistoryAPI's reader that preserves JSON number types.
 public struct StoredChatMessage: Decodable, Equatable, Sendable {
     public let id: Int64
     public let role: String
@@ -31,7 +32,7 @@ public struct StoredChatMessage: Decodable, Equatable, Sendable {
         mode = try values.decode(String.self, forKey: .mode)
         topicID = try values.decode(Int64?.self, forKey: .topicID)
         messageType = try values.decode(String.self, forKey: .messageType)
-        metadata = try values.decode([String: ChatJSONValue]?.self, forKey: .metadata)
+        metadata = try values.decode(ChatMessageMetadata?.self, forKey: .metadata)?.value
         createdAt = try values.decode(String?.self, forKey: .createdAt)
         attachments = try values.decode([[String: ChatJSONValue]].self, forKey: .attachments)
     }

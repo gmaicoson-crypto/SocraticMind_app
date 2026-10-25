@@ -8,11 +8,13 @@ struct MessageContentView: View {
     let renderer: MarkdownRenderer
     let provisional: Bool
     let avatar: AvatarPresentation?
+    let feedback: ChatAnswerFeedback?
 
     init(message: StoredChatMessage, renderer: MarkdownRenderer, avatar: AvatarPresentation? = nil) {
         role = message.role; content = message.content; attachmentCount = message.attachments.count
         self.renderer = renderer; provisional = false
         self.avatar = avatar
+        feedback = ChatAnswerFeedback.from(message)
     }
 
     init(role: String, content: String, renderer: MarkdownRenderer, provisional: Bool = false,
@@ -21,6 +23,7 @@ struct MessageContentView: View {
         self.role = role; self.content = content; attachmentCount = 0
         self.renderer = renderer; self.provisional = provisional
         self.avatar = avatar
+        feedback = nil
     }
 
     var body: some View {
@@ -40,6 +43,9 @@ struct MessageContentView: View {
             }
             if attachmentCount > 0 {
                 Text("包含 \(attachmentCount) 个附件").font(.caption).foregroundStyle(.secondary)
+            }
+            if let feedback {
+                MessageFeedbackView(feedback: feedback)
             }
         }
         .padding(.vertical, 8)

@@ -24,6 +24,7 @@
 		882687C0581C875A202E9A33 /* ChatAvatarPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36CB9D6D35B53049977A359 /* ChatAvatarPickerSheet.swift */; };
 		8959D81C0451B2AF0D509C27 /* ChatSuggestionsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 626AC4B794A189AE79EDCA7C /* ChatSuggestionsBar.swift */; };
 		8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */; };
+		99CAF1FC8EF633BA48940D3F /* MessageFeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21844FC96E96BE311AF933B /* MessageFeedbackView.swift */; };
 		B0AB1E4C863DCC15CCC57C3B /* MindCore in Frameworks */ = {isa = PBXBuildFile; productRef = 492390A04D3652B12EA883A7 /* MindCore */; };
 		C291275025024F4AF9489F99 /* AuthTextInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4648BB5C680AAE1441E028BF /* AuthTextInput.swift */; };
 		CAE7398D6CC376EB08193D80 /* MessageHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A4EDCBFDD1E89414A126F5 /* MessageHistoryView.swift */; };
@@ -68,6 +69,7 @@
 		CA2FBA22AE30161F8C7E7733 /* SocraticMind.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SocraticMind.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB4AB36687E098F09045608 /* AuthFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFields.swift; sourceTree = "<group>"; };
 		E15E6391212E9C17FA2F771E /* SocraticMindApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocraticMindApp.swift; sourceTree = "<group>"; };
+		E21844FC96E96BE311AF933B /* MessageFeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageFeedbackView.swift; sourceTree = "<group>"; };
 		E844435E044814A28ED5D442 /* MarkdownInlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownInlineView.swift; sourceTree = "<group>"; };
 		FEA3DAA7E55A2D7AC384F470 /* ChatActionsControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatActionsControls.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -91,6 +93,7 @@
 				E844435E044814A28ED5D442 /* MarkdownInlineView.swift */,
 				2808D06957854C2FE245352E /* MessageContentView.swift */,
 				3FA5172DA01E429207B11D8F /* MessageCopyButton.swift */,
+				E21844FC96E96BE311AF933B /* MessageFeedbackView.swift */,
 			);
 			path = Messages;
 			sourceTree = "<group>";
@@ -293,6 +296,7 @@
 				2CC998991CCE79DDCF98F589 /* MarkdownInlineView.swift in Sources */,
 				393D26A5169372F78A7EC93F /* MessageContentView.swift in Sources */,
 				E5213532C63BE3DEA427FA76 /* MessageCopyButton.swift in Sources */,
+				99CAF1FC8EF633BA48940D3F /* MessageFeedbackView.swift in Sources */,
 				CAE7398D6CC376EB08193D80 /* MessageHistoryView.swift in Sources */,
 				8AB07723087001E573DDA0A0 /* SocraticMindApp.swift in Sources */,
 			);

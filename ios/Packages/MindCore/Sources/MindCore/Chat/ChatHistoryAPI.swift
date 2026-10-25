@@ -34,7 +34,7 @@ public struct ChatHistoryAPI: ChatHistoryGateway {
             bearer: token,
             query: query
         )
-        let payload = try JSONDecoder().decode(HistoryPagePayload<StoredChatMessage>.self, from: data)
+        let payload = try ChatFeedbackJSON.decode(HistoryPagePayload<StoredChatMessage>.self, from: data)
         let page = try payload.validated(limit: limit, cursor: cursor, identifier: { $0.id })
         guard page.items.allSatisfy({ $0.sessionID == sessionID }) else { throw HistoryContractFailure.invalidPage }
         return page
@@ -48,7 +48,7 @@ public struct ChatHistoryAPI: ChatHistoryGateway {
             method: "GET", path: "api/chat/session-messages", bearer: token,
             query: ["session_id": sessionID, "snapshot_id": String(id), "limit": "1"]
         )
-        let payload = try JSONDecoder().decode(HistoryPagePayload<StoredChatMessage>.self, from: data)
+        let payload = try ChatFeedbackJSON.decode(HistoryPagePayload<StoredChatMessage>.self, from: data)
         let page = try payload.validated(limit: 1, cursor: nil, identifier: { $0.id })
         guard page.snapshotID == id, page.items.allSatisfy({ $0.sessionID == sessionID }) else {
             throw HistoryContractFailure.invalidPage

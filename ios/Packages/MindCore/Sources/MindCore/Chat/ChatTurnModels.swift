@@ -135,8 +135,9 @@ public struct ChatMessageIDs: Equatable, Decodable, Sendable {
 public struct RemoteChatTurn: Sendable {
     public let status: ChatTurnStatus
     public let ids: ChatMessageIDs?
-    public init(status: ChatTurnStatus, ids: ChatMessageIDs?) {
-        self.status = status; self.ids = ids
+    public let feedback: ChatAnswerFeedback?
+    public init(status: ChatTurnStatus, ids: ChatMessageIDs?, feedback: ChatAnswerFeedback? = nil) {
+        self.status = status; self.ids = ids; self.feedback = feedback
     }
 }
 

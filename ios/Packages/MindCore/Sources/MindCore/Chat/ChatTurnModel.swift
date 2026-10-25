@@ -277,21 +277,12 @@ public final class ChatTurnModel: ObservableObject {
             return
         }
         try await requireCurrent(operation)
-        state.notice = if rejected {
-            "所选模型不可用，请刷新模型目录或重新选择后发送；输入与原回答已保留。"
-        } else if pending.regenerateMessageID != nil, remote?.status == .interrupted {
-            "重新生成已停止，原回答仍保留。"
-        } else if pending.regenerateMessageID != nil, remote?.status == .failed {
-            "重新生成失败，原回答仍保留。"
-        } else if remote == nil || (remote?.ids != nil && messages.count != 2) {
-            "消息已更新或删除，请刷新历史查看。"
-        } else {
-            switch remote?.status {
-            case .complete: nil
-            case .interrupted: "回复已停止；已保存的部分可在历史中查看。"
-            default: "本次回复失败；可查看已有内容后重新输入。"
-            }
-        }
+        state.notice = ChatTurnOutcome.notice(
+            pending: pending,
+            remote: remote,
+            messages: messages,
+            rejectedModel: rejected
+        )
         rejectedModelRequest = nil
         state.phase = .ready; state.pending = nil; state.submitted = ""; state.partial = ""; state.ids = nil
         state.receipt = ChatTurnReceipt(pending: pending, status: remote?.status, messages: messages)

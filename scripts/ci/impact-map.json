@@ -618,7 +618,8 @@
         "ios/Packages/MindCore/Sources/MindCore/Chat/StoredChatMessage.swift",
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryAPI.swift",
         "ios/Packages/MindCore/Tests/MindCoreTests/ChatHistoryAPIContractTests.swift",
-        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryGateway.swift"
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatHistoryGateway.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatFeedbackJSON.swift"
       ],
       "depends_on": [
         "history-provider",
@@ -819,7 +820,8 @@
     },
     "turn-fixtures": {
       "paths": [
-        "scripts/contracts/chat_turn_fixture.py"
+        "scripts/contracts/chat_turn_fixture.py",
+        "contracts/fixtures/chat-feedback-wire.json"
       ],
       "depends_on": [],
       "checks": {},
@@ -836,7 +838,8 @@
         "turn-provider",
         "turn-fixtures",
         "history-android",
-        "model-api-android"
+        "model-api-android",
+        "feedback-model-android"
       ],
       "checks": {
         "android": [
@@ -856,7 +859,8 @@
         "turn-provider",
         "turn-fixtures",
         "history-ios",
-        "model-api-ios"
+        "model-api-ios",
+        "feedback-model-ios"
       ],
       "checks": {
         "ios": [
@@ -882,7 +886,8 @@
         "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationTest.kt",
         "android/app/src/main/java/com/gmaicoson/socraticmind/chatui/MessageHistory.kt",
         "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsState.kt",
-        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationContextTest.kt"
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatRegenerationContextTest.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatTurnOutcome.kt"
       ],
       "depends_on": [
         "turn-api-android",
@@ -919,7 +924,8 @@
         "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationTests.swift",
         "ios/SocraticMind/Chat/MessageHistoryView.swift",
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatActionsState.swift",
-        "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationContextTests.swift"
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatRegenerationContextTests.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatTurnOutcome.swift"
       ],
       "depends_on": [
         "turn-api-ios",
@@ -1703,6 +1709,95 @@
         ]
       },
       "manual": []
+    },
+    "feedback-model-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatAnswerFeedback.kt"
+      ],
+      "depends_on": [
+        "feedback-provider"
+      ],
+      "checks": {},
+      "manual": []
+    },
+    "feedback-contract-android": {
+      "paths": [
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatFeedbackContractTest.kt"
+      ],
+      "depends_on": [
+        "feedback-model-android",
+        "turn-api-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatFeedbackContractTest"
+        ]
+      },
+      "manual": []
+    },
+    "feedback-state-android": {
+      "paths": [
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatFeedbackStateTest.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MessageFeedback.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/messageui/MessageContent.kt"
+      ],
+      "depends_on": [
+        "feedback-contract-android",
+        "turn-state-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatFeedbackStateTest"
+        ]
+      },
+      "manual": [
+        "回答错误与用量已接入消息组件；宿主编译、展开控件、无障碍和设备恢复行为待明确获准构建后定向验证。"
+      ]
+    },
+    "feedback-model-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatAnswerFeedback.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatFeedbackJSON.swift"
+      ],
+      "depends_on": [
+        "feedback-provider"
+      ],
+      "checks": {},
+      "manual": []
+    },
+    "feedback-contract-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatFeedbackContractTests.swift"
+      ],
+      "depends_on": [
+        "feedback-model-ios",
+        "turn-api-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatFeedbackContractTests"
+        ]
+      },
+      "manual": []
+    },
+    "feedback-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatFeedbackStateTests.swift",
+        "ios/SocraticMind/Messages/MessageFeedbackView.swift",
+        "ios/SocraticMind/Messages/MessageContentView.swift"
+      ],
+      "depends_on": [
+        "feedback-contract-ios",
+        "turn-state-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatFeedbackStateTests"
+        ]
+      },
+      "manual": [
+        "回答错误与用量已接入消息组件；宿主编译、展开控件、无障碍和设备恢复行为待明确获准构建后定向验证。"
+      ]
     }
   },
   "metadata": [
