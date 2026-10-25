@@ -21,6 +21,7 @@ class ChatActionsController(
     private val library: ChatLibraryController,
     private val turn: ChatTurnController,
     parentScope: CoroutineScope,
+    private val onSessionDeleted: suspend (HistoryAccount, String) -> String? = { _, _ -> null },
 ) {
     private val lock = Any()
     private val scope = CoroutineScope(parentScope.coroutineContext + SupervisorJob(parentScope.coroutineContext[Job]))
@@ -173,16 +174,24 @@ class ChatActionsController(
                 mutableState.value = value.copy(busy = true, notice = null)
                 scope
                     .launch(start = CoroutineStart.LAZY) {
+                        var cleanupNotice: String? = null
                         val result =
                             runCatching {
-                                session.authenticated { token ->
-                                    if (HistoryAccount.from(session.state.value) !=
-                                        account
-                                    ) {
-                                        throw SessionException(SessionFailure.SUPERSEDED)
+                                session
+                                    .authenticated { token ->
+                                        if (HistoryAccount.from(session.state.value) !=
+                                            account
+                                        ) {
+                                            throw SessionException(SessionFailure.SUPERSEDED)
+                                        }
+                                        perform(token, action)
+                                    }.also { change ->
+                                        if (change is ChatLibraryChange.DeletedSession) {
+                                            cleanupNotice =
+                                                runCatching { onSessionDeleted(account, change.sessionId) }
+                                                    .getOrDefault("对话已删除，头像本地记录清理失败。")
+                                        }
                                     }
-                                    perform(token, action)
-                                }
                             }
                         synchronized(lock) finish@{
                             if (ticket != sequence) return@finish
@@ -198,7 +207,7 @@ class ChatActionsController(
                                         reservation,
                                         (change as? ChatLibraryChange.DeletedSession)?.sessionId,
                                     )
-                                    mutableState.value = ChatActionsState(account = account)
+                                    mutableState.value = ChatActionsState(account = account, notice = cleanupNotice)
                                 },
                                 { error ->
                                     turn.releaseHistoryMutation(reservation)

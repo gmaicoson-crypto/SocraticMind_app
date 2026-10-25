@@ -79,14 +79,15 @@ final class ActionsHarness {
     let gateway = QueuedActionsGateway()
     let model: ChatActionsModel
 
-    init() throws {
+    init(onSessionDeleted: @escaping @MainActor (HistoryAccount, String) async -> String? = { _, _ in nil }) throws {
         let history = try HistoryHarness()
         self.history = history
         let turnGateway = QueuedTurnGateway(journal: journal)
         self.turnGateway = turnGateway
         let turn = ChatTurnModel(session: history.session, gateway: turnGateway, journal: journal, pollDelays: [])
         self.turn = turn
-        model = ChatActionsModel(session: history.session, gateway: gateway, library: history.model, turn: turn)
+        model = ChatActionsModel(session: history.session, gateway: gateway, library: history.model, turn: turn,
+                                 onSessionDeleted: onSessionDeleted)
     }
 
     func login(_ id: Int64 = 1) async throws {

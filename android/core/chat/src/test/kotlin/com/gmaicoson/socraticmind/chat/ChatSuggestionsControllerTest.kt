@@ -270,6 +270,7 @@ class ChatSuggestionsControllerTest {
             awaitHistory { h.model.state.value.context == null }
             h.model.setActive(true)
             assertEquals(ChatSuggestionsState(), h.model.state.value)
+            awaitHistory { h.base.session.state.value == SessionState.SignedOut(expired = true) }
             assertEquals(SessionState.SignedOut(expired = true), h.base.session.state.value)
         }
 

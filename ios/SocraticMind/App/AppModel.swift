@@ -11,6 +11,7 @@ final class AppModel: ObservableObject {
     let turn: ChatTurnModel?
     let actions: ChatActionsModel?
     let suggestions: ChatSuggestionsModel?
+    let avatars: ChatAvatarModel?
     let configurationError: String?
     private let store: SessionStore?
     private var observation: Task<Void, Never>?
@@ -35,6 +36,7 @@ final class AppModel: ObservableObject {
             let directory = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
                                                         appropriateFor: nil, create: true)
             let journal = try FileChatTurnJournal(directory: directory, endpointScope: endpoint.credentialScope)
+            let avatarStore = try FileChatAvatarStore(directory: directory, endpointScope: endpoint.credentialScope)
             store = session
             form = AuthFormModel(session: session, recovery: api)
             let actionsAPI = ChatActionsAPI(transport: transport)
@@ -46,11 +48,17 @@ final class AppModel: ObservableObject {
                 journal: journal
             )
             history = library; turn = coordinator
+            let avatarModel = ChatAvatarModel(session: session, gateway: ChatAvatarAPI(transport: transport),
+                                              store: avatarStore, library: library, turn: coordinator)
+            avatars = avatarModel
             actions = ChatActionsModel(
                 session: session,
                 gateway: actionsAPI,
                 library: library,
-                turn: coordinator
+                turn: coordinator,
+                onSessionDeleted: { account, id in
+                    await avatarModel.forgetDeletedSession(account: account, sessionID: id)
+                }
             )
             suggestions = ChatSuggestionsModel(session: session, gateway: ChatSuggestionsAPI(transport: transport),
                                                history: library, turn: coordinator)
@@ -62,6 +70,7 @@ final class AppModel: ObservableObject {
             turn = nil
             actions = nil
             suggestions = nil
+            avatars = nil
             configurationError = "服务地址未正确配置，请检查当前开发配置。"
         }
         // @Published emits before storing state; acknowledge on the next main-actor turn.
@@ -87,6 +96,7 @@ final class AppModel: ObservableObject {
                 }
                 history?.bindAccount(state)
                 turn?.bindAccount(state)
+                avatars?.bindAccount(state)
                 actions?.bindAccount(state)
                 session = state
             }
@@ -111,6 +121,7 @@ final class AppModel: ObservableObject {
         formTask?.cancel()
         form?.reset()
         suggestions?.clear()
+        avatars?.clear()
         actions?.clear()
         history?.clear()
         turn?.clear()

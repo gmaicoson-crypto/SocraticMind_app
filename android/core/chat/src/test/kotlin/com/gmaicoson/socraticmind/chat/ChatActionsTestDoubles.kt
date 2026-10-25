@@ -77,6 +77,7 @@ internal class QueuedActionsGateway : ChatActionsGateway {
 
 internal class ActionsHarness(
     scope: CoroutineScope,
+    onSessionDeleted: suspend (HistoryAccount, String) -> String? = { _, _ -> null },
 ) {
     val history = HistoryHarness(scope)
     val session get() = history.session
@@ -84,7 +85,7 @@ internal class ActionsHarness(
     val turnGateway = QueuedTurnGateway(journal)
     val turn = ChatTurnController(session, turnGateway, journal, scope, pollDelays = emptyList())
     val gateway = QueuedActionsGateway()
-    val model = ChatActionsController(session, gateway, history.model, turn, scope)
+    val model = ChatActionsController(session, gateway, history.model, turn, scope, onSessionDeleted)
 
     suspend fun login(id: Long = 1) {
         if (session.state.value is com.gmaicoson.socraticmind.auth.SessionState.SignedIn) {

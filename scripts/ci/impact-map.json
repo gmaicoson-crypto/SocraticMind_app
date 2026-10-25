@@ -1244,7 +1244,7 @@
         ]
       },
       "manual": [
-        "头像上传、读取及清除仅接入核心适配；选择界面、状态与宿主注入尚未实现。"
+        "头像 API 已接入选择状态与宿主；图片选择器和页面尚未接入，资源检查不代表图片解码或设备验收通过。"
       ]
     },
     "avatar-store-android": {
@@ -1264,7 +1264,7 @@
         ]
       },
       "manual": [
-        "头像选择记录在主机临时目录验证；宿主注入、设备文件保护、退出清理策略和页面仍需后续实施与验收。"
+        "选择记录按账号保留、退出清空内存；确认删除后清理对应记录。主机临时目录验证不覆盖设备文件保护与宿主运行。"
       ]
     },
     "account-files-ios": {
@@ -1305,7 +1305,7 @@
         ]
       },
       "manual": [
-        "头像上传、读取及清除仅接入核心适配；选择界面、状态与宿主注入尚未实现。"
+        "头像 API 已接入选择状态与宿主；图片选择器和页面尚未接入，资源检查不代表图片解码或设备验收通过。"
       ]
     },
     "avatar-store-ios": {
@@ -1325,7 +1325,7 @@
         ]
       },
       "manual": [
-        "头像选择记录在主机临时目录验证；宿主注入、设备文件保护、退出清理策略和页面仍需后续实施与验收。"
+        "选择记录按账号保留、退出清空内存；确认删除后清理对应记录。主机临时目录验证不覆盖设备文件保护与宿主运行。"
       ]
     },
     "avatar-fixtures-android": {
@@ -1343,6 +1343,53 @@
       "depends_on": [],
       "checks": {},
       "manual": []
+    },
+    "avatar-state-android": {
+      "paths": [
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarController.kt",
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarState.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarControllerTest.kt",
+        "android/core/chat/src/test/kotlin/com/gmaicoson/socraticmind/chat/ChatAvatarStateTestDoubles.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/SocraticMindApplication.kt",
+        "android/app/src/main/java/com/gmaicoson/socraticmind/account/AppViewModel.kt"
+      ],
+      "depends_on": [
+        "avatar-api-android",
+        "avatar-store-android",
+        "actions-state-android",
+        "session-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest"
+        ]
+      },
+      "manual": [
+        "会话头像状态与宿主已接线；选择器、缩略图和原生页面尚待实现。主机测试不覆盖系统图片解码、设备存储和进程终止。"
+      ]
+    },
+    "avatar-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatAvatarModel.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Chat/ChatAvatarState.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatAvatarModelTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatAvatarStateTestDoubles.swift",
+        "ios/SocraticMind/App/AppModel.swift"
+      ],
+      "depends_on": [
+        "avatar-api-ios",
+        "avatar-store-ios",
+        "actions-state-ios",
+        "session-ios"
+      ],
+      "checks": {
+        "ios": [
+          "ChatAvatarModelTests"
+        ]
+      },
+      "manual": [
+        "会话头像状态与宿主已接线；选择器、缩略图和原生页面尚待实现。主机测试不覆盖系统图片解码、设备存储和进程终止。"
+      ]
     }
   },
   "metadata": [

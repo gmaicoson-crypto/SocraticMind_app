@@ -9,15 +9,18 @@ public final class ChatActionsModel: ObservableObject {
     private let gateway: any ChatActionsGateway
     private let library: ChatLibraryModel
     private let turn: ChatTurnModel
+    private let onSessionDeleted: @MainActor (HistoryAccount, String) async -> String?
     private var task: Task<Void, Never>?
     private var lease: ChatMutationLease?
     private var sequence: UInt64 = 0
     private var closed = false
 
     public init(session: SessionStore, gateway: any ChatActionsGateway, library: ChatLibraryModel,
-                turn: ChatTurnModel)
+                turn: ChatTurnModel,
+                onSessionDeleted: @escaping @MainActor (HistoryAccount, String) async -> String? = { _, _ in nil })
     {
         self.session = session; self.gateway = gateway; self.library = library; self.turn = turn
+        self.onSessionDeleted = onSessionDeleted
     }
 
     public func bindAccount(_ value: SessionState) {
@@ -111,6 +114,7 @@ public final class ChatActionsModel: ObservableObject {
         state.busy = true; state.notice = nil
         task = Task { [weak self] in
             let result: Result<ChatLibraryChange, Error>
+            var cleanupNotice: String?
             do {
                 let change = try await session.authenticated { token in
                     guard await HistoryAccount.from(session.state) == account else { throw SessionFailure.superseded }
@@ -118,6 +122,9 @@ public final class ChatActionsModel: ObservableObject {
                     return try await Self.perform(gateway, token: token, action: action)
                 }
                 try Task.checkCancellation()
+                if case let .deletedSession(id) = change {
+                    cleanupNotice = await self?.onSessionDeleted(account, id)
+                }
                 result = .success(change)
             } catch { result = .failure(error) }
             let actualAccount = await HistoryAccount.from(session.state)
@@ -133,7 +140,7 @@ public final class ChatActionsModel: ObservableObject {
                     nil
                 }
                 turn.releaseHistoryMutation(reservation, deletedSessionID: deleted)
-                state = ChatActionsState(account: account)
+                state = ChatActionsState(account: account, notice: cleanupNotice)
             case let .failure(error):
                 turn.releaseHistoryMutation(reservation)
                 state.busy = false; state.notice = actionFailure(error)

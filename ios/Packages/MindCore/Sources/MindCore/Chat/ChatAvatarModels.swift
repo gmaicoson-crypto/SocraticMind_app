@@ -94,6 +94,14 @@ public struct ChatAvatarChoices: Sendable {
         values[Data(sessionID.utf8)]
     }
 
+    func replacing(_ sessionID: String, with value: ChatAvatarResource?) throws -> ChatAvatarChoices {
+        var next = records.filter { !$0.sessionID.utf8.elementsEqual(sessionID.utf8) }
+        if let value {
+            next.append(ChatAvatarChoice(sessionID: sessionID, path: value))
+        }
+        return try ChatAvatarChoices(next)
+    }
+
     init(_ records: [ChatAvatarChoice] = []) throws {
         var values: [Data: ChatAvatarResource] = [:]
         for record in records {

@@ -114,3 +114,5 @@ ios-project 将生成的宿主工程登记与 Swift 包依赖拆开：登记改�
 2026-10-25：avatar-provider / avatar-fixtures / avatar-models-* / avatar-api-* / avatar-store-* 与 account-files-* 登记明确消费者。公共 HTTP 增加 multipart 和有界资源读取，原子 IO 同时供头像记录和聊天恢复使用；变化时扩展相应消费者，不执行全量测试。没有新增依赖、锁、迁移或宿主工程登记。
 
 扩展集合 Android 142 项、Swift 139 项通过；补齐 Unicode ID 字节隔离后，双端相关各 13 项通过，按类合并为 Android 143、Swift 140 项有效结果。后端 10 项、工具 63 项通过；Kotlin 10、Swift 11、Python 4 个变化文件的固定格式 / lint 通过。报告复用及原始证据见[实施状态](execution-status.md)，文件预警和未接线范围见[会话头像](chat-avatar-implementation.md)。
+
+随后接入 avatar-state-*：修改状态只选择本平台状态测试；接口 / 存储 / 会话操作变化扩展对应状态消费者，宿主接线保留账号、历史、发送、建议与删除的相关验证。状态批次有效结果为 Android 107、Swift 120、工具 64 项，新增状态测试 Android 15、Swift 16 项。清理旧读取的修正仅复跑相关 Swift suite；Android 失败的相关集合修复测试等待后复验通过。头像页面和图片解码尚未接入，主机测试不替代原生构建或设备验收。

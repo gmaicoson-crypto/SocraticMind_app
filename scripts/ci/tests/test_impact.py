@@ -21,14 +21,39 @@ def scope(*files, initial=False):
 
 
 class ImpactTests(unittest.TestCase):
+    def test_avatar_state_and_delete_hook_select_their_platform_consumers(self):
+        result = load_plan(
+            scope("ios/Packages/MindCore/Sources/MindCore/Chat/ChatAvatarModel.swift")
+        )
+        self.assertEqual(["ChatAvatarModelTests"], result["checks"]["ios"])
+        self.assertFalse(result["checks"]["android"])
+        self.assertFalse(result["checks"]["python"])
+        self.assertTrue(any("选择器" in item for item in result["manual"]))
+        result = load_plan(
+            scope(
+                "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/ChatActionsController.kt"
+            )
+        )
+        self.assertEqual(
+            [
+                "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
+            ],
+            result["checks"]["android"],
+        )
+        self.assertFalse(result["checks"]["ios"])
+        self.assertFalse(result["checks"]["python"])
+
     def test_avatar_fixture_selects_both_adapters_and_stores_without_device_builds(self):
         result = load_plan(scope("contracts/fixtures/chat-avatar.json"))
         self.assertEqual(
-            ["ChatAvatarAPIContractTests", "FileChatAvatarStoreTests"], result["checks"]["ios"]
+            ["ChatAvatarAPIContractTests", "ChatAvatarModelTests", "FileChatAvatarStoreTests"],
+            result["checks"]["ios"],
         )
         self.assertEqual(
             [
                 "com.gmaicoson.socraticmind.chat.ChatAvatarApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatAvatarStoreTest",
             ],
             result["checks"]["android"],
@@ -46,6 +71,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
@@ -60,7 +86,9 @@ class ImpactTests(unittest.TestCase):
         result = load_plan(
             scope("ios/Packages/MindCore/Sources/MindCore/Chat/FileChatAvatarStore.swift")
         )
-        self.assertEqual(["FileChatAvatarStoreTests"], result["checks"]["ios"])
+        self.assertEqual(
+            ["ChatAvatarModelTests", "FileChatAvatarStoreTests"], result["checks"]["ios"]
+        )
         self.assertFalse(result["checks"]["android"])
         self.assertFalse(result["checks"]["python"])
         self.assertTrue(result["manual"])
@@ -110,6 +138,7 @@ class ImpactTests(unittest.TestCase):
             [
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
@@ -147,6 +176,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
@@ -160,6 +190,7 @@ class ImpactTests(unittest.TestCase):
             [
                 "ChatActionsAPIContractTests",
                 "ChatActionsModelTests",
+                "ChatAvatarModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
                 "ChatSuggestionsModelTests",
@@ -184,6 +215,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsApiContractTest",
@@ -197,6 +229,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatActionsModelTests",
+                "ChatAvatarModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
                 "ChatSuggestionsAPIContractTests",
@@ -215,6 +248,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
@@ -238,6 +272,7 @@ class ImpactTests(unittest.TestCase):
             self.assertEqual(
                 [
                     "ChatActionsModelTests",
+                    "ChatAvatarModelTests",
                     "ChatLibraryModelTests",
                     "ChatRegenerationTests",
                     "ChatSuggestionsModelTests",
@@ -258,7 +293,7 @@ class ImpactTests(unittest.TestCase):
             "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt"
         )
         result = load_plan(scope(value))
-        self.assertEqual(19, len(result["checks"]["android"]))
+        self.assertEqual(20, len(result["checks"]["android"]))
         self.assertFalse(result["checks"]["ios"])
         self.assertFalse(result["checks"]["python"])
         self.assertEqual([value], result["files"]["android"])
@@ -281,6 +316,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
@@ -295,6 +331,7 @@ class ImpactTests(unittest.TestCase):
                 "AuthAPIContractTests",
                 "AuthFormModelTests",
                 "ChatActionsModelTests",
+                "ChatAvatarModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
                 "ChatSuggestionsModelTests",
@@ -327,6 +364,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatAvatarApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
@@ -345,6 +383,7 @@ class ImpactTests(unittest.TestCase):
                 "ChatActionsAPIContractTests",
                 "ChatActionsModelTests",
                 "ChatAvatarAPIContractTests",
+                "ChatAvatarModelTests",
                 "ChatHistoryAPIContractTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
@@ -378,6 +417,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatActionsApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatAvatarApiContractTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
@@ -458,6 +498,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatActionsModelTests",
+                "ChatAvatarModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
                 "ChatSuggestionsModelTests",
@@ -479,7 +520,7 @@ class ImpactTests(unittest.TestCase):
             "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         ]:
             result = load_plan(scope(value))
-            self.assertEqual(21, len(result["checks"]["ios"]))
+            self.assertEqual(22, len(result["checks"]["ios"]))
             self.assertIn("MarkdownContractTests", result["checks"]["ios"])
             self.assertEqual(
                 ["unittest:scripts.ci.tests.test_package_resolution"], result["checks"]["python"]
@@ -514,6 +555,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatActionsModelTests",
+                "ChatAvatarModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
                 "ChatSuggestionsModelTests",
@@ -540,6 +582,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",
@@ -559,6 +602,7 @@ class ImpactTests(unittest.TestCase):
         self.assertEqual(
             [
                 "ChatActionsModelTests",
+                "ChatAvatarModelTests",
                 "ChatLibraryModelTests",
                 "ChatRegenerationTests",
                 "ChatSuggestionsModelTests",
@@ -583,6 +627,7 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.auth.AuthFormControllerTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.ChatActionsControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationTest",
                 "com.gmaicoson.socraticmind.chat.ChatSuggestionsControllerTest",

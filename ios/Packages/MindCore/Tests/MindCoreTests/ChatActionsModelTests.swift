@@ -82,7 +82,7 @@ struct ChatActionsModelTests {
             #expect(h.model.state.selectedIDs == [101, 103])
             h.history.model.refreshMessages(); let stale = try await h.history.messages()
             h.model.deleteSelectedMessages(); h.model.confirm(); let write = try await h.next()
-            #expect(await write.ids == [101, 103])
+            #expect(write.ids == [101, 103])
             await write.finish(.success(nil)); try await awaitHistory { !h.model.state.busy }
             #expect(h.history.model.state.messages.items.map(\.id) == [104, 102])
             #expect(h.turn.state.draft == "未发送的草稿"); #expect(h.model.state.selectionSessionID == nil)

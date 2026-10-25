@@ -8,6 +8,7 @@ import com.gmaicoson.socraticmind.auth.AuthFormController
 import com.gmaicoson.socraticmind.auth.SessionState
 import com.gmaicoson.socraticmind.auth.accountErrorMessage
 import com.gmaicoson.socraticmind.chat.ChatActionsController
+import com.gmaicoson.socraticmind.chat.ChatAvatarController
 import com.gmaicoson.socraticmind.chat.ChatLibraryController
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsController
 import com.gmaicoson.socraticmind.chat.ChatTarget
@@ -28,9 +29,28 @@ class AppViewModel(
     val form = graph?.let { AuthFormController(it.session, it.auth) }
     val history = graph?.let { ChatLibraryController(it.session, it.history, viewModelScope, it.actions) }
     val turn = graph?.let { ChatTurnController(it.session, it.turn, it.journal, viewModelScope) }
+    val avatars =
+        graph?.let {
+            ChatAvatarController(
+                it.session,
+                it.avatars,
+                it.avatarStore,
+                checkNotNull(history),
+                checkNotNull(turn),
+                viewModelScope,
+            )
+        }
     val actions =
         graph?.let {
-            ChatActionsController(it.session, it.actions, checkNotNull(history), checkNotNull(turn), viewModelScope)
+            ChatActionsController(
+                it.session,
+                it.actions,
+                checkNotNull(history),
+                checkNotNull(turn),
+                viewModelScope,
+            ) { account, id ->
+                avatars?.forgetDeletedSession(account, id)
+            }
         }
     val suggestions =
         graph?.let {
@@ -54,6 +74,7 @@ class AppViewModel(
                 session.collect { state ->
                     history?.bindAccount(state)
                     turn?.bindAccount(state)
+                    avatars?.bindAccount(state)
                     actions?.bindAccount(state)
                     val next = (state as? SessionState.SignedIn)?.revision
                     if (next != accountRevision) {
@@ -132,6 +153,7 @@ class AppViewModel(
         formJob?.cancel()
         form?.reset()
         suggestions?.clear()
+        avatars?.clear()
         actions?.clear()
         history?.clear()
         turn?.clear()
@@ -140,6 +162,7 @@ class AppViewModel(
 
     override fun onCleared() {
         suggestions?.close()
+        avatars?.close()
         actions?.close()
         history?.close()
         turn?.close()

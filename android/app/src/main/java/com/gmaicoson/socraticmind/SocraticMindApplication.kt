@@ -4,9 +4,11 @@ import android.app.Application
 import com.gmaicoson.socraticmind.auth.AuthApi
 import com.gmaicoson.socraticmind.auth.SessionStore
 import com.gmaicoson.socraticmind.chat.ChatActionsApi
+import com.gmaicoson.socraticmind.chat.ChatAvatarApi
 import com.gmaicoson.socraticmind.chat.ChatHistoryApi
 import com.gmaicoson.socraticmind.chat.ChatSuggestionsApi
 import com.gmaicoson.socraticmind.chat.ChatTurnApi
+import com.gmaicoson.socraticmind.chat.FileChatAvatarStore
 import com.gmaicoson.socraticmind.chat.FileChatTurnJournal
 import com.gmaicoson.socraticmind.network.ApiEndpoint
 import com.gmaicoson.socraticmind.network.HttpTransport
@@ -30,6 +32,8 @@ class SocraticMindApplication : Application() {
                 FileChatTurnJournal(noBackupFilesDir, endpoint.credentialScope),
                 ChatActionsApi(transport),
                 ChatSuggestionsApi(transport),
+                ChatAvatarApi(transport),
+                FileChatAvatarStore(noBackupFilesDir, endpoint.credentialScope),
             )
         }
     }
@@ -43,4 +47,6 @@ class AppGraph(
     val journal: FileChatTurnJournal,
     val actions: ChatActionsApi,
     val suggestions: ChatSuggestionsApi,
+    val avatars: ChatAvatarApi,
+    val avatarStore: FileChatAvatarStore,
 )
