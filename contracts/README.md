@@ -8,6 +8,7 @@
 - [SSE 约定](sse/README.md)：流格式、请求 ID、终态、停止和恢复。
 - [流样例](fixtures/chat-streams.json)：后端提供方测试验证的核心帧，之后由 Kotlin / Swift 消费者使用同一文件。
 - [分页历史](compatibility/chat-history.md)：新增会话摘要 / 单会话消息端点、固定 ID 上界、共享样例及旧接口兼容边界。
+- [回答反馈](compatibility/chat-feedback.md)：超时 / 限流 / 额度错误、单次回答可空用量及旧消费者兼容。
 
 在仓库根使用 `.venv/bin/python scripts/contracts/export_openapi.py --check` 校验快照。接口有意改变时，先评审后端和消费者影响，再省略 `--check` 重新导出。导出使用临时工作目录、合成配置、内存 SQLite URL，禁止网络连接且不启动应用 lifespan / workers；不能据此认为服务健康测试已通过。
 

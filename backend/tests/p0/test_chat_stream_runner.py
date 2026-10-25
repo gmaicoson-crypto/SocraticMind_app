@@ -75,7 +75,7 @@ def test_timed_out_connect_keeps_capacity_until_worker_really_exits(pool):
     try:
         with pytest.raises(ChatStreamError) as error:
             list(runner.cancellable_chat_stream(factory, lambda: None, timeout_seconds=0.04))
-        assert error.value.code == "AI_STREAM_INCOMPLETE"
+        assert error.value.code == "AI_TIMEOUT"
         assert entered.is_set()
         with pytest.raises(ChatStreamError) as busy:
             list(runner.cancellable_chat_stream(lambda _: iter(["new"]), lambda: None))
@@ -211,7 +211,7 @@ def test_upstream_attached_after_timeout_is_closed_without_publishing_late_text(
     try:
         with pytest.raises(ChatStreamError) as timeout:
             list(runner.cancellable_chat_stream(factory, lambda: None, timeout_seconds=0.04))
-        assert timeout.value.code == "AI_STREAM_INCOMPLETE"
+        assert timeout.value.code == "AI_TIMEOUT"
         assert entered.is_set()
     finally:
         release_connect.set()

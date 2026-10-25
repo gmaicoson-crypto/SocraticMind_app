@@ -5,8 +5,17 @@ from copy import deepcopy
 from sqlalchemy import and_, exists, func
 
 from models import ChatMessage, ChatSessionTitle, ChatTurn
+from services.chat_feedback import normalized_usage
 from services.attachments.evidence import hydrate_message_sources
 from services.attachments.service import summaries_for_messages
+
+
+def turn_usage(db, turn):
+    """A bounded lookup also covers a failed regeneration hidden from the visible conversation."""
+    message = db.get(ChatMessage, turn.ai_message_id) if turn.ai_message_id else None
+    if message is None or message.user_id != turn.user_id:
+        return None
+    return normalized_usage((message.metadata_json or {}).get("usage"))
 
 
 def history_responses(db, messages):

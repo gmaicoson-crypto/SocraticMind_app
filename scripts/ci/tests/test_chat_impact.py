@@ -278,6 +278,9 @@ class ChatImpactTests(unittest.TestCase):
         )
         self.assertEqual(
             [
+                "com.gmaicoson.socraticmind.auth.AuthApiContractTest",
+                "com.gmaicoson.socraticmind.auth.AuthFormControllerTest",
+                "com.gmaicoson.socraticmind.auth.EncryptedTokenVaultTest",
                 "com.gmaicoson.socraticmind.auth.SessionStoreTest",
                 "com.gmaicoson.socraticmind.chat.AvatarImageLoaderTest",
                 "com.gmaicoson.socraticmind.chat.AvatarImagePolicyTest",
@@ -287,6 +290,7 @@ class ChatImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatAvatarControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatHistoryApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatLibraryControllerTest",
+                "com.gmaicoson.socraticmind.chat.ChatModelApiContractTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelControllerTest",
                 "com.gmaicoson.socraticmind.chat.ChatModelSendTest",
                 "com.gmaicoson.socraticmind.chat.ChatRegenerationContextTest",
@@ -298,11 +302,15 @@ class ChatImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatAvatarStoreTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
+                "com.gmaicoson.socraticmind.network.HttpTransportTest",
+                "com.gmaicoson.socraticmind.network.SseContractTest",
             ],
             result["checks"]["android"],
         )
         self.assertEqual(
             [
+                "AuthAPIContractTests",
+                "AuthFormModelTests",
                 "AvatarImageCodecTests",
                 "AvatarImageLoaderTests",
                 "ChatActionsAPIContractTests",
@@ -311,6 +319,7 @@ class ChatImpactTests(unittest.TestCase):
                 "ChatAvatarModelTests",
                 "ChatHistoryAPIContractTests",
                 "ChatLibraryModelTests",
+                "ChatModelAPIContractTests",
                 "ChatModelSelectionModelTests",
                 "ChatModelSendTests",
                 "ChatRegenerationContextTests",
@@ -322,13 +331,17 @@ class ChatImpactTests(unittest.TestCase):
                 "ChatTurnModelTests",
                 "FileChatAvatarStoreTests",
                 "FileChatTurnJournalTests",
+                "HTTPTransportTests",
+                "KeychainTokenVaultTests",
+                "SSEContractTests",
                 "SessionStoreTests",
             ],
             result["checks"]["ios"],
         )
         self.assertEqual(
             [
-                "pytest:tests/integration/test_mysql_chat_history.py::test_mysql_history_window_and_unicode_projection"
+                "pytest:tests/integration/test_mysql_chat_feedback.py::test_mysql_usage_checkpoint_and_new_turn_fence",
+                "pytest:tests/integration/test_mysql_chat_history.py::test_mysql_history_window_and_unicode_projection",
             ],
             result["checks"]["mysql"],
         )

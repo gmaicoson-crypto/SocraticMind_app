@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session, sessionmaker
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from ai.agent import ChatStreamError, chat_stream
+from ai.agent import chat_stream
 from ai.prompts import build_normal_suggestions_prompt, build_socratic_suggestions_prompt
 from ai.util import extract_json_from_markdown
 from core.database import get_db
@@ -37,7 +37,8 @@ from core.context_budget import (
 from routers.chat_history import router as history_router
 from schemas.chat_history import HistoryResponse
 from schemas.chat_request import ChatRequest
-from services.chat_history import history_responses, visible_messages
+from services.chat_history import history_responses, turn_usage, visible_messages
+from services.chat_feedback import ChatUsageCollector, classify_chat_error, error_description
 from services.chat_context import assemble_chat_context
 from services.web_evidence import apply_web_context, cited_source_ids, invalid_source_ids
 from services.web_search import iter_web_search, web_search_capabilities
@@ -241,15 +242,7 @@ def chat_stream_endpoint(
                 yield web_event({"type": "web_sources", "web": initial_web, "final": True})
             yield event({"request_state": {"status": replay_status}})
             if replay_status != "complete":
-                yield event(
-                    {
-                        "error": {
-                            "code": replay_error or "CHAT_REQUEST_INCOMPLETE",
-                            "message": "此前请求未完成，请重新生成",
-                            "retryable": True,
-                        }
-                    }
-                )
+                yield event({"error": error_description(replay_error or "CHAT_REQUEST_INCOMPLETE")})
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(replay(), media_type="text/event-stream")
@@ -328,6 +321,7 @@ def chat_stream_endpoint(
 
     def generate():
         full_text = []
+        usage = ChatUsageCollector(req.request_id)
         stream = None
         began = perf_counter()
         checkpoint = began
@@ -599,21 +593,7 @@ def chat_stream_endpoint(
                         if has_attachment_context
                         else {}
                     ),
-                    on_usage=lambda usage: log.info(
-                        "chat_token_usage request=%s estimated_input=%s input_delta=%s usage=%s",
-                        req.request_id,
-                        input_tokens,
-                        (usage["prompt_tokens"] - input_tokens)
-                        if isinstance(usage.get("prompt_tokens"), int)
-                        else None,
-                        {
-                            key: value
-                            for key, value in usage.items()
-                            if key in {"prompt_tokens", "completion_tokens", "total_tokens"}
-                            and isinstance(value, int)
-                            and not isinstance(value, bool)
-                        },
-                    ),
+                    on_usage=lambda value: usage.record(value, estimated_input=input_tokens),
                 )
 
             last_guard = perf_counter()
@@ -687,6 +667,7 @@ def chat_stream_endpoint(
                 content=content,
                 status="complete",
                 web=web,
+                usage=usage.finish(),
             )
             if not saved:
                 raise ApiError(
@@ -726,6 +707,7 @@ def chat_stream_endpoint(
                 status="interrupted",
                 error_code="CLIENT_DISCONNECTED",
                 web=web,
+                usage=usage.finish(),
             )
             checkpoint_interrupted_content(
                 db,
@@ -733,18 +715,13 @@ def chat_stream_endpoint(
                 request_id=req.request_id,
                 generation_token=generation_token,
                 content="".join(full_text),
+                usage=usage.finish(),
             )
             raise
         except Exception as error:
-            known_error = isinstance(error, (ApiError, ChatStreamError))
-            code = error.code if known_error else "AI_STREAM_ERROR"
-            message = error.message if known_error else "模型服务暂时不可用，请重试"
-            retryable = error.retryable if known_error else True
-            if isinstance(error, ContextWindowExceeded):
-                code = "CHAT_CONTEXT_TOO_LARGE"
-                message = str(error)
-                retryable = False
-            incomplete = code in {"AI_OUTPUT_LIMIT", "AI_STREAM_INCOMPLETE"}
+            failure = classify_chat_error(error)
+            code, message, retryable = failure.code, failure.message, failure.retryable
+            incomplete = code in {"AI_OUTPUT_LIMIT", "AI_STREAM_INCOMPLETE", "AI_TIMEOUT"}
             log.warning(
                 "chat_stream_failed request=%s code=%s error_type=%s",
                 req.request_id,
@@ -760,6 +737,7 @@ def chat_stream_endpoint(
                 status="interrupted" if incomplete else "failed",
                 error_code=code,
                 web=web,
+                usage=usage.finish(),
             )
             checkpoint_interrupted_content(
                 db,
@@ -767,6 +745,7 @@ def chat_stream_endpoint(
                 request_id=req.request_id,
                 generation_token=generation_token,
                 content="".join(full_text),
+                usage=usage.finish(),
             )
             current_turn = get_chat_turn(db, user_id=user_id, request_id=req.request_id)
             status = (
@@ -790,6 +769,7 @@ def chat_stream_endpoint(
             yield event({"error": {"code": code, "message": message, "retryable": retryable}})
             yield "data: [DONE]\n\n"
         finally:
+            usage.finish()
             close = getattr(stream, "close", None)
             if close:
                 close()
@@ -822,8 +802,10 @@ def cancel_chat_endpoint(
     turn = cancel_chat_turn(
         db, user_id=current_user.id, session_id=req.session_id, request_id=req.request_id
     )
+    reported = turn_usage(db, turn) if turn else None
     return {
         "status": turn.status if turn else "interrupted",
+        **({"usage": reported} if reported is not None else {}),
         **(
             {"msg_ids": {"user": turn.user_message_id, "ai": turn.ai_message_id}}
             if turn and turn.user_message_id and turn.ai_message_id
@@ -846,13 +828,8 @@ def chat_request_state(
         "status": turn.status,
         "preparation": turn.preparation_json,
         "error_code": turn.error_code,
-        "error": {
-            "code": turn.error_code,
-            "message": "此前请求未完成，请重试或重新生成",
-            "retryable": True,
-        }
-        if turn.error_code
-        else None,
+        "error": error_description(turn.error_code) if turn.error_code else None,
+        "usage": turn_usage(db, turn),
         "msg_ids": {"user": turn.user_message_id, "ai": turn.ai_message_id},
     }
 

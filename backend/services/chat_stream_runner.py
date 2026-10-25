@@ -123,9 +123,7 @@ def cancellable_chat_stream(
             check_active()
             remaining = deadline - monotonic()
             if remaining <= 0:
-                raise ChatStreamError(
-                    "AI_STREAM_INCOMPLETE", "等待模型回复超时，请重试。", retryable=True
-                )
+                raise ChatStreamError("AI_TIMEOUT", "等待模型回复超时，请重试。", retryable=True)
             try:
                 kind, value = messages.get(timeout=min(0.2, remaining))
             except Empty:

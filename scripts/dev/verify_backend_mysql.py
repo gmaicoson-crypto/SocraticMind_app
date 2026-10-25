@@ -18,6 +18,7 @@ TESTS = {
     "test_mysql_previous_revision_upgrade_keeps_unicode_user": TEST_FILE,
     "test_mysql_application_lifespan_and_health": TEST_FILE,
     "test_mysql_history_window_and_unicode_projection": "tests/integration/test_mysql_chat_history.py",
+    "test_mysql_usage_checkpoint_and_new_turn_fence": "tests/integration/test_mysql_chat_feedback.py",
 }
 
 

@@ -148,3 +148,10 @@ Android 12 类 99 项、Swift 12 suite 103 项和工具 69 项通过；Kotlin 6�
 2026-10-25：model-api、model-state、model-send 按平台登记目录类型 / 网络、选择 / 宿主接线及发送 / 建议联动，model-fixtures 关联双方消费者。ChatTurnRequest 和建议请求共用 ID 校验；共享 HTTP fixture 变化扩展相关传输与消费者，仍只执行命名集合。模型配置存在不代表真实调用可用，用户选择稍后配置服务。
 
 Android 27 类 200 项、Swift 27 suite 201 项、工具 81 项通过；15 个 Kotlin、15 个 Swift、6 个 Python 变化文件固定格式 / lint、结构与行数检查通过。XcodeGen 2.46.0 只登记新增选择器。旧影响图按职责拆为 394 行通用文件和 455 行聊天领域文件，原 41 个方法没有删除 / 重复，新模型影响测试仍独立。初轮测试和消费者预期问题及修复证据保留在 `.tools/model-selection-native-*`，行数预警结论见[实施状态](execution-status.md)。没有后端行为改动，不重复提供方 / MySQL 测试；宿主与设备验证、真实模型 / 超时 / 限额 / 用量仍待完成。
+
+
+## 回答反馈的提供方验证
+
+2026-10-25：feedback-provider 显式覆盖安全模型错误、有界用量、消息元数据及取消检查点；feedback-mysql 校验 MySQL 的报告 JSON 与更新轮次保护。共享实现变化扩展相关 SSE / 历史 / turn 消费者及其依赖，纯协议文件不无故选中数据库集合；测试选择仍限定具体文件 / 节点。
+
+后端 212 项、Android JVM 26 类 213 项、Swift macOS 包 26 suite 200 项、工具 78 项通过；OpenAPI 58 路径一致。MySQL 的五项定向集合首轮四项通过，新用例发现旧快照问题后修复并单独通过，生命周期八项随之补验。Python 15 个变化文件格式 / lint、结构和行数检查通过；历史路由 / lifecycle 上限下降为 1146 / 803。失败与最终报告见 `.tools/chat-feedback-provider-*`，真实服务及原生反馈展示另验，未构建或部署应用。

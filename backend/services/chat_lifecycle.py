@@ -13,13 +13,12 @@ from sqlalchemy.orm import Session
 
 from core.errors import ApiError
 from models import ChatCancellation, ChatMessage, ChatSession, ChatTurn
-from services.web_evidence import cited_source_ids
+from services.chat_message_metadata import TERMINAL_STATUSES, usage_metadata, web_metadata
 from services.web_search import empty_web_snapshot
 from services.attachments.service import validate_for_message, bind_to_message
 from services.chat_regeneration import regeneration_question
 
 GENERATION_LEASE_SECONDS = 360
-TERMINAL_STATUSES = {"complete", "failed", "interrupted"}
 
 
 def utcnow() -> datetime:
@@ -130,28 +129,10 @@ def _mark_interrupted(db: Session, turn: ChatTurn, code: str) -> None:
     if message is not None:
         message.metadata_json = {
             **(message.metadata_json or {}),
-            **_web_metadata(message, message.content, status="interrupted", error_code=code),
+            **web_metadata(message, message.content, status="interrupted", error_code=code),
             "status": "interrupted",
             "error_code": code,
         }
-
-
-def _web_metadata(
-    message: ChatMessage,
-    content: str,
-    *,
-    web: dict | None = None,
-    status: str = "generating",
-    error_code: str | None = None,
-) -> dict:
-    snapshot = deepcopy(web if web is not None else (message.metadata_json or {}).get("web"))
-    if snapshot is None:
-        return {}
-    snapshot["cited_source_ids"] = cited_source_ids(content, snapshot.get("sources", []))
-    if status in TERMINAL_STATUSES and snapshot.get("status") in {"deciding", "searching"}:
-        snapshot["status"] = "failed"
-        snapshot["error_code"] = error_code or "WEB_PREPARATION_INTERRUPTED"
-    return {"web": snapshot}
 
 
 def _attachment_input(db, *, user_id, session_id, mode, topic_id, ids, regenerate_message_id):
@@ -466,6 +447,7 @@ def finish_chat_turn(
     status: str,
     error_code: str | None = None,
     web: dict | None = None,
+    usage: dict | None = None,
 ) -> bool:
     if status not in TERMINAL_STATUSES:
         raise ValueError("invalid chat turn terminal status")
@@ -508,9 +490,10 @@ def finish_chat_turn(
     message.content = content
     message.metadata_json = {
         **(message.metadata_json or {}),
-        **_web_metadata(message, content, web=web, status=status, error_code=error_code),
+        **web_metadata(message, content, web=web, status=status, error_code=error_code),
         "status": status,
         **({"error_code": error_code} if error_code else {}),
+        **usage_metadata(usage),
     }
     turn.status = status
     turn.error_code = error_code
@@ -602,7 +585,7 @@ def refresh_generation_lease(
             message.content = content
         message.metadata_json = {
             **(message.metadata_json or {}),
-            **_web_metadata(message, message.content, web=web),
+            **web_metadata(message, message.content, web=web),
             **(
                 {"attachment_derived": attachment_derived} if attachment_derived is not None else {}
             ),
@@ -762,6 +745,7 @@ def checkpoint_interrupted_content(
     request_id: str,
     generation_token: str,
     content: str,
+    usage: dict | None = None,
 ) -> bool:
     """Persist the last displayed partial after cancellation without reviving a turn."""
     turn = get_chat_turn(db, user_id=user_id, request_id=request_id)
@@ -781,7 +765,13 @@ def checkpoint_interrupted_content(
         db.rollback()
         return False
     db.refresh(turn)
-    if turn.status != "interrupted" or turn.generation_token != generation_token:
+    newer_turn = (
+        db.query(ChatTurn.id)
+        .filter(ChatTurn.chat_session_id == turn.chat_session_id, ChatTurn.id > turn.id)
+        .with_for_update()  # MySQL current read, even when the caller already has an older snapshot.
+        .first()
+    )
+    if newer_turn or turn.status != "interrupted" or turn.generation_token != generation_token:
         db.rollback()
         return False
     message = (
@@ -790,17 +780,24 @@ def checkpoint_interrupted_content(
         .populate_existing()
         .one_or_none()
     )
+    report = usage_metadata(usage)
     if (
         message is None
         or not content.startswith(message.content)
-        or len(content) <= len(message.content)
+        or (
+            content == message.content
+            and all(
+                (message.metadata_json or {}).get(key) == value for key, value in report.items()
+            )
+        )
     ):
         db.rollback()
         return False
     message.content = content
     message.metadata_json = {
         **(message.metadata_json or {}),
-        **_web_metadata(message, content, status="interrupted", error_code=turn.error_code),
+        **web_metadata(message, content, status="interrupted", error_code=turn.error_code),
+        **report,
     }
     db.commit()
     return True

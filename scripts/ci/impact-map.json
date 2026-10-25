@@ -146,7 +146,8 @@
       "depends_on": [
         "chat-provider",
         "wire-fixtures",
-        "android-dependencies"
+        "android-dependencies",
+        "feedback-provider"
       ],
       "checks": {
         "android": [
@@ -164,7 +165,8 @@
       "depends_on": [
         "chat-provider",
         "wire-fixtures",
-        "ios-dependencies"
+        "ios-dependencies",
+        "feedback-provider"
       ],
       "checks": {
         "ios": [
@@ -309,7 +311,8 @@
           "unittest:scripts.ci.tests.test_impact",
           "unittest:scripts.ci.tests.test_avatar_image_impact",
           "unittest:scripts.ci.tests.test_model_selection_impact",
-          "unittest:scripts.ci.tests.test_chat_impact"
+          "unittest:scripts.ci.tests.test_chat_impact",
+          "unittest:scripts.ci.tests.test_chat_feedback_impact"
         ]
       },
       "manual": []
@@ -599,7 +602,8 @@
       "depends_on": [
         "history-provider",
         "history-native-fixtures",
-        "http-android"
+        "http-android",
+        "feedback-provider"
       ],
       "checks": {
         "android": [
@@ -619,7 +623,8 @@
       "depends_on": [
         "history-provider",
         "history-native-fixtures",
-        "http-ios"
+        "http-ios",
+        "feedback-provider"
       ],
       "checks": {
         "ios": [
@@ -793,7 +798,8 @@
       "depends_on": [
         "chat-provider",
         "history-provider",
-        "model-provider"
+        "model-provider",
+        "feedback-provider"
       ],
       "checks": {
         "python": [
@@ -1643,6 +1649,57 @@
       "checks": {
         "ios": [
           "ChatModelSendTests"
+        ]
+      },
+      "manual": []
+    },
+    "feedback-provider": {
+      "paths": [
+        "backend/services/chat_feedback.py",
+        "backend/services/chat_message_metadata.py",
+        "backend/tests/feedback_cases.py",
+        "backend/tests/p0/test_chat_feedback.py",
+        "backend/tests/p0/test_chat_feedback_lifecycle.py",
+        "backend/tests/contracts/test_chat_feedback_contract.py",
+        "backend/tests/p0/test_chat_stream_runner.py",
+        "contracts/fixtures/chat-feedback.json",
+        "backend/routers/chat.py",
+        "backend/services/chat_lifecycle.py",
+        "backend/services/chat_history.py",
+        "backend/services/chat_stream_runner.py",
+        "backend/ai/agent.py",
+        "backend/core/errors.py",
+        "backend/core/context_budget.py"
+      ],
+      "depends_on": [],
+      "checks": {
+        "python": [
+          "pytest:tests/p0/test_chat_feedback.py",
+          "pytest:tests/p0/test_chat_feedback_lifecycle.py",
+          "pytest:tests/contracts/test_chat_feedback_contract.py",
+          "pytest:tests/p0/test_chat_stream_runner.py",
+          "pytest:tests/contracts/test_chat_stream_contract.py",
+          "pytest:tests/contracts/test_chat_history_contract.py",
+          "pytest:tests/p0/test_web_chat.py::test_sources_persist_before_terminal_and_replay_without_search",
+          "pytest:tests/p0/test_web_chat.py::test_failed_regeneration_keeps_original_sources",
+          "pytest:tests/p0/test_web_chat.py::test_successful_regeneration_replaces_answer_and_sources"
+        ]
+      },
+      "manual": [
+        "错误与用量使用合成模型验证；真实服务报告、设备显示及后台断流仍需独立验收。"
+      ]
+    },
+    "feedback-mysql": {
+      "paths": [
+        "backend/tests/integration/test_mysql_chat_feedback.py"
+      ],
+      "depends_on": [
+        "feedback-provider",
+        "mysql"
+      ],
+      "checks": {
+        "mysql": [
+          "pytest:tests/integration/test_mysql_chat_feedback.py::test_mysql_usage_checkpoint_and_new_turn_fence"
         ]
       },
       "manual": []

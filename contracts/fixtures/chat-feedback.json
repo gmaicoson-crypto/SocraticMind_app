@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "scope": "one-answer-model-call",
+  "reported_usage": {
+    "prompt_tokens": 42,
+    "completion_tokens": 17,
+    "total_tokens": 59
+  },
+  "zero_usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "usage_cases": [
+    {
+      "name": "reported",
+      "input": {
+        "prompt_tokens": 42,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      },
+      "expected": {
+        "prompt_tokens": 42,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      }
+    },
+    {
+      "name": "reported-zero",
+      "input": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "expected": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    {
+      "name": "extra-private-fields",
+      "input": {
+        "prompt_tokens": 42,
+        "completion_tokens": 17,
+        "total_tokens": 59,
+        "provider_private": "synthetic-private-key"
+      },
+      "expected": {
+        "prompt_tokens": 42,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      }
+    },
+    {
+      "name": "safe-integer-maximum",
+      "input": {
+        "prompt_tokens": 9007199254740991,
+        "completion_tokens": 0,
+        "total_tokens": 9007199254740991
+      },
+      "expected": {
+        "prompt_tokens": 9007199254740991,
+        "completion_tokens": 0,
+        "total_tokens": 9007199254740991
+      }
+    },
+    {
+      "name": "missing",
+      "input": null,
+      "expected": null
+    },
+    {
+      "name": "empty",
+      "input": {},
+      "expected": null
+    },
+    {
+      "name": "partial",
+      "input": {
+        "total_tokens": 59
+      },
+      "expected": null
+    },
+    {
+      "name": "array",
+      "input": [],
+      "expected": null
+    },
+    {
+      "name": "string",
+      "input": "59",
+      "expected": null
+    },
+    {
+      "name": "boolean",
+      "input": {
+        "prompt_tokens": true,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      },
+      "expected": null
+    },
+    {
+      "name": "float",
+      "input": {
+        "prompt_tokens": 42.5,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      },
+      "expected": null
+    },
+    {
+      "name": "numeric-string",
+      "input": {
+        "prompt_tokens": "42",
+        "completion_tokens": 17,
+        "total_tokens": 59
+      },
+      "expected": null
+    },
+    {
+      "name": "negative",
+      "input": {
+        "prompt_tokens": -1,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      },
+      "expected": null
+    },
+    {
+      "name": "unsafe-integer",
+      "input": {
+        "prompt_tokens": 9007199254740992,
+        "completion_tokens": 17,
+        "total_tokens": 59
+      },
+      "expected": null
+    },
+    {
+      "name": "inconsistent-total",
+      "input": {
+        "prompt_tokens": 42,
+        "completion_tokens": 17,
+        "total_tokens": 60
+      },
+      "expected": null
+    }
+  ],
+  "errors": [
+    {
+      "kind": "sdk_timeout",
+      "code": "AI_TIMEOUT",
+      "message": "等待模型回复超时，已保存的内容可在历史中查看；请稍后手动重试。",
+      "retryable": true,
+      "status": "interrupted"
+    },
+    {
+      "kind": "stream_timeout",
+      "code": "AI_TIMEOUT",
+      "message": "等待模型回复超时，已保存的内容可在历史中查看；请稍后手动重试。",
+      "retryable": true,
+      "status": "interrupted"
+    },
+    {
+      "kind": "rate_limit",
+      "code": "AI_RATE_LIMITED",
+      "message": "模型服务请求过于频繁，请稍后重试或切换模型。",
+      "retryable": true,
+      "status": "failed"
+    },
+    {
+      "kind": "invalid_quota_code",
+      "code": "AI_RATE_LIMITED",
+      "message": "模型服务请求过于频繁，请稍后重试或切换模型。",
+      "retryable": true,
+      "status": "failed"
+    },
+    {
+      "kind": "quota",
+      "code": "AI_QUOTA_EXCEEDED",
+      "message": "模型服务额度不足，请检查服务配置或切换模型。",
+      "retryable": false,
+      "status": "failed"
+    },
+    {
+      "kind": "quota_alternate",
+      "code": "AI_QUOTA_EXCEEDED",
+      "message": "模型服务额度不足，请检查服务配置或切换模型。",
+      "retryable": false,
+      "status": "failed"
+    },
+    {
+      "kind": "credentials",
+      "code": "AI_PROVIDER_AUTH_FAILED",
+      "message": "模型服务凭据或权限不可用，请检查服务配置或切换模型。",
+      "retryable": false,
+      "status": "failed"
+    },
+    {
+      "kind": "permission",
+      "code": "AI_PROVIDER_AUTH_FAILED",
+      "message": "模型服务凭据或权限不可用，请检查服务配置或切换模型。",
+      "retryable": false,
+      "status": "failed"
+    },
+    {
+      "kind": "request",
+      "code": "AI_REQUEST_REJECTED",
+      "message": "模型服务未接受本次请求，请调整问题或切换模型。",
+      "retryable": false,
+      "status": "failed"
+    },
+    {
+      "kind": "unavailable",
+      "code": "AI_PROVIDER_UNAVAILABLE",
+      "message": "模型服务暂时不可用，请稍后重试或切换模型。",
+      "retryable": true,
+      "status": "failed"
+    },
+    {
+      "kind": "sdk_connection",
+      "code": "AI_CONNECTION_FAILED",
+      "message": "与模型服务的连接中断，请查看已保存内容后手动重试。",
+      "retryable": true,
+      "status": "failed"
+    },
+    {
+      "kind": "stream_connection",
+      "code": "AI_CONNECTION_FAILED",
+      "message": "与模型服务的连接中断，请查看已保存内容后手动重试。",
+      "retryable": true,
+      "status": "failed"
+    },
+    {
+      "kind": "unexpected",
+      "code": "AI_STREAM_ERROR",
+      "message": "本次回答未完成，请查看已有内容后手动重试。",
+      "retryable": true,
+      "status": "failed"
+    }
+  ]
+}
