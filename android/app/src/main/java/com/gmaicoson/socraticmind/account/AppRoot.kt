@@ -23,6 +23,8 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gmaicoson.socraticmind.auth.SessionState
@@ -42,7 +44,7 @@ fun AppRoot(model: AppViewModel) {
             lightColorScheme(primary = Color(0xFF6350A2))
         }
     MaterialTheme(colorScheme = colors) {
-        Surface(Modifier.fillMaxSize()) {
+        Surface(Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
             if (model.configurationError != null) {
                 SessionPanel("暂时无法连接学习空间", model.configurationError)
             } else {

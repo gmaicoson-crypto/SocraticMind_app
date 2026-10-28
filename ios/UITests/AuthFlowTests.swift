@@ -5,6 +5,33 @@ import XCTest
 final class AuthFlowTests: XCTestCase {
     private let app = XCUIApplication()
 
+    func testRegisterAndOpenChat() async throws {
+        continueAfterFailure = false
+        let account = try await AuthUITestFixture.account()
+        app.launch()
+        if app.buttons["清理本机登录并退出"].waitForExistence(timeout: 3) {
+            logout()
+        }
+        expectSignedOut()
+        tap("auth.mode.register")
+        fill("username", account.username)
+        fill("email", account.email)
+        fill("password", account.password)
+        fill("confirmation", account.password)
+        tap("auth.sendCode")
+        try await fill("code", AuthUITestFixture.code("register"))
+        tap("auth.submit")
+        expectText("你好，\(account.username)")
+        XCTAssertTrue(app.buttons["新建对话"].waitForExistence(timeout: 15))
+        app.buttons["新建对话"].tap()
+        let input = app.textFields["chat_input"]
+        XCTAssertTrue(input.waitForExistence(timeout: 10))
+        input.tap()
+        input.typeText("Hello, help me understand Socratic learning.")
+        XCTAssertTrue(app.buttons["chat_send"].isEnabled)
+        capture("chat-ready")
+    }
+
     func testPasswordTypingInLoginAndRegister() {
         continueAfterFailure = false
         app.launch()

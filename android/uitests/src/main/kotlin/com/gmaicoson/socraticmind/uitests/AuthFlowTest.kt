@@ -25,6 +25,33 @@ class AuthFlowTest {
     private val appId = "com.gmaicoson.socraticmind"
 
     @Test
+    fun registerAndOpenChat() {
+        try {
+            val account = AuthUiFixture.account()
+            restart()
+            device.wait(Until.findObject(By.text("清理本机登录并退出")), 3_000)?.let { logout() }
+            expectSignedOut()
+            tap("auth.mode.register")
+            fill("username", account.getString("username"))
+            fill("email", account.getString("email"))
+            fill("password", account.getString("password"))
+            fill("confirmation", account.getString("password"))
+            tap("auth.sendCode")
+            fill("code", AuthUiFixture.code("register"))
+            tap("auth.submit")
+            expectText("你好，${account.getString("username")}")
+            element(By.text("新建对话")).click()
+            val input = checkNotNull(device.wait(Until.findObject(By.res("chat_input")), 15_000))
+            input.text = "Hello, help me understand Socratic learning."
+            assertTrue(element(By.res("chat_send")).isEnabled)
+            capture("chat-ready")
+        } catch (failure: Throwable) {
+            capture("chat-failure")
+            throw failure
+        }
+    }
+
+    @Test
     fun registerRestoreLogoutLoginAndReset() {
         try {
             accountFlow()

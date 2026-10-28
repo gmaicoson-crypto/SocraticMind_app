@@ -37,48 +37,8 @@ struct ChatLibraryView: View {
                 .account || actions.state.account != model.state.account || avatars.state.account != model.state.account
             {
                 ProgressView("正在读取会话…").frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let selected = model.state.selected {
-                header(title: selected.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "对话",
-                       loading: model.state.messages.loading, back: turn.state.editable ? back : nil,
-                       refresh: model.refreshSelectedConversation)
-                ChatAvatarControls(model: avatars, images: avatarImages, target: selected.target,
-                                   enabled: turn.state.editable && actions.state.dialog == nil && actions.state
-                                       .selectionSessionID == nil)
-                if actions.state.selectionSessionID == selected.sessionID {
-                    ChatSelectionControls(
-                        state: actions.state,
-                        enabled: turn.state.editable && !actions.state.busy,
-                        model: actions
-                    )
-                } else {
-                    ChatManagementMenu(
-                        sessionID: selected.sessionID,
-                        enabled: actions.canManage(selected.sessionID),
-                        model: actions,
-                        messages: !model.state.messages.items.isEmpty
-                    )
-                }
-                if selected.target != turn.state.target {
-                    ProgressView("正在切换会话…").frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    MessageHistoryView(
-                        page: model.state.messages,
-                        renderer: renderer,
-                        turn: turn.state,
-                        regenerationID: ChatRegeneration.from(model.state)?.answerID,
-                        regenerate: regenerate,
-                        actions: actions.state,
-                        toggleMessage: actions.toggleMessage,
-                        avatar: AvatarPresentation(
-                            images: avatarImages,
-                            resource: avatars.state.resource(for: selected.target),
-                            fallback: .fallback(for: selected.target.mode)
-                        ),
-                        refresh: model.refreshSelectedConversation,
-                        more: model.loadMoreMessages
-                    )
-                    .id(selected.sessionID)
-                }
+            } else if model.state.selected != nil {
+                selectedConversation
             } else {
                 header(title: "会话", loading: model.state.conversations.loading, refresh: model.refreshConversations)
                 Button("新建对话", action: newConversation).disabled(!turn.state.editable)
@@ -136,6 +96,59 @@ struct ChatLibraryView: View {
         .onDisappear {
             model.setTitlePollingActive(false); suggestions.setActive(false)
             Task { await renderer.clear() }
+        }
+    }
+
+    @ViewBuilder
+    private var selectedConversation: some View {
+        if let selected = model.state.selected {
+            let backAction: (() -> Void)? = turn.state.editable ? { back() } : nil
+            header(title: selected.title?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? "对话",
+                   loading: model.state.messages.loading, back: backAction,
+                   refresh: model.refreshSelectedConversation)
+            ChatAvatarControls(model: avatars, images: avatarImages, target: selected.target,
+                               enabled: turn.state.editable && actions.state.dialog == nil && actions.state
+                                   .selectionSessionID == nil)
+            if actions.state.selectionSessionID == selected.sessionID {
+                ChatSelectionControls(
+                    state: actions.state,
+                    enabled: turn.state.editable && !actions.state.busy,
+                    model: actions
+                )
+            } else {
+                ChatManagementMenu(
+                    sessionID: selected.sessionID,
+                    enabled: actions.canManage(selected.sessionID),
+                    model: actions,
+                    messages: !model.state.messages.items.isEmpty
+                )
+            }
+            selectedMessages(selected)
+        }
+    }
+
+    @ViewBuilder
+    private func selectedMessages(_ selected: ChatConversation) -> some View {
+        if selected.target != turn.state.target {
+            ProgressView("正在切换会话…").frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            MessageHistoryView(
+                page: model.state.messages,
+                renderer: renderer,
+                turn: turn.state,
+                regenerationID: ChatRegeneration.from(model.state)?.answerID,
+                regenerate: regenerate,
+                actions: actions.state,
+                toggleMessage: actions.toggleMessage,
+                avatar: AvatarPresentation(
+                    images: avatarImages,
+                    resource: avatars.state.resource(for: selected.target),
+                    fallback: .fallback(for: selected.target.mode)
+                ),
+                refresh: model.refreshSelectedConversation,
+                more: model.loadMoreMessages
+            )
+            .id(selected.sessionID)
         }
     }
 

@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -62,7 +61,6 @@ fun AuthScreen(
     }
     Column(
         Modifier
-            .semantics { testTagsAsResourceId = true }
             .fillMaxSize()
             .safeDrawingPadding()
             .imePadding()

@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.coroutines.android)
+    implementation(libs.serialization.json)
 }
 dependencyLocking {
     lockAllConfigurations()

@@ -7,7 +7,16 @@ import SwiftUI
 final class AppModel: ObservableObject {
     @Published private(set) var session: SessionState = .uninitialized
     @Published private(set) var error: String?
-    @Published private(set) var avatarImages: AvatarImageLoader<CGImage>?
+    // Keep the Sendable actor reference separate from Combine's isolated property wrapper.
+    private var avatarImageStorage: AvatarImageLoader<CGImage>?
+    private(set) var avatarImages: AvatarImageLoader<CGImage>? {
+        get { avatarImageStorage }
+        set {
+            objectWillChange.send()
+            avatarImageStorage = newValue
+        }
+    }
+
     let form: AuthFormModel?
     let history: ChatLibraryModel?
     let turn: ChatTurnModel?
@@ -222,8 +231,8 @@ final class AppModel: ObservableObject {
     }
 
     deinit {
-        if let avatarImages {
-            Task { await avatarImages.close() }
+        if let images = avatarImageStorage {
+            Task { await images.close() }
         }
         observation?.cancel()
         formTask?.cancel()
