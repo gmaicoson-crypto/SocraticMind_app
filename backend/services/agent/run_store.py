@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from core.errors import ApiError
 from models import AgentRun
-from models.enums import AgentRunStatus
+from models.enums import AgentRunStatus, AgentRunType
 from .state_machine import transition
 from .structured_ai import StructuredResult
 
@@ -183,3 +183,20 @@ def require_version(db: Session, run: AgentRun, version: int | None) -> None:
             message="流程版本已过期，请刷新后重试",
             retryable=False,
         )
+
+
+def cancel_run(
+    db: Session, *, user_id: int, run_id: str, run_type: AgentRunType | None = None
+) -> AgentRun:
+    run = _load_owned(db, user_id, run_id, for_update=True)
+    if run_type is not None and run.run_type != run_type.value:
+        raise ApiError(status_code=404, code="RUN_NOT_FOUND", message="流程不存在")
+    if run.status == AgentRunStatus.CANCELLED.value:
+        return run
+    run.status = transition(run.status, AgentRunStatus.CANCELLED).value
+    state = deepcopy(run.state_json or {})
+    state["processing"] = False
+    run.state_json = state
+    run.version += 1
+    db.commit()
+    return _load_owned(db, user_id, run_id)

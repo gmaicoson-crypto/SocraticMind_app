@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
-from pydantic import ValidationError
+from pydantic import UUID4, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -40,6 +40,7 @@ from services.agent.orchestrator import (
     update_run_parameters,
 )
 from services.agent.structured_ai import generate_structured
+from services.agent.onboarding_creation import cancel_onboarding
 
 
 router = APIRouter(prefix="/api/agent", tags=["Learning Agent"])
@@ -165,6 +166,18 @@ def create_onboarding_run(
             generator=generator,
             model_id=selected_model(request.model, current_user.id),
         ),
+    )
+
+
+@router.post("/onboarding/{run_id}/cancel", response_model=AgentRunResponse)
+def cancel_onboarding_run(
+    run_id: UUID4,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # Cancellation must work without model configuration, including before creation.
+    return serialize_and_sync(
+        db, cancel_onboarding(db, user_id=current_user.id, run_id=str(run_id))
     )
 
 

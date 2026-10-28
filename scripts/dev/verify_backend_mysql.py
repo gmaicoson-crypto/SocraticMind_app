@@ -23,6 +23,10 @@ TESTS = {
     "test_mysql_confirmation_uses_current_version_despite_old_read_snapshot": "tests/integration/test_mysql_onboarding_recovery.py",
     "test_mysql_cancel_fences_late_onboarding_model_result": "tests/integration/test_mysql_onboarding_recovery.py",
     "test_mysql_cancel_after_creation_commit_preserves_terminal_version": "tests/integration/test_mysql_onboarding_recovery.py",
+    "test_mysql_cancel_wins_despite_creator_old_missing_snapshot": "tests/integration/test_mysql_onboarding_cancellation.py",
+    "test_mysql_create_wins_before_cancel_reservation_insert": "tests/integration/test_mysql_onboarding_cancellation.py",
+    "test_mysql_concurrent_cancel_reservations_return_one_terminal_record": "tests/integration/test_mysql_onboarding_cancellation.py",
+    "test_mysql_onboarding_cancel_fences_inflight_success_and_failure": "tests/integration/test_mysql_onboarding_cancellation.py",
 }
 
 

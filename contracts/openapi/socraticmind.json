@@ -2657,6 +2657,54 @@
         ]
       }
     },
+    "/api/agent/onboarding/{run_id}/cancel": {
+      "post": {
+        "operationId": "cancel_onboarding_run_api_agent_onboarding__run_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid4",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRunResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Cancel Onboarding Run",
+        "tags": [
+          "Learning Agent"
+        ]
+      }
+    },
     "/api/agent/runs/{run_id}": {
       "get": {
         "operationId": "read_run_api_agent_runs__run_id__get",

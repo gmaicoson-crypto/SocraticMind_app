@@ -25,6 +25,7 @@ from .run_store import (
     _load_owned,
     _mark_failed,
     _snapshot,
+    cancel_run as cancel_run,
     get_run as get_run,
     require_version,
 )
@@ -475,19 +476,6 @@ def submit_answer(
     snapshot = _snapshot(run)
     db.commit()
     return _generate_preview(db, snapshot, generator)
-
-
-def cancel_run(db: Session, *, user_id: int, run_id: str) -> AgentRun:
-    run = _load_owned(db, user_id, run_id, for_update=True)
-    if run.status == AgentRunStatus.CANCELLED.value:
-        return run
-    run.status = transition(run.status, AgentRunStatus.CANCELLED).value
-    state = deepcopy(run.state_json or {})
-    state["processing"] = False
-    run.state_json = state
-    run.version += 1
-    db.commit()
-    return _load_owned(db, user_id, run_id)
 
 
 def retry_run(

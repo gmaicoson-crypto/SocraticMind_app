@@ -1,0 +1,15 @@
+{
+  "run_id": "7934d27e-4279-4a41-881a-97fcb93509cb",
+  "response": {
+    "run_id": "7934d27e-4279-4a41-881a-97fcb93509cb",
+    "type": "onboarding",
+    "status": "cancelled",
+    "version": 1,
+    "step": null,
+    "preview": null,
+    "result": null,
+    "error": null,
+    "input": null,
+    "processing": false
+  }
+}

@@ -552,3 +552,21 @@ Android 模块登记变化扩展已登记的纯 JVM 依赖消费者；公共回�
 新增生产文件低于 300 行、测试低于 500 行预警。共享 fixture 279 行仍只负责 HTTP 派发，学习请求断言独立为 50 行文件；没有提高例外上限。请求派发不持有页面状态、不重试写操作，模型 ID 可选且不涉及密钥。详细复用与限制见[新主题实施](onboarding-implementation.md)。
 
 本批没有 backend / 数据库修改，不重跑提供方或 MySQL；没有 APK / IPA / iOS 模拟器应用构建、设备测试、真实模型调用、远端 CI、部署或 push。账号隔离的状态、ID 日志、未知创建安全退出、导航和原生页面仍待接入；GET 404 不能证明在途 POST 已结束。M2 未退出，M3-01、P04 和成品目标保持未完成。
+
+## M3-01 未知创建的安全取消
+
+2026-10-28：基线为已独立核验的双端请求层提交 `2e2864c080d174af8794c3a3434d3457399e5350`。新增 POST `/api/agent/onboarding/{run_id}/cancel`，在创建尚未到达时保存最小取消占位，使用原 AgentRun 主键裁决并发；已有记录复用共享取消事务，迟到成功 / 失败仍不能覆盖取消版本。专用入口无需加载模型配置，旧通用 cancel 行为保持。无数据库迁移，OpenAPI 增至 59 条路径。
+
+| 检查 | 结果与证据 |
+| --- | --- |
+| 后端定向集合 | 128 项通过；`.tools/onboarding-cancel-reports/backend/`，新取消契约十项 |
+| 独立 MySQL | 15 项通过，其中新取消五个场景；`onboarding-cancel-reports/mysql/` |
+| 原生兼容集合 | Android 三类 32 项、Swift 三 suite 18 项通过；`onboarding-cancel-reports/android/` 和 `ios/` |
+| 影响图 / 工具 | 90 项通过；`.tools/onboarding-cancel-python.log` |
+| 固定质量工具 | 八个变化 Python 文件格式 / lint、结构、行数与 diff 检查通过；`.tools/onboarding-cancel-quality.json` |
+
+MySQL 证明创建方旧的“不存在”快照不能绕过取消占位；也覆盖创建先于取消插入、同时取消，以及正在生成时取消后迟到成功 / 失败。HTTP 覆盖取消重放、无模型配置、权限 / 类型隔离、完成保护、UUID / 登录校验及无关插入错误不被吞掉。隔离 harness 仅启动临时 Unix socket 服务，使用明确命名集合；其登记修改扩展了已有迁移 / 生命周期 / 聊天数据库检查，没有全量运行。
+
+orchestrator 688 → 676 行，历史上限同步下降；取消事务集中到 run_store 202 行并保留原调用入口，未重复状态机。agent 路由 310 → 323 行仍仅负责鉴权、UUID、派发与投影，处于预警区；后续按流程拆路由。创建仲裁 110 行、两份新测试均低于各自预警值，没有新增豁免。
+
+最小取消记录需长期保留，不能随客户端清理日志而删除；取消已启动的调用不保证停止上游计费。双端新取消请求、状态日志和页面尚未接入，当前原生结果仅为已提交消费者兼容性。无 APK / IPA / iOS 模拟器应用构建、设备验证、真实模型、远端 CI、部署或 push；M2、M3-01 和成品仍未完成。详见[协议](../contracts/compatibility/onboarding.md)与[实施说明](onboarding-implementation.md)。

@@ -16,6 +16,7 @@ class OnboardingImpactTests(unittest.TestCase):
             "backend/services/agent/onboarding_creation.py",
             "backend/services/assessments.py",
             "contracts/fixtures/onboarding-runs.json",
+            "contracts/fixtures/onboarding-cancellation.json",
         ]:
             with self.subTest(path=path):
                 checks = load_plan(scope(path))["checks"]
@@ -32,7 +33,10 @@ class OnboardingImpactTests(unittest.TestCase):
                     "com.gmaicoson.socraticmind.network.SseContractTest", checks["android"]
                 )
                 self.assertIn("ChatHistoryAPIContractTests", checks["ios"])
-                self.assertEqual(4, len(checks["mysql"]))
+                self.assertEqual(8, len(checks["mysql"]))
+                self.assertIn(
+                    "pytest:tests/contracts/test_onboarding_cancellation.py", checks["python"]
+                )
                 self.assertNotIn("pytest:tests/p0/test_auth_api.py", checks["python"])
 
     def test_mysql_test_only_does_not_expand_unrelated_suites(self):
@@ -44,6 +48,18 @@ class OnboardingImpactTests(unittest.TestCase):
     def test_plan_documents_do_not_run_business_tests(self):
         result = load_plan(scope("docs/m2-evidence-review.md", "docs/onboarding-implementation.md"))
         self.assertTrue(all(not values for values in result["checks"].values()))
+
+    def test_cancel_mysql_test_changes_select_only_its_four_named_methods(self):
+        result = load_plan(scope("backend/tests/integration/test_mysql_onboarding_cancellation.py"))
+        self.assertEqual(4, len(result["checks"]["mysql"]))
+        self.assertTrue(
+            all(
+                "test_mysql_onboarding_cancellation.py::" in item
+                for item in result["checks"]["mysql"]
+            )
+        )
+        for lane in ["python", "android", "ios"]:
+            self.assertFalse(result["checks"][lane])
 
     def test_legacy_chat_test_correction_keeps_its_narrow_scope(self):
         result = load_plan(scope("backend/tests/p0/test_chat_context_edges.py"))

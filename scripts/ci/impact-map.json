@@ -1816,7 +1816,9 @@
         "backend/tests/p0/test_onboarding_recovery.py",
         "backend/tests/contracts/test_onboarding_contract.py",
         "contracts/fixtures/onboarding-runs.json",
-        "backend/tests/p0/test_agent_permissions.py"
+        "backend/tests/p0/test_agent_permissions.py",
+        "backend/tests/contracts/test_onboarding_cancellation.py",
+        "contracts/fixtures/onboarding-cancellation.json"
       ],
       "depends_on": [],
       "checks": {
@@ -1833,7 +1835,8 @@
           "pytest:tests/p0/test_chat_context_edges.py",
           "pytest:tests/p0/test_planning.py",
           "pytest:tests/p0/test_plans_queries.py",
-          "pytest:tests/contracts/test_openapi_contract.py"
+          "pytest:tests/contracts/test_openapi_contract.py",
+          "pytest:tests/contracts/test_onboarding_cancellation.py"
         ],
         "android": [
           "com.gmaicoson.socraticmind.network.SseContractTest",
@@ -1943,6 +1946,26 @@
       },
       "manual": [
         "新主题表单状态、恢复日志、导航与页面尚待接入；不以请求层通过代表宿主或功能验收。"
+      ]
+    },
+    "onboarding-cancel-mysql": {
+      "paths": [
+        "backend/tests/integration/test_mysql_onboarding_cancellation.py"
+      ],
+      "depends_on": [
+        "onboarding-provider",
+        "mysql"
+      ],
+      "checks": {
+        "mysql": [
+          "pytest:tests/integration/test_mysql_onboarding_cancellation.py::test_mysql_cancel_wins_despite_creator_old_missing_snapshot",
+          "pytest:tests/integration/test_mysql_onboarding_cancellation.py::test_mysql_create_wins_before_cancel_reservation_insert",
+          "pytest:tests/integration/test_mysql_onboarding_cancellation.py::test_mysql_concurrent_cancel_reservations_return_one_terminal_record",
+          "pytest:tests/integration/test_mysql_onboarding_cancellation.py::test_mysql_onboarding_cancel_fences_inflight_success_and_failure"
+        ]
+      },
+      "manual": [
+        "未知创建取消需真实 MySQL 独立连接覆盖双方插入竞争、重复取消和迟到成功 / 失败。"
       ]
     }
   },

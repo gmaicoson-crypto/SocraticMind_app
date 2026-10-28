@@ -178,3 +178,9 @@ r2 最终后端 118、工具 85、Swift 主机包 11、隔离 MySQL 十项通过
 Android 31 类 237 项、Swift 28 suite 209 项、工具 89 项通过；新学习测试各七项。Kotlin 七、Swift 七、Python 六个变化文件通过固定格式 / lint，无行数预警。公共回环 fixture、Android settings 和 Swift 共享数字判断按反向依赖扩展命名集合；初轮精确列表补齐新消费者后通过，没有删除断言或放宽未知路径检查。最终原始报告见 `.tools/onboarding-native-reports/`，过程与失败记录使用 `.tools/onboarding-native-*`。
 
 新 Android 模块仅复用已有 Kotlin / serialization / coroutines / JUnit 版本并生成独立 lockfile；无工具升级、后端行为修改或新模型依赖。纯包测试不覆盖原生宿主、页面、恢复日志或生命周期；未运行应用构建，后续边界见[实施状态](execution-status.md)。
+
+## 未知创建取消验证
+
+2026-10-28：onboarding-provider 纳入新的取消契约与合成取消样例；onboarding-cancel-mysql 显式登记四个方法、五个参数化场景。原 MySQL 恢复文件单独变化仍只选自己的四个方法；新文件单独变化只选新的四个方法，提供方变化同时覆盖两组。harness 增加命名登记后，既有迁移、生命周期、历史与用量数据库检查也按依赖保留。
+
+后端 128、隔离 MySQL 15、工具 90 项通过；现有 Android 三类 32 项、Swift 三 suite 18 项通过。八个变化 Python 文件固定格式 / lint 通过，orchestrator 历史上限下调到 676，路由 323 行预警已有职责审查。OpenAPI 59 路径与提供方一致；无工具版本、依赖锁或数据库 schema 变化。原始报告封存于 `.tools/onboarding-cancel-reports/`；新的取消路径仍待原生消费者接入，不以兼容集合代表功能完成。

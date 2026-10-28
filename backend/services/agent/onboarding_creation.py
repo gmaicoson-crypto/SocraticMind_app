@@ -11,12 +11,17 @@ from core.errors import ApiError
 from models import AgentRun
 from models.enums import AgentRunStatus, AgentRunType
 from schemas.agent import OnboardingRequest
-from .run_store import RunSnapshot, _snapshot
+from .run_store import RunSnapshot, _snapshot, cancel_run
 
 
 def _replay(run: AgentRun, user_id: int, fingerprint: str) -> AgentRun:
     if run.user_id != user_id or run.run_type != AgentRunType.ONBOARDING.value:
         raise ApiError(status_code=404, code="RUN_NOT_FOUND", message="流程不存在")
+    if (
+        run.status == AgentRunStatus.CANCELLED.value
+        and (run.state_json or {}).get("creation_cancelled") is True
+    ):
+        return run
     if (run.state_json or {}).get("creation_fingerprint") != fingerprint:
         raise ApiError(
             status_code=409,
@@ -76,3 +81,30 @@ def reserve_onboarding(
             raise
         return _replay(existing, user_id, fingerprint), None
     return run, snapshot
+
+
+def cancel_onboarding(db: Session, *, user_id: int, run_id: str) -> AgentRun:
+    """Persist cancellation even before a delayed create reaches this server.
+
+    Do not lock a missing row: the primary key arbitrates concurrent inserts. If
+    creation wins, roll back the failed insert before locking/cancelling its run.
+    The minimal terminal record must remain while delayed requests are possible.
+    """
+    if db.get(AgentRun, run_id, populate_existing=True) is None:
+        run = AgentRun(
+            id=run_id,
+            user_id=user_id,
+            run_type=AgentRunType.ONBOARDING.value,
+            status=AgentRunStatus.CANCELLED.value,
+            version=1,
+            state_json={"creation_cancelled": True, "processing": False},
+        )
+        db.add(run)
+        try:
+            db.commit()
+            return run
+        except IntegrityError:
+            db.rollback()
+            if db.get(AgentRun, run_id, populate_existing=True) is None:
+                raise
+    return cancel_run(db, user_id=user_id, run_id=run_id, run_type=AgentRunType.ONBOARDING)
