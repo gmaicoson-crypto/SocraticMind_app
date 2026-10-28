@@ -1244,9 +1244,14 @@
     },
     "account-files-android": {
       "paths": [
-        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/AccountFileStorage.kt"
+        "android/core/chat/src/main/kotlin/com/gmaicoson/socraticmind/chat/AccountFileStorage.kt",
+        "android/core/storage/src/main/kotlin/com/gmaicoson/socraticmind/storage/AccountFileStorage.kt",
+        "android/core/storage/build.gradle.kts",
+        "android/core/storage/gradle.lockfile"
       ],
-      "depends_on": [],
+      "depends_on": [
+        "android-dependencies"
+      ],
       "checks": {},
       "manual": [
         "原子文件 IO 在主机临时目录验证；App 私有目录、最低系统、备份排除及设备文件保护另行验收。"
@@ -1305,7 +1310,8 @@
     },
     "account-files-ios": {
       "paths": [
-        "ios/Packages/MindCore/Sources/MindCore/Chat/AccountFileStorage.swift"
+        "ios/Packages/MindCore/Sources/MindCore/Chat/AccountFileStorage.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Storage/AccountFileStorage.swift"
       ],
       "depends_on": [],
       "checks": {},
@@ -1922,7 +1928,7 @@
         ]
       },
       "manual": [
-        "新主题表单状态、恢复日志、导航与页面尚待接入；不以请求层通过代表宿主或功能验收。"
+        "新主题请求、状态和恢复日志有核心验证，表单及宿主导航尚待接入，不代表设备或完整功能验收。"
       ]
     },
     "onboarding-ios": {
@@ -1945,7 +1951,7 @@
         ]
       },
       "manual": [
-        "新主题表单状态、恢复日志、导航与页面尚待接入；不以请求层通过代表宿主或功能验收。"
+        "新主题请求、状态和恢复日志有核心验证，表单及宿主导航尚待接入，不代表设备或完整功能验收。"
       ]
     },
     "onboarding-cancel-mysql": {
@@ -1966,6 +1972,59 @@
       },
       "manual": [
         "未知创建取消需真实 MySQL 独立连接覆盖双方插入竞争、重复取消和迟到成功 / 失败。"
+      ]
+    },
+    "onboarding-state-android": {
+      "paths": [
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/FileOnboardingJournal.kt",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingJournal.kt",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingState.kt",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingController.kt",
+        "android/core/learning/src/test/kotlin/com/gmaicoson/socraticmind/learning/OnboardingTestSupport.kt",
+        "android/core/learning/src/test/kotlin/com/gmaicoson/socraticmind/learning/OnboardingControllerTest.kt",
+        "android/core/learning/src/test/kotlin/com/gmaicoson/socraticmind/learning/FileOnboardingJournalTest.kt"
+      ],
+      "depends_on": [
+        "onboarding-android",
+        "session-android",
+        "account-files-android"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.learning.OnboardingControllerTest",
+          "com.gmaicoson.socraticmind.learning.FileOnboardingJournalTest"
+        ]
+      },
+      "manual": [
+        "学习流程状态和ID日志已接入核心，页面/宿主、进程终止、文件保护和设备行为待单独验收。"
+      ]
+    },
+    "onboarding-state-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Learning/FileOnboardingJournal.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingJournal.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingState.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingModel.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/OnboardingTestSupport.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/OnboardingModelTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/FileOnboardingJournalTests.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/SessionTestDoubles.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatTurnTestDoubles.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/ChatLibraryTestDoubles.swift"
+      ],
+      "depends_on": [
+        "onboarding-ios",
+        "session-ios",
+        "account-files-ios"
+      ],
+      "checks": {
+        "ios": [
+          "OnboardingModelTests",
+          "FileOnboardingJournalTests"
+        ]
+      },
+      "manual": [
+        "学习流程状态和ID日志已接入核心，页面/宿主、进程终止、文件保护和设备行为待单独验收。"
       ]
     }
   },

@@ -10,6 +10,8 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 dependencies {
+    implementation(project(":core:auth"))
+    implementation(project(":core:storage"))
     implementation(project(":core:network"))
     implementation(libs.serialization.json)
     implementation(libs.coroutines.core)

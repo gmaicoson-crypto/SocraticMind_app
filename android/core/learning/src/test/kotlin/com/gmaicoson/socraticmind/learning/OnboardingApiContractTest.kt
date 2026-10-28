@@ -27,6 +27,22 @@ class OnboardingApiContractTest {
     private val form = decodeForm(data.getValue("request"))
 
     @Test
+    fun `cancel before creation decodes terminal reservation through new HTTP path`() =
+        runBlocking {
+            val fixture = fixture("onboarding-cancellation.json")
+            val reserved = OnboardingID(fixture.text("run_id", 36))
+            LoopbackFixture().use { server ->
+                HttpTransport(server.endpoint).use { transport ->
+                    val run = OnboardingApi(transport).cancel("onboarding-cancel-before-create", reserved)
+                    assertEquals(OnboardingStatus.CANCELLED, run.status)
+                    assertEquals(1, run.version)
+                    assertNull(run.input)
+                    assertEquals(reserved, run.id)
+                }
+            }
+        }
+
+    @Test
     fun `provider states project diagnosis preview and terminal results`() {
         val responses = data.getValue("responses").obj()
         for ((_, value) in responses) {

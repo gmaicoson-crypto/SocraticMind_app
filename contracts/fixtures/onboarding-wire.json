@@ -653,7 +653,7 @@
     {
       "id": "cancel",
       "method": "POST",
-      "path": "/api/agent/runs/31e38ecf-638c-4b16-89da-3ee35d576137/cancel",
+      "path": "/api/agent/onboarding/31e38ecf-638c-4b16-89da-3ee35d576137/cancel",
       "body": null,
       "response": {
         "run_id": "31e38ecf-638c-4b16-89da-3ee35d576137",
@@ -782,6 +782,25 @@
         "retryable": false
       },
       "status": 409
+    },
+    {
+      "id": "cancel-before-create",
+      "method": "POST",
+      "path": "/api/agent/onboarding/7934d27e-4279-4a41-881a-97fcb93509cb/cancel",
+      "body": null,
+      "status": 200,
+      "response": {
+        "run_id": "7934d27e-4279-4a41-881a-97fcb93509cb",
+        "type": "onboarding",
+        "status": "cancelled",
+        "version": 1,
+        "step": null,
+        "preview": null,
+        "result": null,
+        "error": null,
+        "input": null,
+        "processing": false
+      }
     }
   ],
   "invalid": [

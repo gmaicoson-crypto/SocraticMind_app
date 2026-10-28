@@ -154,7 +154,7 @@ class OnboardingApi(
     override suspend fun cancel(
         token: String,
         id: OnboardingID,
-    ) = request("POST", token, id, "/cancel")
+    ) = decode(transport.request("POST", "api/agent/onboarding/${id.value}/cancel", bearer = token), id)
 
     override suspend fun retry(
         token: String,

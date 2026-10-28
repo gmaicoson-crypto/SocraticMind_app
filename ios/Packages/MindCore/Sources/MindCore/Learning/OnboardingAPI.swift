@@ -77,7 +77,9 @@ public struct OnboardingAPI: OnboardingGateway {
     }
 
     public func cancel(token: String, id: OnboardingID) async throws -> OnboardingRun {
-        try await request("POST", token: token, id: id, suffix: "/cancel")
+        let data = try await transport.request(method: "POST", path: "api/agent/onboarding/\(id.value)/cancel",
+                                               bearer: token)
+        return try OnboardingRun.decode(data, expected: id)
     }
 
     public func retry(token: String, id: OnboardingID, version: Int) async throws -> OnboardingRun {

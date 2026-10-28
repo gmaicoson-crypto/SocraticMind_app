@@ -27,4 +27,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "SocraticMind"
-include(":app", ":core:network", ":core:auth", ":core:chat", ":core:learning", ":uitests")
+include(":app", ":core:network", ":core:auth", ":core:chat", ":core:learning", ":core:storage", ":uitests")

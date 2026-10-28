@@ -1,4 +1,4 @@
-package com.gmaicoson.socraticmind.chat
+package com.gmaicoson.socraticmind.storage
 
 import java.io.File
 import java.io.FileOutputStream
@@ -7,7 +7,7 @@ import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 
 /** Bounded atomic IO shared by account records. The calling repository owns synchronization and schema. */
-internal class AccountFileStorage(
+class AccountFileStorage(
     directory: File,
     endpointScope: String,
     namespace: String,

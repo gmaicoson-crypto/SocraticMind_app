@@ -2,7 +2,7 @@ import Foundation
 @testable import MindCore
 import Testing
 
-private func onboardingFixture(_ name: String) throws -> LearningRow {
+func onboardingFixture(_ name: String) throws -> LearningRow {
     var root = URL(fileURLWithPath: #filePath)
     for _ in 0 ..< 6 {
         root.deleteLastPathComponent()
@@ -11,13 +11,23 @@ private func onboardingFixture(_ name: String) throws -> LearningRow {
     return try LearningRow(JSONSerialization.jsonObject(with: data))
 }
 
-private func decodeRun(_ raw: Any?, id: OnboardingID? = nil) throws -> OnboardingRun {
+func decodeRun(_ raw: Any?, id: OnboardingID? = nil) throws -> OnboardingRun {
     let row = try LearningRow(raw)
     let expected = try id ?? OnboardingID(row.text("run_id", 36))
     return try OnboardingRun.decode(JSONSerialization.data(withJSONObject: row.values), expected: expected)
 }
 
 struct OnboardingAPIContractTests {
+    @Test
+    func cancelBeforeCreationUsesNewPathAndAcceptsMinimalTerminalRecord() async throws {
+        let fixture = try onboardingFixture("onboarding-cancellation.json")
+        let id = try OnboardingID(fixture.text("run_id", 36))
+        let server = try LoopbackFixture(); defer { server.close() }
+        let transport = try HTTPTransport(endpoint: server.endpoint); defer { transport.close() }
+        let run = try await OnboardingAPI(transport: transport).cancel(token: "onboarding-cancel-before-create", id: id)
+        #expect(run.id == id && run.status == .cancelled && run.version == 1 && run.input == nil)
+    }
+
     @Test
     func providerStatesProjectDiagnosisPreviewAndTerminalResults() throws {
         let data = try onboardingFixture("onboarding-runs.json")

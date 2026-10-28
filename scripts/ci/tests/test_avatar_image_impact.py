@@ -155,6 +155,8 @@ class AvatarImageImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatAvatarStoreTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
+                "com.gmaicoson.socraticmind.learning.FileOnboardingJournalTest",
+                "com.gmaicoson.socraticmind.learning.OnboardingControllerTest",
             ],
             result["checks"]["android"],
         )

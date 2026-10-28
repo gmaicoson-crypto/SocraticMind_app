@@ -43,7 +43,7 @@ class ImpactTests(unittest.TestCase):
             "android/core/network/src/main/kotlin/com/gmaicoson/socraticmind/network/SseDecoder.kt"
         )
         result = load_plan(scope(value))
-        self.assertEqual(29, len(result["checks"]["android"]))
+        self.assertEqual(31, len(result["checks"]["android"]))
         self.assertIn(
             "com.gmaicoson.socraticmind.learning.OnboardingApiContractTest",
             result["checks"]["android"],
@@ -83,6 +83,8 @@ class ImpactTests(unittest.TestCase):
                 "com.gmaicoson.socraticmind.chat.ChatTitleRefreshTest",
                 "com.gmaicoson.socraticmind.chat.ChatTurnControllerTest",
                 "com.gmaicoson.socraticmind.chat.FileChatTurnJournalTest",
+                "com.gmaicoson.socraticmind.learning.FileOnboardingJournalTest",
+                "com.gmaicoson.socraticmind.learning.OnboardingControllerTest",
             ],
             result["checks"]["android"],
         )
@@ -104,7 +106,9 @@ class ImpactTests(unittest.TestCase):
                 "ChatTitleRefreshTests",
                 "ChatTurnModelTests",
                 "FileChatTurnJournalTests",
+                "FileOnboardingJournalTests",
                 "KeychainTokenVaultTests",
+                "OnboardingModelTests",
                 "SessionStoreTests",
             ],
             result["checks"]["ios"],
@@ -155,7 +159,7 @@ class ImpactTests(unittest.TestCase):
             "ios/SocraticMind.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
         ]:
             result = load_plan(scope(value))
-            self.assertEqual(31, len(result["checks"]["ios"]))
+            self.assertEqual(33, len(result["checks"]["ios"]))
             self.assertIn("OnboardingAPIContractTests", result["checks"]["ios"])
             self.assertIn("MarkdownContractTests", result["checks"]["ios"])
             self.assertEqual(

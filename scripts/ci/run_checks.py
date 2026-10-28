@@ -93,7 +93,9 @@ def android_tests(selectors: list[str]) -> None:
     )
     tasks = [line.split()[0] for line in result.stdout.splitlines() if line.startswith(":")]
     if not tasks or any(
-        not task.startswith((":core:network:", ":core:auth:", ":core:chat:", ":core:learning:"))
+        not task.startswith(
+            (":core:network:", ":core:auth:", ":core:chat:", ":core:learning:", ":core:storage:")
+        )
         for task in tasks
     ):
         raise ValueError("Unexpected task outside registered pure JVM modules")

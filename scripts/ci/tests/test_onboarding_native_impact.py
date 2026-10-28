@@ -24,7 +24,14 @@ class OnboardingNativeImpactTests(unittest.TestCase):
             ),
         ]:
             checks = load_plan(scope(path))["checks"]
-            self.assertEqual([expected], checks[lane])
+            related = {
+                "android": [
+                    "com.gmaicoson.socraticmind.learning.FileOnboardingJournalTest",
+                    "com.gmaicoson.socraticmind.learning.OnboardingControllerTest",
+                ],
+                "ios": ["FileOnboardingJournalTests", "OnboardingModelTests"],
+            }
+            self.assertEqual(sorted([expected, *related[lane]]), checks[lane])
             for other in {"python", "mysql", "android", "ios"} - {lane}:
                 self.assertFalse(checks[other])
 
@@ -35,9 +42,21 @@ class OnboardingNativeImpactTests(unittest.TestCase):
         ]:
             checks = load_plan(scope(path))["checks"]
             self.assertEqual(
-                ["com.gmaicoson.socraticmind.learning.OnboardingApiContractTest"], checks["android"]
+                [
+                    "com.gmaicoson.socraticmind.learning.FileOnboardingJournalTest",
+                    "com.gmaicoson.socraticmind.learning.OnboardingApiContractTest",
+                    "com.gmaicoson.socraticmind.learning.OnboardingControllerTest",
+                ],
+                checks["android"],
             )
-            self.assertEqual(["OnboardingAPIContractTests"], checks["ios"])
+            self.assertEqual(
+                [
+                    "FileOnboardingJournalTests",
+                    "OnboardingAPIContractTests",
+                    "OnboardingModelTests",
+                ],
+                checks["ios"],
+            )
             self.assertFalse(checks["python"])
             self.assertFalse(checks["mysql"])
 
@@ -61,10 +80,43 @@ class OnboardingNativeImpactTests(unittest.TestCase):
         self.assertTrue(provider["python"])
         self.assertTrue(provider["mysql"])
 
+    def test_shared_storage_move_selects_chat_and_learning_without_provider(self):
+        for path, lane, names in [
+            (
+                "android/core/storage/src/main/kotlin/com/gmaicoson/socraticmind/storage/AccountFileStorage.kt",
+                "android",
+                [
+                    "FileChatAvatarStoreTest",
+                    "FileChatTurnJournalTest",
+                    "FileOnboardingJournalTest",
+                    "OnboardingControllerTest",
+                ],
+            ),
+            (
+                "ios/Packages/MindCore/Sources/MindCore/Storage/AccountFileStorage.swift",
+                "ios",
+                [
+                    "FileChatAvatarStoreTests",
+                    "FileChatTurnJournalTests",
+                    "FileOnboardingJournalTests",
+                    "OnboardingModelTests",
+                ],
+            ),
+        ]:
+            checks = load_plan(scope(path))["checks"]
+            for name in names:
+                self.assertTrue(any(item.endswith(name) for item in checks[lane]))
+            for other in {"python", "mysql", "android", "ios"} - {lane}:
+                self.assertFalse(checks[other])
+
     def test_learning_runner_checks_jvm_graph_before_execution(self):
         selector = ["com.gmaicoson.socraticmind.learning.OnboardingApiContractTest"]
         for graph, allowed in [
-            (":core:network:jar SKIPPED\n:core:learning:test SKIPPED", True),
+            (
+                ":core:network:jar SKIPPED\n:core:storage:jar SKIPPED\n:core:learning:test SKIPPED",
+                True,
+            ),
+            (":core:storage:assemble SKIPPED", False),
             (":core:learning:assemble SKIPPED", False),
             (":app:assembleDebug SKIPPED", False),
             (":core:unknown:test SKIPPED", False),
