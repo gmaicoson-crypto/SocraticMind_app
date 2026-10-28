@@ -314,7 +314,8 @@
           "unittest:scripts.ci.tests.test_model_selection_impact",
           "unittest:scripts.ci.tests.test_chat_impact",
           "unittest:scripts.ci.tests.test_chat_feedback_impact",
-          "unittest:scripts.ci.tests.test_onboarding_impact"
+          "unittest:scripts.ci.tests.test_onboarding_impact",
+          "unittest:scripts.ci.tests.test_onboarding_native_impact"
         ]
       },
       "manual": []
@@ -627,7 +628,8 @@
         "history-provider",
         "history-native-fixtures",
         "http-ios",
-        "feedback-provider"
+        "feedback-provider",
+        "json-scalar-ios"
       ],
       "checks": {
         "ios": [
@@ -1762,7 +1764,8 @@
         "ios/Packages/MindCore/Sources/MindCore/Chat/ChatFeedbackJSON.swift"
       ],
       "depends_on": [
-        "feedback-provider"
+        "feedback-provider",
+        "json-scalar-ios"
       ],
       "checks": {},
       "manual": []
@@ -1876,6 +1879,71 @@
         ]
       },
       "manual": []
+    },
+    "json-scalar-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Networking/JSONScalar.swift"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "onboarding-native-fixture": {
+      "paths": [
+        "contracts/fixtures/onboarding-wire.json",
+        "scripts/contracts/onboarding_fixture.py"
+      ],
+      "depends_on": [],
+      "checks": {},
+      "manual": []
+    },
+    "onboarding-android": {
+      "paths": [
+        "android/core/learning/build.gradle.kts",
+        "android/core/learning/gradle.lockfile",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingRun.kt",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingApi.kt",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingForm.kt",
+        "android/core/learning/src/main/kotlin/com/gmaicoson/socraticmind/learning/OnboardingWire.kt",
+        "android/core/learning/src/test/kotlin/com/gmaicoson/socraticmind/learning/OnboardingApiContractTest.kt"
+      ],
+      "depends_on": [
+        "onboarding-provider",
+        "onboarding-native-fixture",
+        "http-android",
+        "android-dependencies"
+      ],
+      "checks": {
+        "android": [
+          "com.gmaicoson.socraticmind.learning.OnboardingApiContractTest"
+        ]
+      },
+      "manual": [
+        "新主题表单状态、恢复日志、导航与页面尚待接入；不以请求层通过代表宿主或功能验收。"
+      ]
+    },
+    "onboarding-ios": {
+      "paths": [
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingForm.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingAPI.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingRun.swift",
+        "ios/Packages/MindCore/Sources/MindCore/Learning/OnboardingWire.swift",
+        "ios/Packages/MindCore/Tests/MindCoreTests/OnboardingAPIContractTests.swift"
+      ],
+      "depends_on": [
+        "onboarding-provider",
+        "onboarding-native-fixture",
+        "http-ios",
+        "json-scalar-ios"
+      ],
+      "checks": {
+        "ios": [
+          "OnboardingAPIContractTests"
+        ]
+      },
+      "manual": [
+        "新主题表单状态、恢复日志、导航与页面尚待接入；不以请求层通过代表宿主或功能验收。"
+      ]
     }
   },
   "metadata": [

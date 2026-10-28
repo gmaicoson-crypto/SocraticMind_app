@@ -18,6 +18,7 @@ from chat_suggestions_fixture import response as suggestions_response
 from chat_turn_fixture import frames as turn_frames
 from chat_turn_fixture import response as turn_response
 from model_selection_fixture import response as model_response
+from onboarding_fixture import handle as onboarding_handle
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +56,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        if onboarding_handle(self, "GET", RUNS, LOCK):
+            return
         if avatar_resource(self, RUNS, LOCK):
             return
         url = urlsplit(self.path)
@@ -107,12 +110,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_PUT(self):
         self.chat_action("PUT")
 
+    def do_PATCH(self):
+        if not onboarding_handle(self, "PATCH", RUNS, LOCK):
+            self.send_error(501, "Unsupported method")
+
     def do_DELETE(self):
         if avatar_mutation(self, "DELETE", RUNS, LOCK):
             return
         self.chat_action("DELETE")
 
     def do_POST(self):
+        if onboarding_handle(self, "POST", RUNS, LOCK):
+            return
         if avatar_mutation(self, "POST", RUNS, LOCK):
             return
         if self.path == "/fresh-mutation" and getattr(self, "drop_next_mutation", False):

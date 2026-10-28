@@ -170,3 +170,11 @@ Android 29 类 209 项、Swift 29 suite 210 项、工具 86 项通过。双端�
 r2 最终后端 118、工具 85、Swift 主机包 11、隔离 MySQL 十项通过。Android JVM 两类 25 项首轮通过；r2 未修改其代码 / 输入，命名 Gradle 任务为 UP-TO-DATE，原始报告保留。十三个 Python 文件格式 / lint、变化文件规模和 OpenAPI 58 路径通过。历史 orchestrator / assessments 上限下调至 688 / 528，路由 310 行预警已审查。
 
 首轮两项旧测试失败均在未改基线 `c7d5ed8` 复现，修正旧图样例与 ORM 缓存断言并保留无效图保护用例，相关两文件十六项补验通过。r1 审查未通过：提交后快照可能吸收取消版本、历史 null 会让新增投影抛错。r2 修正后补充 after_commit 的真实 MySQL 成功 / 失败回写保护及三种旧字段 HTTP 回归，重新运行明确的受影响集合。初次失败、探针和修复证据不删除，最终结果见 `.tools/onboarding-provider-r2-results.json`。没有应用构建、设备测试或真实模型调用。
+
+## 双端学习协议验证
+
+2026-10-28：onboarding-android / onboarding-ios 显式登记独立学习类型、请求和测试；onboarding-native-fixture 只选择双端请求消费者，提供方状态样例仍保留 backend / MySQL 关联。json-scalar-ios 关联学习、用量及历史消费者。执行器新增 learning 纯 JVM 模块白名单，仍先 dry-run 检查实际任务图，拒绝 assemble、未知模块及应用打包任务。
+
+Android 31 类 237 项、Swift 28 suite 209 项、工具 89 项通过；新学习测试各七项。Kotlin 七、Swift 七、Python 六个变化文件通过固定格式 / lint，无行数预警。公共回环 fixture、Android settings 和 Swift 共享数字判断按反向依赖扩展命名集合；初轮精确列表补齐新消费者后通过，没有删除断言或放宽未知路径检查。最终原始报告见 `.tools/onboarding-native-reports/`，过程与失败记录使用 `.tools/onboarding-native-*`。
+
+新 Android 模块仅复用已有 Kotlin / serialization / coroutines / JUnit 版本并生成独立 lockfile；无工具升级、后端行为修改或新模型依赖。纯包测试不覆盖原生宿主、页面、恢复日志或生命周期；未运行应用构建，后续边界见[实施状态](execution-status.md)。

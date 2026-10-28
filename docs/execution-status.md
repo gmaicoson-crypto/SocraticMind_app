@@ -534,3 +534,21 @@ r1 冻结审查发现两项阻断问题，未提交：创建提交后才读取�
 变化十三个 Python 文件固定格式 / lint、结构与行数检查通过。路由 310 行预警，orchestrator / assessments 历史上限下调至 688 / 528，职责结论见实施说明。CI 只选择列明的受影响测试；MySQL 十项包含四个新测试方法的五个场景，以及修改 harness 影响到的五个既有用例。
 
 原始日志、首次失败、基线对照、补验及最终报告在 `.tools/onboarding-provider-*`，冻结审查 probe 在 `.tools/onboarding-r2-probe*`。新流程仍缺少原生页面、标识存储及生命周期验证；同步请求在服务进程中断后可能保留 processing，需用户取消后明确新建，不自动追加模型调用。本批未构建应用、运行设备测试、调用真实模型、部署或 push；M3-01 和成品目标保持未完成。
+
+## M3-01 双端学习协议与请求层
+
+2026-10-28：开发会话已独立核验提供方提交 `c1f3602d18cfb0ae6ff11fb1a8abed1be3aa6a34` 的父提交、24 个文件 / 46 份证据及干净状态。本批复用该协议和现有鉴权 HTTPTransport，增加 Android 纯 JVM learning 模块、Swift Learning 类型与七类请求，未接入新主题宿主页面。Swift 严格整数判断从既有用量解析提取并复用，避免版本被浮点 / 布尔值冒充。
+
+| 检查 | 结果与证据 |
+| --- | --- |
+| 新学习契约 | 双端各七项；七种提供方状态、十三种 HTTP 请求 / 错误、二十六组非法原始 JSON、三种兼容响应 |
+| Android 受影响集合 | 31 类 237 项通过，零失败 / 跳过；`.tools/onboarding-native-reports/android/` |
+| Swift 受影响集合 | 28 suite 209 项通过，零失败 / 跳过；`.tools/onboarding-native-reports/ios/` |
+| 工具 / 影响图 | 89 项通过；`.tools/onboarding-native-python-final.log` |
+| 固定质量工具 | Kotlin 七、Swift 七、Python 六个变化文件格式 / lint、结构、行数与 diff 检查通过；`.tools/onboarding-native-quality.json` |
+
+Android 模块登记变化扩展已登记的纯 JVM 依赖消费者；公共回环 fixture 与 Swift 数字读取变化扩展相关 HTTP / 用量 / 历史消费者。仍为命名测试集合，未改为全量测试。初轮 Swift 测试编译缺少 try、Kotlin 排版及三处旧影响图消费者断言已修正；初轮日志保留，最终报告汇总在 `.tools/onboarding-native-results.json`。新增模块使用现有版本目录并提交独立依赖锁，无新第三方版本。
+
+新增生产文件低于 300 行、测试低于 500 行预警。共享 fixture 279 行仍只负责 HTTP 派发，学习请求断言独立为 50 行文件；没有提高例外上限。请求派发不持有页面状态、不重试写操作，模型 ID 可选且不涉及密钥。详细复用与限制见[新主题实施](onboarding-implementation.md)。
+
+本批没有 backend / 数据库修改，不重跑提供方或 MySQL；没有 APK / IPA / iOS 模拟器应用构建、设备测试、真实模型调用、远端 CI、部署或 push。账号隔离的状态、ID 日志、未知创建安全退出、导航和原生页面仍待接入；GET 404 不能证明在途 POST 已结束。M2 未退出，M3-01、P04 和成品目标保持未完成。

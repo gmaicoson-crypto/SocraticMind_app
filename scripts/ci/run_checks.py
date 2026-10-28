@@ -76,7 +76,9 @@ def python_tests(selectors: list[str], mysql: bool = False) -> None:
 def android_tests(selectors: list[str]) -> None:
     modules = {}
     for item in selectors:
-        match = re.fullmatch(r"com\.gmaicoson\.socraticmind\.(network|auth|chat)\.\w+Test", item)
+        match = re.fullmatch(
+            r"com\.gmaicoson\.socraticmind\.(network|auth|chat|learning)\.\w+Test", item
+        )
         if not match:
             raise ValueError("Register explicit pure JVM test classes before adding another module")
         modules.setdefault(match.group(1), []).append(item)
@@ -91,7 +93,8 @@ def android_tests(selectors: list[str]) -> None:
     )
     tasks = [line.split()[0] for line in result.stdout.splitlines() if line.startswith(":")]
     if not tasks or any(
-        not task.startswith((":core:network:", ":core:auth:", ":core:chat:")) for task in tasks
+        not task.startswith((":core:network:", ":core:auth:", ":core:chat:", ":core:learning:"))
+        for task in tasks
     ):
         raise ValueError("Unexpected task outside registered pure JVM modules")
     if any(

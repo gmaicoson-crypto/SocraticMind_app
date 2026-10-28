@@ -1,4 +1,3 @@
-import CoreFoundation
 import Foundation
 
 /// Foundation's typed integer decoder also accepts 42.0. Keep JSON number types for optional usage.
@@ -18,11 +17,8 @@ enum ChatFeedbackJSON {
               let usage = object["usage"] as? [String: Any] else { return nil }
         var fields: [String: ChatJSONValue] = [:]
         for name in ["prompt_tokens", "completion_tokens", "total_tokens"] {
-            guard let number = usage[name] as? NSNumber,
-                  CFGetTypeID(number) != CFBooleanGetTypeID(),
-                  ["c", "C", "s", "S", "i", "I", "l", "L", "q", "Q"].contains(String(cString: number.objCType)),
-                  number.decimalValue >= 0, number.decimalValue <= 9_007_199_254_740_991 else { return nil }
-            fields[name] = .integer(number.int64Value)
+            guard let number = JSONScalar.integer(usage[name], in: 0 ... 9_007_199_254_740_991) else { return nil }
+            fields[name] = .integer(number)
         }
         guard ReportedTokenUsage.decode(.object(fields)) != nil else { return nil }
         return .object(fields)
